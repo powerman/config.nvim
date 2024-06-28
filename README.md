@@ -1,25 +1,18 @@
-# kickstart-modular.nvim
+# ~/.config/nvim
 
 ## Introduction
 
-*This is a fork of [nvim-lua/kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) that moves from a single file to a multi file configuration.*
+This is my Neovim config.
 
-A starting point for Neovim that is:
-
-* Small
-* Modular
-* Completely Documented
-
-**NOT** a Neovim distribution, but instead a starting point for your configuration.
+It was started as a fork of [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim).
 
 ## Installation
 
 ### Install Neovim
 
-Kickstart.nvim targets *only* the latest
-['stable'](https://github.com/neovim/neovim/releases/tag/stable) and latest
-['nightly'](https://github.com/neovim/neovim/releases/tag/nightly) of Neovim.
-If you are experiencing issues, please make sure you have the latest versions.
+Config.nvim targets *only* the latest
+['stable'](https://github.com/neovim/neovim/releases/tag/stable) Neovim.
+If you are experiencing issues, please make sure you have the latest version.
 
 ### Install External Dependencies
 
@@ -34,11 +27,7 @@ External Requirements:
   - If want to write Golang, you will need `go`
   - etc.
 
-> **NOTE**
-> See [Install Recipes](#Install-Recipes) for additional Windows and Linux specific notes
-> and quick install snippets
-
-### Install Kickstart
+### Install Config
 
 > **NOTE**
 > [Backup](#FAQ) your previous configuration (if any exists)
@@ -48,8 +37,6 @@ Neovim's configurations are located under the following paths, depending on your
 | OS | PATH |
 | :- | :--- |
 | Linux, MacOS | `$XDG_CONFIG_HOME/nvim`, `~/.config/nvim` |
-| Windows (cmd)| `%userprofile%\AppData\Local\nvim\` |
-| Windows (powershell)| `$env:USERPROFILE\AppData\Local\nvim\` |
 
 #### Recommended Step
 
@@ -59,9 +46,9 @@ fork to your machine using one of the commands below, depending on your OS.
 
 > **NOTE**
 > Your fork's url will be something like this:
-> `https://github.com/<your_github_username>/kickstart-modular.nvim.git`
+> `https://github.com/<your_github_username>/config.nvim.git`
 
-#### Clone kickstart.nvim
+#### Clone config.nvim
 > **NOTE**
 > If following the recommended step above (i.e., forking the repo), replace
 > `dam9000` with `<your_github_username>` in the commands below
@@ -69,7 +56,7 @@ fork to your machine using one of the commands below, depending on your OS.
 <details><summary> Linux and Mac </summary>
 
 ```sh
-git clone https://github.com/dam9000/kickstart-modular.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
+git clone https://github.com/powerman/config.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
 ```
 
 </details>
@@ -79,13 +66,13 @@ git clone https://github.com/dam9000/kickstart-modular.nvim.git "${XDG_CONFIG_HO
 If you're using `cmd.exe`:
 
 ```
-git clone https://github.com/dam9000/kickstart-modular.nvim.git %userprofile%\AppData\Local\nvim\
+git clone https://github.com/powerman/config.nvim.git %userprofile%\AppData\Local\nvim\
 ```
 
 If you're using `powershell.exe`
 
 ```
-git clone https://github.com/dam9000/kickstart-modular.nvim.git $env:USERPROFILE\AppData\Local\nvim\
+git clone https://github.com/powerman/config.nvim.git $env:USERPROFILE\AppData\Local\nvim\
 ```
 
 </details>
@@ -101,10 +88,6 @@ nvim
 That's it! Lazy will install all the plugins you have. Use `:Lazy` to view
 current plugin status. Hit `q` to close the window.
 
-Read through the `init.lua` file in your configuration folder for more
-information about extending and exploring Neovim. That also includes
-examples of adding popularly requested plugins.
-
 
 ### Getting Started
 
@@ -116,38 +99,25 @@ examples of adding popularly requested plugins.
   * You should back it up and then delete all associated files.
   * This includes your existing init.lua and the neovim files in `~/.local`
     which can be deleted with `rm -rf ~/.local/share/nvim/`
-* Can I keep my existing configuration in parallel to kickstart?
+* Can I keep my existing configuration in parallel?
   * Yes! You can use [NVIM_APPNAME](https://neovim.io/doc/user/starting.html#%24NVIM_APPNAME)`=nvim-NAME`
-    to maintain multiple configurations. For example, you can install the kickstart
-    configuration in `~/.config/nvim-kickstart` and create an alias:
+    to maintain multiple configurations. For example, you can install the
+    configuration in `~/.config/nvim-powerman` and create an alias:
     ```
-    alias nvim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
+    alias nvim-powerman='NVIM_APPNAME="nvim-powerman" nvim'
     ```
-    When you run Neovim using `nvim-kickstart` alias it will use the alternative
+    When you run Neovim using `nvim-powerman` alias it will use the alternative
     config directory and the matching local directory
-    `~/.local/share/nvim-kickstart`. You can apply this approach to any Neovim
+    `~/.local/share/nvim-powerman`. You can apply this approach to any Neovim
     distribution that you would like to try out.
 * What if I want to "uninstall" this configuration:
   * See [lazy.nvim uninstall](https://github.com/folke/lazy.nvim#-uninstalling) information
-* Why is the kickstart `init.lua` a single file? Wouldn't it make sense to split it into multiple files?
-  * The main purpose of kickstart is to serve as a teaching tool and a reference
-    configuration that someone can easily use to `git clone` as a basis for their own.
-    As you progress in learning Neovim and Lua, you might consider splitting `init.lua`
-    into smaller parts. A fork of kickstart that does this while maintaining the 
-    same functionality is available here:
-    * [kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim)
-  * *NOTE: This is the fork that splits the configuration into smaller parts.*
-    The original repo with the single `init.lua` file is available here:
-    * [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
-  * Discussions on this topic can be found here:
-    * [Restructure the configuration](https://github.com/nvim-lua/kickstart.nvim/issues/218)
-    * [Reorganize init.lua into a multi-file setup](https://github.com/nvim-lua/kickstart.nvim/pull/473)
 
 ### Install Recipes
 
 Below you can find OS specific install instructions for Neovim and dependencies.
 
-After installing all the dependencies continue with the [Install Kickstart](#Install-Kickstart) step.
+After installing all the dependencies continue with the [Install Config](#Install-Config) step.
 
 #### Windows Installation
 
@@ -231,4 +201,3 @@ sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
 ```
 </details>
-
