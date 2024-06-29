@@ -3,7 +3,7 @@
 -- For more options, you can see `:help option-list`.
 
 -- Make line numbers default.
-vim.opt.number = true
+-- vim.opt.number = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
