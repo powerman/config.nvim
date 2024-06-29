@@ -8,8 +8,8 @@ return {
         },
         opts = {
             signs = false,
-            -- Remove space after doublewidth icons to fix "Vim:E239: Invalid sign text".
-            -- Replace TEST icon because original one is missing from my fonts.
+            -- Removed space after doublewidth icons to fix "Vim:E239: Invalid sign text".
+            -- Replaced TEST icon because original one is missing from my fonts.
             keywords = {
                 FIX = { icon = '' },
                 TODO = { icon = '' },
@@ -20,5 +20,16 @@ return {
                 TEST = { icon = '󰝖' },
             },
         },
+        config = function(_, opts)
+            require('todo-comments').setup(opts)
+
+            vim.keymap.set('n', ']t', function()
+                require('todo-comments').jump_next()
+            end, { desc = 'Next [t]odo comment' })
+
+            vim.keymap.set('n', '[t', function()
+                require('todo-comments').jump_prev()
+            end, { desc = 'Previous [t]odo comment' })
+        end,
     },
 }
