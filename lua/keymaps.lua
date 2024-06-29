@@ -4,6 +4,20 @@
 -- Undo Neovim's default mapping. See `:help Y-default`.
 -- vim.keymap.del('n', 'Y')
 
+-- Add hotkey to save current buffer: <F2>.
+vim.keymap.set('n', '<F2>', ':w<CR>', { desc = 'Save current buffer' })
+vim.keymap.set('v', '<F2>', '<Esc>:w<CR>gv', { desc = 'Save current buffer' })
+vim.keymap.set('i', '<F2>', '<C-O>:w<CR>', { desc = 'Save current buffer' })
+
+-- Add hotkey to toggle wrap: <F5>.
+vim.keymap.set('n', '<F5>', ':set wrap!<CR>', { desc = 'Toggle wrap' })
+vim.keymap.set('i', '<F5>', '<C-O>:set wrap!<CR>', { desc = 'Toggle wrap' })
+
+-- Add hotkey to quit if no unsaved changes: <F10>.
+vim.keymap.set('n', '<F10>', ':qa<CR>', { desc = 'Quit if no unsaved changes' })
+vim.keymap.set('v', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
+vim.keymap.set('i', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
+
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
