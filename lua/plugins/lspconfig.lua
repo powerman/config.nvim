@@ -1,3 +1,39 @@
+local extra_lsp_augroup = vim.api.nvim_create_augroup('extra-lsp', { clear = true })
+
+-- termux-language-server is a language server for some specific bash scripts.
+-- See https://github.com/termux/termux-language-server.
+vim.api.nvim_create_autocmd('BufEnter', {
+    group = extra_lsp_augroup,
+    pattern = {
+        -- [[ Android Termux ]] -- Disabled because I'm not using it.
+        -- 'build.sh',
+        -- '*.subpackage.sh',
+
+        -- [[ ArchLinux/Windows Msys2 ]] -- Disabled because I'm not using it.
+        -- 'PKGBUILD',
+        -- '*.install',
+        -- 'makepkg.conf',
+
+        -- [[ Gentoo ]] -- Disabled because of:
+        -- BUG: Version 0.0.23 has issues with *.ebuild so let's disable it for now.
+        -- https://github.com/termux/termux-language-server/issues/19
+        'FAKE_PATTERN_TO_HAVE_AT_LEAST_ONE_WHILE_ALL_OTHERS_ARE_DISABLED', -- XXX:
+        -- '*.ebuild',
+        -- '*.eclass',
+        -- 'make.conf',
+        -- 'color.map',
+
+        -- [[ zsh ]] -- Disabled because I'm not using it.
+        -- '*.mdd',
+    },
+    callback = function()
+        vim.lsp.start {
+            name = 'termux',
+            cmd = { 'termux-language-server' },
+        }
+    end,
+})
+
 return {
     { -- LSP Configuration & Plugins
         'neovim/nvim-lspconfig',
