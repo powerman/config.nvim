@@ -238,6 +238,9 @@ return {
             --  - settings (table): Override the default settings passed when initializing the server.
             --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
             local servers = {
+                -- Will be used only if configured (project has sgconfig.yml in a root dir).
+                ast_grep = {},
+
                 -- It actually uses `shellcheck` and `shfmt`, so configure it using file
                 -- `.shellcheckrc` in project's root dir (check `:LspInfo`).
                 bashls = {},
