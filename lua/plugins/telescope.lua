@@ -30,6 +30,29 @@ return {
             -- Useful for getting pretty icons, but requires a Nerd Font.
             { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
         },
+        keys = {
+            {
+                '<F3>',
+                '<Leader>sp',
+                mode = 'n',
+                remap = true,
+                desc = 'Search Project files',
+            },
+            {
+                '<F3>',
+                '<Esc><Leader>sp',
+                mode = 'v',
+                remap = true,
+                desc = 'Search Project files',
+            },
+            {
+                '<F3>',
+                '<Esc><Leader>sp',
+                mode = 'i',
+                remap = true,
+                desc = 'Search Project files',
+            },
+        },
         config = function()
             -- Telescope is a fuzzy finder that comes with a lot of different things that
             -- it can fuzzy find! It's more than just a "file finder", it can search
@@ -61,6 +84,8 @@ return {
                         i = {
                             -- Enter opens in a new tab instead of a split window.
                             ['<Enter>'] = 'select_tab',
+                            -- <F3> both opens (Search Project files) and closes.
+                            ['<F3>'] = 'close',
                         },
                     },
                 },
@@ -141,6 +166,13 @@ return {
             vim.keymap.set('n', '<leader>sn', function()
                 builtin.find_files { cwd = vim.fn.stdpath 'config' }
             end, { desc = '[S]earch [N]eovim files' })
+
+            -- Shortcut for searching your project files
+            vim.keymap.set('n', '<leader>sp', function()
+                local buf_filename = vim.api.nvim_buf_get_name(0)
+                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
+                builtin.find_files { cwd = dir }
+            end, { desc = '[S]earch [P]roject files' })
         end,
     },
 }
