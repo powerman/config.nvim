@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: lazy-plugin-type
+message: Add `@type LazySpec` for plugin spec.
+severity: hint # error, warning, info, hint
+language: Lua
+files:
+  - './lua/plugins/*.lua'
+rule:
+  pattern: return { $$$ }
+  all:
+    - not:
+        follows:
+          kind: comment
+          regex: '^---@type LazySpec$'
+    - not:
+        inside:
+          kind: block
+          stopBy: end
+
+note: |
+  Add type annotation for Lazy plugin spec:
+
+    ---@type LazySpec
+    return {

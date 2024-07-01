@@ -1,0 +1,33 @@
+id: lazy-plugin-type
+snapshots:
+  ? |
+    -- Comment.
+    return {}
+  : labels:
+    - source: return {}
+      style: primary
+      start: 12
+      end: 21
+  ? |
+    ---@type Wrong
+    return {}
+  : labels:
+    - source: return {}
+      style: primary
+      start: 15
+      end: 24
+  ? |
+    local v = {}
+    return {}
+  : labels:
+    - source: return {}
+      style: primary
+      start: 13
+      end: 22
+  ? |
+    return {}
+  : labels:
+    - source: return {}
+      style: primary
+      start: 0
+      end: 9

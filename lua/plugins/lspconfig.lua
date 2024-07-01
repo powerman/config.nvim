@@ -34,6 +34,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
     end,
 })
 
+---@type LazySpec
 return {
     { -- LSP Configuration & Plugins
         'neovim/nvim-lspconfig',

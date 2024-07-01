@@ -1,0 +1,54 @@
+id: lazy-plugin-type
+
+valid:
+  - |
+    ---@type LazySpec
+    return {}
+  - |
+    ---@type LazySpec
+    return {
+      'some/plugin',
+      {
+        'some/plugin',
+        keys: {},
+      },
+    }
+  - |
+    ---@type LazySpec
+    return {
+      {
+        'some/plugin',
+        config = function()
+          return {}
+        end,
+      },
+    }
+  - |
+    function f()
+      return {}
+    end
+  - |
+    ---@type V
+    local v = {}
+  - |
+    -- Comment.
+    local v = {}
+  - |
+    local v = {}
+  - |
+    local v = {}
+    ---@type LazySpec
+    return {}
+
+invalid:
+  - |
+    return {}
+  - |
+    local v = {}
+    return {}
+  - |
+    -- Comment.
+    return {}
+  - |
+    ---@type Wrong
+    return {}

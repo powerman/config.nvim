@@ -1,3 +1,4 @@
+---@type LazySpec
 return {
     { -- "gc", "#", "<C-C>" to comment visual regions/lines.
         'numToStr/Comment.nvim',

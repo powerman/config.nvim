@@ -13,6 +13,7 @@
 -- after the plugin has been loaded:
 --  config = function() ... end
 
+---@type LazySpec
 return {
     { -- Useful plugin to show you pending keybinds.
         'folke/which-key.nvim',

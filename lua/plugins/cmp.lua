@@ -1,3 +1,4 @@
+---@type LazySpec
 return {
     { -- Autocompletion
         'hrsh7th/nvim-cmp',
