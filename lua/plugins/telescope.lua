@@ -83,8 +83,6 @@ return {
                 defaults = {
                     mappings = {
                         i = {
-                            -- Enter opens in a new tab instead of a split window.
-                            ['<Enter>'] = 'select_tab',
                             -- <F3> both opens (Search Project files) and closes.
                             ['<F3>'] = 'close',
                         },
@@ -174,6 +172,14 @@ return {
                 local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
                 builtin.find_files { cwd = dir }
             end, { desc = '[S]earch [P]roject files' })
+
+            -- Open files in a new tab by default.
+            local actions_state = require 'telescope.actions.state'
+            local select_key_to_edit_key = actions_state.select_key_to_edit_key
+            actions_state.select_key_to_edit_key = function(type) ---@diagnostic disable-line: duplicate-set-field
+                local key = select_key_to_edit_key(type)
+                return key == 'edit' and 'tabedit' or key
+            end
         end,
     },
 }
