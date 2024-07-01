@@ -1,0 +1,88 @@
+id: map-key-case
+snapshots:
+  map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame'):
+    fixed: map('<Leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+    labels:
+    - source: '''<leader>rn'''
+      style: primary
+      start: 4
+      end: 16
+  ? |
+    return {
+      {
+        keys = {
+          '<leader>a',
+        },
+      }
+    }
+  : fixed: |
+      return {
+        {
+          keys = {
+            '<Leader>a',
+          },
+        }
+      }
+    labels:
+    - source: '''<leader>a'''
+      style: primary
+      start: 32
+      end: 43
+  v = "<Enter>":
+    fixed: v = "<CR>"
+    labels:
+    - source: '"<Enter>"'
+      style: primary
+      start: 4
+      end: 13
+  v = "<LEADER>":
+    fixed: v = "<Leader>"
+    labels:
+    - source: '"<LEADER>"'
+      style: primary
+      start: 4
+      end: 14
+  v = "<Leader><cmd>cmd<CR>":
+    fixed: v = "<Leader><Cmd>cmd<CR>"
+    labels:
+    - source: '"<Leader><cmd>cmd<CR>"'
+      style: primary
+      start: 4
+      end: 26
+  v = "<Return>":
+    fixed: v = "<CR>"
+    labels:
+    - source: '"<Return>"'
+      style: primary
+      start: 4
+      end: 14
+  v = "<lEADER>":
+    fixed: v = "<Leader>"
+    labels:
+    - source: '"<lEADER>"'
+      style: primary
+      start: 4
+      end: 14
+  v = "<leader>":
+    fixed: v = "<Leader>"
+    labels:
+    - source: '"<leader>"'
+      style: primary
+      start: 4
+      end: 14
+  v = "<leader><cmd>cmd<cr>":
+    fixed: v = "<Leader><Cmd>cmd<CR>"
+    labels:
+    - source: '"<leader><cmd>cmd<cr>"'
+      style: primary
+      start: 4
+      end: 26
+  ? |
+    vim.keymap.set('i', '<C-O><leader>sp', function()
+  : fixed: |
+      vim.keymap.set('i', '<C-O><Leader>sp', function()
+    labels:
+    - source: '''<C-O><leader>sp'''
+      style: primary
+      start: 20
+      end: 37

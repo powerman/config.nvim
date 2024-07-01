@@ -20,7 +20,7 @@ vim.keymap.set('i', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved change
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set(
@@ -37,13 +37,13 @@ vim.keymap.set(
 )
 vim.keymap.set(
     'n',
-    '<leader>e',
+    '<Leader>e',
     vim.diagnostic.open_float,
     { desc = 'Show diagnostic [E]rror messages' }
 )
 vim.keymap.set(
     'n',
-    '<leader>q',
+    '<Leader>q',
     vim.diagnostic.setloclist,
     { desc = 'Open diagnostic [Q]uickfix list' }
 )

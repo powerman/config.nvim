@@ -1,0 +1,35 @@
+id: map-key-case
+valid:
+  - 'v = "<Leader>"'
+  - 'v = "<Leader><Cmd>cmd<CR>"'
+  - "map('<Leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')"
+  - |
+    return {
+      {
+        keys = {
+          '<Leader>a',
+        },
+      }
+    }
+  - |
+    vim.keymap.set('i', '<C-O><Leader>sp', function()
+    end, { desc = '[S]earch [P]roject files' })
+invalid:
+  - 'v = "<leader>"'
+  - 'v = "<LEADER>"'
+  - 'v = "<lEADER>"'
+  - 'v = "<Leader><cmd>cmd<CR>"'
+  - 'v = "<leader><cmd>cmd<cr>"'
+  - 'v = "<Enter>"'
+  - 'v = "<Return>"'
+  - "map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')"
+  - |
+    return {
+      {
+        keys = {
+          '<leader>a',
+        },
+      }
+    }
+  - |
+    vim.keymap.set('i', '<C-O><leader>sp', function()
