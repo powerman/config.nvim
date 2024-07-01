@@ -14,14 +14,11 @@ vim.api.nvim_create_autocmd('BufEnter', {
         -- '*.install',
         -- 'makepkg.conf',
 
-        -- [[ Gentoo ]] -- Disabled because of:
-        -- BUG: Version 0.0.23 has issues with *.ebuild so let's disable it for now.
-        -- https://github.com/termux/termux-language-server/issues/19
-        'FAKE_PATTERN_TO_HAVE_AT_LEAST_ONE_WHILE_ALL_OTHERS_ARE_DISABLED', -- XXX:
-        -- '*.ebuild',
-        -- '*.eclass',
-        -- 'make.conf',
-        -- 'color.map',
+        -- [[ Gentoo ]]
+        '*.ebuild',
+        '*.eclass',
+        'make.conf',
+        'color.map',
 
         -- [[ zsh ]] -- Disabled because I'm not using it.
         -- '*.mdd',
@@ -31,6 +28,16 @@ vim.api.nvim_create_autocmd('BufEnter', {
             name = 'termux',
             cmd = { 'termux-language-server' },
         }
+    end,
+})
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = extra_lsp_augroup,
+    callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        -- HACK: https://github.com/termux/termux-language-server/issues/19#issuecomment-2200349890
+        if client and client.name == 'termux' then
+            client.server_capabilities.documentFormattingProvider = nil
+        end
     end,
 })
 
