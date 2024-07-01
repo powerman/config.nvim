@@ -14,4 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: pwd
+      - run: ls -al
+      - run: cat sgconfig.yml
+
       - uses: ast-grep/action@v1.5
