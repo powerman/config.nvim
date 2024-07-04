@@ -2,7 +2,7 @@
 return {
     { -- Autoformat
         'stevearc/conform.nvim',
-        lazy = false,
+        lazy = false, -- Ensure 'format_on_save' will works.
         keys = {
             {
                 '<Leader>f',
@@ -14,7 +14,7 @@ return {
             },
         },
         opts = {
-            notify_on_error = false,
+            notify_on_error = true,
             format_on_save = function(bufnr)
                 -- Disable "format_on_save lsp_fallback" for languages that don't
                 -- have a well standardized coding style. You can add additional
@@ -25,16 +25,150 @@ return {
                     lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
                 }
             end,
+            -- NOTE: After installing these tools do not forget to setup them!
+            -- - Globally:
+            --   - ~/.editorconfig: setup your preferences for indent
+            --   - ~/.prettierrc.yml: add installed plugins
+            --   - ~/.stylelintrc.yml
+            --   - ~/.config/yamlfmt/yamlfmt.yml
+            -- - For some project:
+            --   - ./.editorconfig: setup project preferences for indent
+            --   - ./sgconfig.yml: use `sg new`
+            --   - ./.stylua.toml
+            --   - ./.dprint.jsonc: use `dprint init -c .dprint.jsonc`
+            --   - ./.yamlfmt.yml
             formatters_by_ft = {
-                ['*'] = { 'ast-grep' },
-                lua = { 'stylua' },
                 -- Conform can also run multiple formatters sequentially
                 -- python = { "isort", "black" },
                 --
                 -- You can use a sub-list to tell conform to run *until* a formatter
                 -- is found.
                 -- javascript = { { "prettierd", "prettier" } },
+                --
+                -- BUG: 'prettierd' does not show error https://github.com/stevearc/conform.nvim/issues/486
+
+                ['*'] = { 'ast-grep' },
+                asm = { 'asmfmt' }, -- Go Assembler.
+                -- bash = { 'shellcheck' },
+                bash = { 'shfmt' },
+                css = { 'prettierd' },
+                -- css = { 'stylelint' },
+                csv = { 'yq_csv' },
+                dockerfile = { 'dprint' }, -- Require `dprint config add dockerfile`.
+                go = { 'gofumpt', 'gci' }, -- Also: 'gofmt', 'goimports', 'goimports-reviser'.
+                graphql = { 'prettierd' },
+                html = { 'djlint' },
+                -- html = { 'prettierd' }, -- Fail on invalid HTML without error message.
+                -- javascript = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
+                javascript = { 'prettierd' },
+                -- javascript = { 'standardjs' }, -- Fail on invalid JS.
+                -- javascriptreact = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
+                javascriptreact = { 'prettierd' },
+                -- javascriptreact = { 'standardjs' }, -- Fail on invalid JS.
+                -- json = { 'dprint' }, -- Fix some errors. Require `dprint config add dprint-plugin-json`.
+                json = { 'fixjson' }, -- Convert relaxed JSON5 to JSON.
+                -- json = { 'jq' }, -- Fail on invalid JSON.
+                -- json = { 'prettierd' }, -- Fix few errors.
+                -- json = { 'yq_json' }, -- Fix few errors.
+                json5 = { 'prettierd' },
+                jsonc = { 'prettierd' },
+                less = { 'prettierd' },
+                lua = { 'stylua' },
+                -- markdown = { 'dprint', 'injected' }, -- Require `dprint config add markdown`.
+                -- markdown = { 'markdownlint', 'injected' },
+                -- markdown = { 'markdownlint-cli2', 'injected' },
+                markdown = { 'mdformat', 'injected' }, -- With plugins almost as good as dprint.
+                -- markdown = { 'prettierd', 'injected' },
+                nginx = { 'prettierd_nginx' }, -- Require prettier plugin.
+                proto = { 'buf' },
+                scss = { 'prettierd' },
+                solidity = { 'prettierd' }, -- Require prettier plugin.
+                sql = { 'prettierd' }, -- Require prettier plugin.
+                template = { 'djlint' }, -- Go/Django/Jinja/Twig/Handlebars/Angular.
+                -- template = { 'prettierd' },
+                -- toml = { 'dprint' }, -- Require `dprint config add toml`.
+                toml = { 'prettierd' }, -- Require prettier plugin.
+                tsv = { 'yq_tsv' },
+                -- typescript = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
+                typescript = { 'prettierd' },
+                -- typescript = { 'standardts' },
+                -- typescriptreact = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
+                typescriptreact = { 'prettierd' },
+                vue = { 'prettierd' },
+                xml = { 'xmllint' },
+                -- xml = { 'yq_xml' },
+                yaml = { 'yamlfmt' },
+                -- yaml = { 'yq' },
+
+                -- Alternatives to 'injected':
+                -- - 'cbfmt' (markdown, rst)
+                -- - 'mdsf' (markdown)
+                -- - 'mdformat' (markdown)
+                --
+                -- May be useful:
+                -- - 'cue_fmt' - Format CUE files using cue fmt command.
+                -- - 'hcl' - A formatter for HCL files.
+                -- - 'packer_fmt' - The packer fmt Packer command is used to format HCL2 configuration files to a canonical format and style.
+                -- - 'terragrunt_hclfmt' - Format hcl files into a canonical format.
+                -- - 'rustywind' - A tool for formatting Tailwind CSS classes.
+                -- - 'd2' - D2 is a modern diagram scripting language that turns text to diagrams.
+                -- - 'docstrfmt' - reStructuredText formatter.
+                -- - 'pg_format' - PostgreSQL SQL syntax beautifier.
+                -- - 'sql_formatter' - A whitespace formatter for different query languages.
+                -- - 'sqlfmt' - sqlfmt formats your dbt SQL files so you don't have to. It is similar in nature to Black, gofmt, and rustfmt (but for SQL)
+                -- - 'sqlfluff' - A modular SQL linter and auto-formatter with support for multiple dialects and templated code.
             },
         },
+        config = function(_, opts)
+            require('conform').setup(opts)
+            local util = require 'conform.util'
+            local formatters = require 'conform.formatters'
+
+            ---@return conform.FormatterConfigOverride
+            local function yq_for(type)
+                return vim.tbl_deep_extend('force', formatters.yq, {
+                    args = { '-p', type, '-o', type, '-P', '-' },
+                })
+            end
+
+            ---@return conform.FormatterConfigOverride
+            local function prettierd_for(filename)
+                return vim.tbl_deep_extend('force', formatters.prettierd, {
+                    args = { filename },
+                    range_args = function(self, ctx)
+                        local args = formatters.prettierd.range_args(self, ctx)
+                        args[1] = filename
+                        return args
+                    end,
+                })
+            end
+
+            require('conform').formatters.injected = {
+                options = {
+                    -- lang_to_ext = {
+                    --     lua = 'lua',
+                    -- },
+                    -- Map of treesitter language to formatters to use
+                    -- (defaults to the value from formatters_by_ft)
+                    lang_to_formatters = {
+                        -- HACK: Work around https://github.com/stevearc/conform.nvim/issues/485
+                        html = {},
+                    },
+                },
+            }
+            require('conform').formatters.gci = {
+                cwd = util.root_file { 'go.mod' },
+                append_args = { '-s', 'standard', '-s', 'default', '-s', 'localmodule' },
+            }
+            require('conform').formatters.standardts =
+                vim.tbl_deep_extend('force', formatters.standardjs, {
+                    command = util.from_node_modules 'ts-standard',
+                })
+            require('conform').formatters.prettierd_nginx = prettierd_for 'FAKE.nginx'
+            require('conform').formatters.yq_csv = yq_for 'csv'
+            require('conform').formatters.yq_json = yq_for 'json'
+            require('conform').formatters.yq_tsv = yq_for 'tsv'
+            require('conform').formatters.yq_xml = yq_for 'xml'
+        end,
     },
 }
