@@ -1,26 +1,32 @@
 -- Highlight todo, notes, etc in comments
+---@type TodoOptions
+local opts = {
+    signs = false,
+    -- Removed space after doublewidth icons to fix "Vim:E239: Invalid sign text".
+    -- Replaced TEST icon because original one is missing from my fonts.
+    keywords = {
+        FIX = { icon = '' },
+        TODO = { icon = '' },
+        HACK = { icon = '' },
+        WARN = { icon = '' },
+        PERF = { icon = '' },
+        NOTE = { icon = '' },
+        TEST = { icon = '󰝖' },
+    },
+    gui_style = {
+        bg = 'BOLD,NOCOMBINE', -- NOCOMBINE will cancel ITALIC and thus fix last letter's edge.
+    },
+}
 ---@type LazySpec
 return {
     {
         'folke/todo-comments.nvim',
+        version = '*',
         event = 'VimEnter',
         dependencies = {
             'nvim-lua/plenary.nvim',
         },
-        opts = {
-            signs = false,
-            -- Removed space after doublewidth icons to fix "Vim:E239: Invalid sign text".
-            -- Replaced TEST icon because original one is missing from my fonts.
-            keywords = {
-                FIX = { icon = '' },
-                TODO = { icon = '' },
-                HACK = { icon = '' },
-                WARN = { icon = '' },
-                PERF = { icon = '' },
-                NOTE = { icon = '' },
-                TEST = { icon = '󰝖' },
-            },
-        },
+        opts = opts,
         keys = {
             {
                 ']t',
