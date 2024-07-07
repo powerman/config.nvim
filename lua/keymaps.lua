@@ -1,9 +1,6 @@
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
--- Undo Neovim's default mapping. See `:help Y-default`.
--- vim.keymap.del('n', 'Y')
-
 -- Add hotkey to save current buffer: <F2>.
 vim.keymap.set('n', '<F2>', ':w<CR>', { desc = 'Save current buffer' })
 vim.keymap.set('v', '<F2>', '<Esc>:w<CR>gv', { desc = 'Save current buffer' })
