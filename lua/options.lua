@@ -2,9 +2,6 @@
 -- See `:help vim.opt`.
 -- For more options, you can see `:help option-list`.
 
--- Make line numbers default.
--- vim.opt.number = true
-
 -- Disable wrapping.
 vim.opt.wrap = false
 
@@ -57,3 +54,6 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 6
+
+-- Shift + cursor|Home|End starts visual mode selection.
+vim.opt.keymodel = 'startsel'
