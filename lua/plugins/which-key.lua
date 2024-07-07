@@ -1,39 +1,42 @@
--- NOTE: Plugins can also be configured to run Lua code when they are loaded.
---
--- This is often very useful to both group configuration, as well as handle
--- lazy loading plugins that don't need to be loaded immediately at startup.
---
--- For example, in the following configuration, we use:
---  event = 'VimEnter'
---
--- which loads which-key before all the UI elements are loaded. Events can be
--- normal autocommands events (`:help autocmd-events`).
---
--- Then, because we use the `config` key, the configuration only runs
--- after the plugin has been loaded:
---  config = function() ... end
+--- BUG: Healthcheck show non-existing conflicts because it does not track unmapped keys:
+--- https://github.com/folke/which-key.nvim/issues/615
 
 ---@type LazySpec
 return {
     { -- Useful plugin to show you pending keybinds.
         'folke/which-key.nvim',
-        event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-        config = function() -- This is the function that runs, AFTER loading
-            require('which-key').setup()
+        event = 'VeryLazy',
+        ---@type Options
+        opts = {
+            popup_mappings = {
+                -- Use lower case to look consistent with <esc> and <bs>.
+                scroll_down = '<c-down>',
+                scroll_up = '<c-up>',
+            },
+        },
+        config = function(_, opts) -- This is the function that runs, AFTER loading
+            require('which-key').setup(opts)
 
-            -- Document existing key chains
-            require('which-key').register {
-                ['<Leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-                ['<Leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-                ['<Leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-                ['<Leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-                ['<Leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-                ['<Leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-                ['<Leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-            }
-            -- visual mode
+            -- Document existing key chain prefixes and useful key chains.
             require('which-key').register({
-                ['<Leader>h'] = { 'Git [H]unk' },
+                ['['] = 'Jump to previous',
+                [']'] = 'Jump to next',
+                ['s'] = 'Surrounding',
+                ['z'] = 'Fold | Spell | Scroll',
+                ['<<'] = 'Lines',
+                ['>>'] = 'Lines',
+                ['<Leader>c'] = '[C]ode',
+                ['<Leader>d'] = '[D]ocument',
+                ['<Leader>h'] = 'Git [H]unk',
+                ['<Leader>r'] = '[R]ename',
+                ['<Leader>s'] = '[S]earch',
+                ['<Leader>t'] = '[T]oggle',
+                ['<Leader>w'] = '[W]orkspace',
+            }, { mode = 'n' })
+            require('which-key').register({
+                ['<Leader>h'] = 'Git [H]unk',
+                ['<'] = 'Indent left',
+                ['>'] = 'Indent right',
             }, { mode = 'v' })
         end,
     },
