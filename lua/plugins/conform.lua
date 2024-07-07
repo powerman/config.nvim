@@ -2,6 +2,7 @@
 return {
     { -- Autoformat
         'stevearc/conform.nvim',
+        version = '*',
         lazy = false, -- Ensure 'format_on_save' will works.
         keys = {
             {
