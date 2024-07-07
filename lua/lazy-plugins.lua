@@ -7,9 +7,13 @@
 --
 --  To update plugins you can run:
 --    :Lazy update
-require('lazy').setup {
-    spec = {
-        { import = 'plugins' },
+require('lazy').setup({ import = 'plugins' }, {
+    change_detection = {
+        -- automatically check for config file changes and reload the ui
+        enabled = false,
+    },
+    dev = {
+        path = '~/proj/nvim',
     },
     ui = {
         -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -31,4 +35,4 @@ require('lazy').setup {
             lazy = '💤 ',
         },
     },
-}
+})
