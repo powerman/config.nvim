@@ -2,6 +2,7 @@
 return {
     { -- "gc", "#", "<C-C>" to comment visual regions/lines.
         'numToStr/Comment.nvim',
+        lazy = false, -- Needs setup() to define mappings.
         opts = {},
         keys = {
             {
