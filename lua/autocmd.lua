@@ -18,6 +18,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd('VimEnter', {
     desc = 'On start open multiple files in own tabs instead of hidden buffers',
     group = vim.api.nvim_create_augroup('start-in-tabs', { clear = true }),
+    nested = true,
     callback = function()
         vim.cmd 'if argc() > 1 && !&diff | tab sball | tabfirst | endif'
     end,
