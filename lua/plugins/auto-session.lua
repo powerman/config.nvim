@@ -55,7 +55,7 @@ return {
                     for _, window in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
                         local buffer = vim.api.nvim_win_get_buf(window)
                         local file_name = vim.api.nvim_buf_get_name(buffer)
-                        if file_name ~= '' and vim.fn.filereadable(file_name) then
+                        if vim.fn.filereadable(file_name) == 1 then
                             valuable = valuable + 1
                         end
                     end
