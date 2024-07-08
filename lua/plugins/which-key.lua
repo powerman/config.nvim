@@ -1,5 +1,5 @@
---- BUG: Healthcheck show non-existing conflicts because it does not track unmapped keys:
---- https://github.com/folke/which-key.nvim/issues/615
+-- BUG: Healthcheck show non-existing conflicts because it does not track unmapped keys:
+-- https://github.com/folke/which-key.nvim/issues/615
 
 ---@type LazySpec
 return {
@@ -8,10 +8,34 @@ return {
         event = 'VeryLazy',
         ---@type Options
         opts = {
+            operators = {
+                ['gq'] = 'Format lines in a smart way',
+                ['gw'] = 'Format lines as a plain text',
+            },
+            -- XXX: Does not attect which-key's own keys <esc> and <bs> shown at the bottom. :(
+            key_labels = {
+                -- ast-grep-ignore: map-key-case
+                ['<leader>'] = '<Leader>',
+                -- ast-grep-ignore: map-key-case
+                ['<space>'] = '<Space>',
+                -- ast-grep-ignore: map-key-case
+                ['<esc>'] = '<Esc>',
+                -- ast-grep-ignore: map-key-case
+                ['<bs>'] = '<BS>',
+                -- ast-grep-ignore: map-key-case
+                ['<cr>'] = '<CR>',
+                -- ast-grep-ignore: map-key-case
+                ['<tab>'] = '<Tab>',
+                -- ast-grep-ignore: map-key-case
+                ['<c-w>'] = '<C-W>',
+            },
             popup_mappings = {
                 -- Use lower case to look consistent with <esc> and <bs>.
                 scroll_down = '<c-down>',
                 scroll_up = '<c-up>',
+            },
+            window = {
+                border = 'single',
             },
         },
         config = function(_, opts) -- This is the function that runs, AFTER loading
@@ -25,6 +49,9 @@ return {
                 ['z'] = 'Fold | Spell | Scroll',
                 ['<<'] = 'Lines',
                 ['>>'] = 'Lines',
+                ['ga'] = '[G]et [A]SCII code dec/hex/oct',
+                ['gq'] = 'Format lines in a smart way',
+                ['gw'] = 'Format lines as a plain text',
                 ['<Leader>c'] = '[C]ode',
                 ['<Leader>d'] = '[D]ocument',
                 ['<Leader>h'] = 'Git [H]unk',
