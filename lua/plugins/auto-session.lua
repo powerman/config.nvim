@@ -38,8 +38,11 @@ return {
             vim.opt.sessionoptions:append 'winpos'
             vim.opt.sessionoptions:append 'localoptions'
         end,
+        ---@type defaultConf
         opts = {
             auto_session_suppress_dirs = { '/', '~/', '~/proj/' },
+            ---@type session_lens_config
+            ---@diagnostic disable-next-line: missing-fields
             session_lens = {
                 load_on_setup = true,
                 theme_conf = { border = true },

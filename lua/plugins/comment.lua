@@ -20,8 +20,9 @@
 
 ---@type LazySpec
 return {
-    { -- "gc", "#", "<C-C>" to comment visual regions/lines.
+    {
         'numToStr/Comment.nvim',
+        branch = 'master', -- There a lot of filetype-related updates since last release.
         lazy = false, -- Needs setup() to define mappings.
         keys = {
             {
