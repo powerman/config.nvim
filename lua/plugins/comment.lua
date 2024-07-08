@@ -3,13 +3,14 @@ return {
     { -- "gc", "#", "<C-C>" to comment visual regions/lines.
         'numToStr/Comment.nvim',
         lazy = false, -- Needs setup() to define mappings.
-        opts = {},
         keys = {
             {
                 '#',
                 function()
                     return vim.v.count == 0 and '<Plug>(comment_toggle_linewise_current)<Down>'
                         or '<Plug>(comment_toggle_linewise_count)'
+                            .. vim.v.count
+                            .. '<Down>'
                 end,
                 mode = 'n',
                 expr = true,
@@ -51,6 +52,11 @@ return {
                 silent = true,
                 desc = 'Backup current line as a comment',
             },
+        },
+        ---@type CommentConfig
+        ---@diagnostic disable-next-line: missing-fields
+        opts = {
+            -- ignore = '^$',
         },
     },
 }
