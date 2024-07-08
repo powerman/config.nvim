@@ -23,6 +23,9 @@ require 'options'
 -- Setting basic keymaps (working without plugins).
 require 'keymaps'
 
+-- Setting basic autocommands (working without plugins).
+require 'autocmd'
+
 -- Install `lazy.nvim` plugin manager.
 require 'lazy-bootstrap'
 
