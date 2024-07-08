@@ -1,10 +1,10 @@
 --[[ Configuration ]]
--- See https://learnxinyminutes.com/docs/lua/.
--- See `:help lua-guide`.
+--
+--  See https://learnxinyminutes.com/docs/lua/.
+--  See `:help lua-guide`.
 
 -- Set <space> as the leader key.
 -- See `:help mapleader`.
---  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -17,14 +17,14 @@ vim.g.mono_nerd_font = false
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
 
--- [[ Setting options ]]
+-- Setting options.
 require 'options'
 
--- [[ Basic Keymaps ]]
+-- Setting basic keymaps (working without plugins).
 require 'keymaps'
 
--- [[ Install `lazy.nvim` plugin manager ]]
+-- Install `lazy.nvim` plugin manager.
 require 'lazy-bootstrap'
 
--- [[ Configure and install plugins ]]
+-- Install and configure all plugins.
 require 'lazy-plugins'

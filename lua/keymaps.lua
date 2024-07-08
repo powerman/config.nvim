@@ -1,5 +1,6 @@
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
+-- [[ Setting basic keymaps ]]
+--
+--  See `:help vim.keymap.set()`.
 
 -- Add hotkey to save current buffer: <F2>.
 vim.keymap.set('n', '<F2>', ':w<CR>', { desc = 'Save current buffer' })

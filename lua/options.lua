@@ -1,6 +1,7 @@
 -- [[ Setting options ]]
--- See `:help vim.opt`.
--- For more options, you can see `:help option-list`.
+--
+--  See `:help vim.opt`.
+--  For more options, you can see `:help option-list`.
 
 -- Disable wrapping.
 vim.opt.wrap = false
