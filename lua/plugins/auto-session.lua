@@ -7,6 +7,7 @@ return {
     -- session for the current cwd if one exists.
     {
         'rmagatti/auto-session',
+        version = '*',
         dependencies = {
             'nvim-telescope/telescope.nvim',
         },
