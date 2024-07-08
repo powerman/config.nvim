@@ -1,3 +1,23 @@
+-- [[ Smart and powerful comment plugin for neovim ]]
+--
+--  Neovim out-of-box supports commenting and uncommenting of lines based on 'commentstring'
+--  on `gc` keymapping and also provides text object `gc` for the largest contiguous block of
+--  non-blank commented lines around the cursor.
+--
+--  This plugin extends that basic functionality:
+--    - Support blockwise comments (using `gb` inplace of `gc`).
+--    - Works for multiple (injected/embedded) languages like Vue or Markdown.
+--      - Support for jsx/tsx requires 'JoosepAlviste/nvim-ts-context-commentstring' plugin.
+--    - Optionally ignore lines (e.g. empty ones).
+--    - Adds extra keymapping: `gco`, `gcO`, `gcA`.
+--
+-- NOTE: Key `#` (un)comments lines like `gcc` then jumps to line following (un)commented ones.
+-- NOTE: Key `<C-C>` copy lines into comment and start editing (also works in INSERT).
+-- NOTE: Text object `gc` match a whole comment around cursor line.
+--
+-- BUG: `gc` and `#` in VISUAL with 1 line works blockwise instead of linewise.
+-- https://github.com/numToStr/Comment.nvim/issues/476
+
 ---@type LazySpec
 return {
     { -- "gc", "#", "<C-C>" to comment visual regions/lines.
