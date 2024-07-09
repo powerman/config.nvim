@@ -33,7 +33,9 @@ return {
     { -- Autoformat
         'stevearc/conform.nvim',
         version = '*',
-        lazy = false, -- Ensure 'format_on_save' will works.
+        lazy = true,
+        event = { 'BufWritePre' },
+        cmd = { 'ConformInfo', 'FormatDisable', 'FormatEnable' },
         keys = {
             {
                 '<Leader>f',
