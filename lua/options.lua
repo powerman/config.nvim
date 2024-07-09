@@ -3,9 +3,6 @@
 --  See `:help vim.opt`.
 --  For more options, you can see `:help option-list`.
 
--- Disable wrapping.
-vim.opt.wrap = false
-
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
@@ -58,3 +55,9 @@ vim.opt.scrolloff = 6
 
 -- Shift + cursor|Home|End starts visual mode selection.
 vim.opt.keymodel = 'startsel'
+
+-- Disable wrapping.
+vim.opt.wrap = false
+
+-- When formatting text (e.g. using `gq` or `gw`), recognize numbered lists
+vim.opt.formatoptions:append 'n'

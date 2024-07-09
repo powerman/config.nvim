@@ -12,7 +12,7 @@ return {
                 ['gq'] = 'Format lines in a smart way',
                 ['gw'] = 'Format lines as a plain text',
             },
-            -- XXX: Does not attect which-key's own keys <esc> and <bs> shown at the bottom. :(
+            -- XXX: Does not affect which-key's own keys <esc> and <bs> shown at the bottom. :(
             key_labels = {
                 -- ast-grep-ignore: map-key-case
                 ['<leader>'] = '<Leader>',
