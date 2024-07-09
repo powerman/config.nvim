@@ -14,7 +14,7 @@
 --
 --  See https://github.com/rmagatti/auto-session.
 --
--- NOTE: Key `<Leader>sa` opens session manager (to view/restore/delete sessions).
+-- NOTE:  <Leader>sa  List/delete sessions.
 
 ---@type LazySpec
 return {

@@ -9,9 +9,9 @@
 -- List of supported formatters: https://github.com/stevearc/conform.nvim#formatters.
 -- TODO: Find out is it possible to automate installation of these tools using mason.
 --
--- NOTE: Key `<Leader>f` formats current buffer.
--- NOTE: Cmd `:FormatDisable` disables autoformat.
--- NOTE: Cmd `:FormatDisable!` disables autoformat for a current buffer.
+-- NOTE:  <Leader>f        Formats current buffer.
+-- NOTE:  :FormatDisable   Disables autoformat.
+-- NOTE:  :FormatDisable!  Disables autoformat for the buffer.
 
 -- Disable autoformat on certain filetypes.
 local ignore_filetypes = {

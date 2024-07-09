@@ -1,6 +1,6 @@
 -- [[ A clean, dark Neovim theme, with support for lsp, treesitter and lots of plugins ]]
 --
--- NOTE: Cmd `Telescope colorscheme` let you see installed colorschemes and change it.
+-- NOTE:  Telescope colorscheme  Select colorscheme.
 
 ---@type LazySpec
 return {

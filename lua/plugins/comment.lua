@@ -11,9 +11,9 @@
 --    - Optionally ignore lines (e.g. empty ones).
 --    - Adds extra keymapping: `gco`, `gcO`, `gcA`.
 --
--- NOTE: Key `#` (un)comments lines like `gcc` then jumps to line following (un)commented ones.
--- NOTE: Key `<C-C>` copy lines into comment and start editing (also works in INSERT).
--- NOTE: Text object `gc` match a whole comment around cursor line.
+-- NOTE:  #      (Un)Comments lines and move on.
+-- NOTE:  <C-C>  Backup line(s) into comment and edit.
+-- NOTE: 󰴑 gc     Match a whole comment around cursor.
 --
 -- BUG: `gc` and `#` in VISUAL with 1 line works blockwise instead of linewise.
 -- https://github.com/numToStr/Comment.nvim/issues/476
