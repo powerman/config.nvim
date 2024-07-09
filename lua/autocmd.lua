@@ -42,3 +42,23 @@ vim.api.nvim_create_autocmd('TabEnter', {
         end
     end,
 })
+
+-- For usual files <Enter> begins a new line below the cursor and insert text.
+vim.api.nvim_create_autocmd('BufWinEnter', {
+    desc = 'Enter begins a new line below the cursor and insert text',
+    group = vim.api.nvim_create_augroup('enter-is-o', { clear = true }),
+    callback = function(ev)
+        if
+            not vim.bo.readonly
+            and ev.file ~= 'quickfix'
+            and vim.bo.ft ~= 'qf'
+            and not vim.wo.diff
+            and vim.bo.ft ~= 'diff'
+        then
+            vim.keymap.set('n', '<CR>', 'o', {
+                buffer = ev.buf,
+                desc = 'Begin a new line below the cursor and insert text',
+            })
+        end
+    end,
+})
