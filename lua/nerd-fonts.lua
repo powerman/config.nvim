@@ -10,7 +10,7 @@ if not vim.g.mono_nerd_font then
         { 0x2665, 0x2665, 2 }, -- Octicons
         { 0x2b58, 0x2b58, 2 }, -- IEC Power Symbols
         { 0xe000, 0xe00a, 2 }, -- Pomicons
-        { 0xe0b8, 0xe0c8, 2 }, -- Powerline Extra
+        { 0xe0c0, 0xe0c8, 2 }, -- Powerline Extra
         { 0xe0ca, 0xe0ca, 2 }, -- Powerline Extra
         { 0xe0cc, 0xe0d7, 2 }, -- Powerline Extra
         { 0xe200, 0xe2a9, 2 }, -- Font Awesome Extension
