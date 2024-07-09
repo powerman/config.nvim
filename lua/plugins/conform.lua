@@ -46,6 +46,9 @@ return {
                 desc = '[F]ormat buffer',
             },
         },
+        init = function()
+            vim.o.formatexpr = "v:lua.require('conform').formatexpr()"
+        end,
         opts = {
             notify_on_error = true,
             format_on_save = function(bufnr)
@@ -144,7 +147,7 @@ return {
 
             vim.api.nvim_create_user_command('FormatDisable', function(args)
                 if args.bang then
-                    -- FormatDisable! will disable formatting just for this buffer
+                    -- FormatDisable! will disable formatting just for this buffer.
                     vim.b.disable_autoformat = true
                 else
                     vim.g.disable_autoformat = true
@@ -188,7 +191,7 @@ return {
                     --     lua = 'lua',
                     -- },
                     -- Map of treesitter language to formatters to use
-                    -- (defaults to the value from formatters_by_ft)
+                    -- (defaults to the value from formatters_by_ft).
                     lang_to_formatters = {
                         -- HACK: Work around https://github.com/stevearc/conform.nvim/issues/485
                         html = {},
