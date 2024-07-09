@@ -49,6 +49,7 @@ return {
         init = function()
             vim.o.formatexpr = "v:lua.require('conform').formatexpr()"
         end,
+        ---@type conform.setupOpts
         opts = {
             notify_on_error = true,
             format_on_save = function(bufnr)
