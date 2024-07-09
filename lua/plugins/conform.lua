@@ -1,3 +1,33 @@
+-- [[ Lightweight yet powerful formatter plugin for Neovim ]]
+--
+--  - Format a lot of different file types using both LSP and 3rd-party tools.
+--  - Format embedded code blocks in another language (e.g. in markdown, templates, etc.).
+--  - Autoformat on save file.
+--
+-- INFO: You have to configure formatting for file types you're using! This includes not only
+-- modifying this file, but also installing and configuring required 3rd-party tools.
+-- List of supported formatters: https://github.com/stevearc/conform.nvim#formatters.
+-- TODO: Find out is it possible to automate installation of these tools using mason.
+--
+-- NOTE: Key `<Leader>f` formats current buffer.
+-- NOTE: Cmd `:FormatDisable` disables autoformat.
+-- NOTE: Cmd `:FormatDisable!` disables autoformat for a current buffer.
+
+-- Disable autoformat on certain filetypes.
+local ignore_filetypes = {
+    -- Languages without a well standardized coding style.
+    'c',
+    'cpp',
+}
+-- Disable autoformat for files in a certain path.
+local ignore_paths = {
+    -- Directories with 3rd-party code.
+    vim.fn.stdpath 'data' .. '/lazy/',
+    '/node_modules/',
+    '/vendor/',
+    '/go/pkg/mod/', -- Maybe run `go env GOMODCACHE` instead of hardcode?
+}
+
 ---@type LazySpec
 return {
     { -- Autoformat
@@ -8,25 +38,30 @@ return {
             {
                 '<Leader>f',
                 function()
-                    require('conform').format { async = true, lsp_fallback = true }
+                    require('conform').format { async = true, lsp_format = 'fallback' }
                 end,
-                mode = '',
+                mode = 'n',
                 desc = '[F]ormat buffer',
             },
         },
         opts = {
             notify_on_error = true,
             format_on_save = function(bufnr)
-                -- Disable "format_on_save lsp_fallback" for languages that don't
-                -- have a well standardized coding style. You can add additional
-                -- languages here or re-enable it for the disabled ones.
-                local disable_filetypes = { c = true, cpp = true }
-                return {
-                    timeout_ms = 500,
-                    lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-                }
+                if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+                    return
+                end
+                if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
+                    return
+                end
+                local bufname = vim.api.nvim_buf_get_name(bufnr)
+                for _, pattern in ipairs(ignore_paths) do
+                    if bufname:match(pattern) then
+                        return
+                    end
+                end
+                return { timeout_ms = 500, lsp_format = 'fallback' }
             end,
-            -- NOTE: After installing these tools do not forget to setup them!
+            -- INFO: After installing these 3rd-party tools do not forget to setup them!
             -- - Globally:
             --   - ~/.editorconfig: setup your preferences for indent
             --   - ~/.prettierrc.yml: add installed plugins
@@ -42,13 +77,13 @@ return {
                 -- Conform can also run multiple formatters sequentially
                 -- python = { "isort", "black" },
                 --
-                -- You can use a sub-list to tell conform to run *until* a formatter
-                -- is found.
+                -- You can use a sub-list to tell conform to run *until* a formatter is found.
                 -- javascript = { { "prettierd", "prettier" } },
                 --
-                -- BUG: 'prettierd' does not show error https://github.com/stevearc/conform.nvim/issues/486
+                -- BUG: 'prettierd' does not show error
+                -- https://github.com/stevearc/conform.nvim/issues/486
 
-                ['*'] = { 'ast-grep' },
+                ['*'] = { 'ast-grep' }, -- Linter/fixer for many treesitter-supported languages.
                 asm = { 'asmfmt' }, -- Go Assembler.
                 -- bash = { 'shellcheck' },
                 bash = { 'shfmt' },
@@ -100,28 +135,29 @@ return {
                 -- xml = { 'yq_xml' },
                 yaml = { 'yamlfmt' },
                 -- yaml = { 'yq' },
-
-                -- Alternatives to 'injected':
-                -- - 'cbfmt' (markdown, rst)
-                -- - 'mdsf' (markdown)
-                -- - 'mdformat' (markdown)
-                --
-                -- May be useful:
-                -- - 'cue_fmt' - Format CUE files using cue fmt command.
-                -- - 'hcl' - A formatter for HCL files.
-                -- - 'packer_fmt' - The packer fmt Packer command is used to format HCL2 configuration files to a canonical format and style.
-                -- - 'terragrunt_hclfmt' - Format hcl files into a canonical format.
-                -- - 'rustywind' - A tool for formatting Tailwind CSS classes.
-                -- - 'd2' - D2 is a modern diagram scripting language that turns text to diagrams.
-                -- - 'docstrfmt' - reStructuredText formatter.
-                -- - 'pg_format' - PostgreSQL SQL syntax beautifier.
-                -- - 'sql_formatter' - A whitespace formatter for different query languages.
-                -- - 'sqlfmt' - sqlfmt formats your dbt SQL files so you don't have to. It is similar in nature to Black, gofmt, and rustfmt (but for SQL)
-                -- - 'sqlfluff' - A modular SQL linter and auto-formatter with support for multiple dialects and templated code.
             },
         },
         config = function(_, opts)
             require('conform').setup(opts)
+
+            vim.api.nvim_create_user_command('FormatDisable', function(args)
+                if args.bang then
+                    -- FormatDisable! will disable formatting just for this buffer
+                    vim.b.disable_autoformat = true
+                else
+                    vim.g.disable_autoformat = true
+                end
+            end, {
+                desc = 'Disable autoformat-on-save',
+                bang = true,
+            })
+            vim.api.nvim_create_user_command('FormatEnable', function()
+                vim.b.disable_autoformat = false
+                vim.g.disable_autoformat = false
+            end, {
+                desc = 'Re-enable autoformat-on-save',
+            })
+
             local util = require 'conform.util'
             local formatters = require 'conform.formatters'
 
