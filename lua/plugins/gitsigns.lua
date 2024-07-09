@@ -1,7 +1,37 @@
+-- [[ Super fast git decorations ]]
+--
+--  - Signs for added, removed, and changed (including staged) lines.
+--  - Status bar integration.
+--  - Git blame a whole buffer or a specific line.
+--  - Manage git hunks:
+--    - Stage hunks (with undo).
+--    - Navigation between hunks.
+--    - Preview diffs of hunks (with word diff).
+--    - Ability to display deleted/changed lines via virtual lines.
+--    - Hunk text object.
+--
+--  There are more features, see `:help gitsigns`.
+--
+-- INFO: To see git signs use `vim.opt.signcolumn = 'yes'`.
+-- INFO: Git branch and diff status provided by this plugin is used by mini.statusline plugin.
+--
+-- NOTE:  ]c [c             Git: next/prev hunk.
+-- NOTE:  <Leader>hp        Git: preview hunk inline.
+-- NOTE:  <Leader>hd        Git: diff against index.
+-- NOTE:  <Leader>hD        Git: diff against last commit.
+-- NOTE:  <Leader>tD        Git: toggle show deleted.
+-- NOTE:  <Leader>hs        Git: stage hunk.
+-- NOTE:  <Leader>hu        Git: undo stage hunk.
+-- NOTE:  <Leader>hr        Git: reset hunk (get from index).
+-- NOTE:  :Gitsigns blame   Git: blame.
+-- NOTE: 󰴑 ih                Git: match hunk around cursor.
+
 ---@type LazySpec
 return {
-    { -- Adds git related signs to the gutter, as well as utilities for managing changes
+    {
         'lewis6991/gitsigns.nvim',
+        lazy = true, -- Must be loaded but not critical, so let's use event VeryLazy.
+        event = 'VeryLazy',
         opts = {
             signs = {
                 changedelete = { text = '┻' },
@@ -81,6 +111,9 @@ return {
                 map('n', '<Leader>hR', gitsigns.reset_buffer, {
                     desc = 'Git: [H]unks [R]eset all',
                 })
+
+                -- Text object
+                map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
             end,
         },
     },
