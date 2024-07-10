@@ -45,6 +45,11 @@ return {
                 remap = true,
                 desc = 'Search Project files',
             },
+            {
+                '<Leader>st',
+                '<Cmd>TodoTelescope<CR>',
+                desc = '[S]earch Directory [T]odo',
+            },
         },
         config = function()
             -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -171,6 +176,13 @@ return {
                 local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
                 builtin.find_files { cwd = dir }
             end, { desc = '[S]earch [P]roject files' })
+
+            -- Shortcut for searching your project todos
+            vim.keymap.set('n', '<Leader>sT', function()
+                local buf_filename = vim.api.nvim_buf_get_name(0)
+                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
+                return '<Cmd>TodoTelescope cwd=' .. dir .. '<CR>'
+            end, { expr = true, desc = '[S]earch Project [T]odo' })
 
             -- Open files in a new tab by default.
             local actions_state = require 'telescope.actions.state'
