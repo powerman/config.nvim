@@ -1,11 +1,31 @@
--- Highlight todo, notes, etc in comments
+--[[ Highlight, list and search todo comments in your projects ]]
+--
+--  - Highlight your todo comments in different styles.
+--  - Optionally only highlights todos in comments using TreeSitter.
+--  - Open todos in a quickfix list.
+--  - Search todos with Telescope.
+--
+--  Default keywords:
+--    - FIX FIXME BUG FIXIT ISSUE
+--    - TODO
+--    - HACK
+--    - WARN WARNING XXX
+--    - PERF OPTIM PERFORMANCE OPTIMIZE
+--    - NOTE INFO
+--    - TEST TESTING PASSED FAILED
+
+-- NOTE:  ]t [t                  Jump to next/prev TODO.
+-- NOTE:  :TodoTelescope         Search all TODO in cwd.
+-- NOTE:  :TodoTelescope cwd=..  Search all TODO in ../.
+-- NOTE:  :TodoQuickFix          All TODO in a quickfix.
 
 ---@type LazySpec
 return {
     {
         'folke/todo-comments.nvim',
         version = '*',
-        event = 'VimEnter',
+        lazy = true, -- Must be loaded but not critical, so let's use event VeryLazy.
+        event = 'VeryLazy',
         keys = {
             {
                 ']t',
