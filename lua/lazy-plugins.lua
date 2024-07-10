@@ -9,9 +9,12 @@
 --    :Lazy update
 
 require('lazy').setup({ import = 'plugins' }, {
+    checker = {
+        enabled = true,
+        notify = false,
+    },
     change_detection = {
-        -- Enable to automatically check for config file changes and reload the ui.
-        enabled = false,
+        notify = false,
     },
     dev = {
         path = '~/proj/nvim',

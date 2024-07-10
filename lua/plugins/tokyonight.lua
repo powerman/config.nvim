@@ -12,6 +12,13 @@ return {
         ---@type tokyonight.Config
         opts = {
             style = 'night',
+            on_highlights = function(hl, c)
+                -- Added in `mini.lua`.
+                hl.MiniStatuslineLazyUpdates = {
+                    fg = c.info,
+                    bg = c.fg_gutter,
+                }
+            end,
         },
         config = function(_, opts)
             require('tokyonight').setup(opts)
