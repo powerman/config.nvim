@@ -1,4 +1,4 @@
--- [[ Lightweight yet powerful formatter plugin for Neovim ]]
+--[[ Lightweight yet powerful formatter plugin for Neovim ]]
 --
 --  - Format a lot of different file types using both LSP and 3rd-party tools.
 --  - Format embedded code blocks in another language (e.g. in markdown, templates, etc.).
@@ -8,7 +8,7 @@
 -- modifying this file, but also installing and configuring required 3rd-party tools.
 -- List of supported formatters: https://github.com/stevearc/conform.nvim#formatters.
 -- TODO: Find out is it possible to automate installation of these tools using mason.
---
+
 -- NOTE:  <Leader>f        Formats current buffer.
 -- NOTE:  :FormatDisable   Disables autoformat.
 -- NOTE:  :FormatDisable!  Disables autoformat for the buffer.

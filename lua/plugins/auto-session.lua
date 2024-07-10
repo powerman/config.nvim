@@ -1,4 +1,4 @@
--- [[ A small automated session manager for Neovim ]]
+--[[ A small automated session manager for Neovim ]]
 --
 --  1. When starting `nvim` with no arguments, auto-session will try to restore an existing
 --     session for the `cwd` (current working directory) if one exists.
@@ -13,7 +13,7 @@
 --  6. When piping to nvim, e.g: `cat myfile | nvim`, auto-session won't do anything.
 --
 --  See https://github.com/rmagatti/auto-session.
---
+
 -- NOTE:  <Leader>sa  List/delete sessions.
 
 ---@type LazySpec

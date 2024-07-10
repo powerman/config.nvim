@@ -1,4 +1,4 @@
--- [[ Super fast git decorations ]]
+--[[ Super fast git decorations ]]
 --
 --  - Signs for added, removed, and changed (including staged) lines.
 --  - Status bar integration.
@@ -14,7 +14,7 @@
 --
 -- INFO: To see git signs use `vim.opt.signcolumn = 'yes'`.
 -- INFO: Git branch and diff status provided by this plugin is used by mini.statusline plugin.
---
+
 -- NOTE:  ]c [c             Git: next/prev hunk.
 -- NOTE:  <Leader>hp        Git: preview hunk inline.
 -- NOTE:  <Leader>hd        Git: diff against index.

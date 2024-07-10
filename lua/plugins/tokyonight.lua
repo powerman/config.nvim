@@ -1,5 +1,5 @@
--- [[ A clean, dark Neovim theme, with support for lsp, treesitter and lots of plugins ]]
---
+--[[ A clean, dark Neovim theme, with support for lsp, treesitter and lots of plugins ]]
+
 -- NOTE:  Telescope colorscheme  Select colorscheme.
 
 ---@type LazySpec

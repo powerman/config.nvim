@@ -1,4 +1,4 @@
--- [[ Setting basic autocommands ]]
+--[[ Setting basic autocommands ]]
 --
 --  See `:help lua-guide-autocommands`.
 

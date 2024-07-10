@@ -1,4 +1,4 @@
--- [[ Smart and powerful comment plugin for neovim ]]
+--[[ Smart and powerful comment plugin for neovim ]]
 --
 --  Neovim out-of-box supports commenting and uncommenting of lines based on 'commentstring'
 --  on `gc` keymapping and also provides text object `gc` for the largest contiguous block of
@@ -11,12 +11,12 @@
 --    - Optionally ignore lines (e.g. empty ones).
 --    - Adds extra keymapping: `gco`, `gcO`, `gcA`.
 --
+-- BUG: `gc` and `#` in VISUAL with 1 line works blockwise instead of linewise.
+-- https://github.com/numToStr/Comment.nvim/issues/476
+
 -- NOTE:  #      (Un)Comments lines and move on.
 -- NOTE:  <C-C>  Backup line(s) into comment and edit.
 -- NOTE: 󰴑 gc     Match a whole comment around cursor.
---
--- BUG: `gc` and `#` in VISUAL with 1 line works blockwise instead of linewise.
--- https://github.com/numToStr/Comment.nvim/issues/476
 
 ---@type LazySpec
 return {

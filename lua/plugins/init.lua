@@ -1,4 +1,4 @@
--- [[ Plugins without complicated configuration ]]
+--[[ Plugins without complicated configuration ]]
 
 ---@type LazySpec
 return {

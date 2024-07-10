@@ -1,4 +1,4 @@
--- [[ Nerd Fonts ]]
+--[[ Nerd Fonts ]]
 --
 --  See https://www.nerdfonts.com/.
 
