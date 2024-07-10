@@ -1,14 +1,22 @@
+--[[ A library used by other plugins ]]
+--
+--  See https://github.com/nvim-lua/plenary.nvim.
+--
+-- TODO: It also provides a plugin to help run tests - document it here!
+
 ---@type LazySpec
 return {
     {
-        'nvim-lua/plenary.nvim', -- Not a plugin, just a useful library.
+        'nvim-lua/plenary.nvim',
+        lazy = true, -- Will be loaded only if some other plugin will depend on it.
         config = function()
             local Path = require 'plenary.path'
 
-            --- TODO: Add tests.
             local normalize = Path.normalize
-            --- Monkey-patch Path:normalize method to make it try harder looking for shortest
-            --- relative path by checking also path UP from cwd: '../../…'.
+            -- Feature request: https://github.com/nvim-lua/plenary.nvim/issues/600.
+            -- Monkey-patch Path:normalize method to make it try harder looking for shortest
+            -- relative path by checking also path UP from cwd: '../../…'.
+            -- TODO: Add tests.
             ---@diagnostic disable-next-line: duplicate-set-field
             Path.normalize = function(self, cwd)
                 -- Absolute (DOWN FROM / or ~) or relative (DOWN FROM cwd).
