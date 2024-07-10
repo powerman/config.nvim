@@ -4,7 +4,12 @@
 
 This is my Neovim config.
 
-It was started as a fork of [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim).
+> **NOTE**
+> It was started as a fork of
+> [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim) and I
+> highly recommend it if you like to create your own config yourself (like I did). I do not
+> support this config on Windows, but it might work - check that kickstart repo for
+> Windows-specific install instructions.
 
 ## Installation
 
@@ -17,15 +22,20 @@ If you are experiencing issues, please make sure you have the latest version.
 ### Install External Dependencies
 
 External Requirements:
-- Basic utils: `git`, `make`, `unzip`, C Compiler (`gcc`)
-- [ripgrep](https://github.com/BurntSushi/ripgrep#installation)
-- Clipboard tool (xclip/xsel/win32yank or other depending on platform)
-- A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons
-  - if you have it set `vim.g.have_nerd_font` in `init.lua` to true
-- Language Setup:
+
+- Basic utils: `git`, `make`, `unzip`, C Compiler (`gcc`).
+- [ripgrep](https://github.com/BurntSushi/ripgrep#installation).
+- Clipboard tool (xclip/xsel or other depending on platform).
+- A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons.
+  - If you have it set `vim.g.have_nerd_font` in `init.lua` to true.
+  - If you chose "Mono" font kind set `vim.g.mono_nerd_font ` in `init.lua` to true.
+- Language setup:
   - If want to write Typescript, you need `npm`
   - If want to write Golang, you will need `go`
   - etc.
+- Setup formatters for file types you need:
+  - Check/update list of tools configured in `lua/plugins/conform.lua`.
+  - Install/setup these tools.
 
 ### Install Config
 
@@ -34,8 +44,8 @@ External Requirements:
 
 Neovim's configurations are located under the following paths, depending on your OS:
 
-| OS | PATH |
-| :- | :--- |
+| OS           | PATH                                      |
+| :----------- | :---------------------------------------- |
 | Linux, MacOS | `$XDG_CONFIG_HOME/nvim`, `~/.config/nvim` |
 
 #### Recommended Step
@@ -49,30 +59,15 @@ fork to your machine using one of the commands below, depending on your OS.
 > `https://github.com/<your_github_username>/config.nvim.git`
 
 #### Clone config.nvim
+
 > **NOTE**
 > If following the recommended step above (i.e., forking the repo), replace
-> `dam9000` with `<your_github_username>` in the commands below
+> `powerman` with `<your_github_username>` in the commands below
 
 <details><summary> Linux and Mac </summary>
 
 ```sh
 git clone https://github.com/powerman/config.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
-```
-
-</details>
-
-<details><summary> Windows </summary>
-
-If you're using `cmd.exe`:
-
-```
-git clone https://github.com/powerman/config.nvim.git %userprofile%\AppData\Local\nvim\
-```
-
-If you're using `powershell.exe`
-
-```
-git clone https://github.com/powerman/config.nvim.git $env:USERPROFILE\AppData\Local\nvim\
 ```
 
 </details>
@@ -88,6 +83,8 @@ nvim
 That's it! Lazy will install all the plugins you have. Use `:Lazy` to view
 current plugin status. Hit `q` to close the window.
 
+If you are on another machine, you can do `:Lazy restore`, to update all your plugins to the
+version from the lockfile.
 
 ### Getting Started
 
@@ -95,12 +92,12 @@ current plugin status. Hit `q` to close the window.
 
 ### FAQ
 
-* What should I do if I already have a pre-existing neovim configuration?
-  * You should back it up and then delete all associated files.
-  * This includes your existing init.lua and the neovim files in `~/.local`
+- What should I do if I already have a pre-existing neovim configuration?
+  - You should back it up and then delete all associated files.
+  - This includes your existing init.lua and the neovim files in `~/.local`
     which can be deleted with `rm -rf ~/.local/share/nvim/`
-* Can I keep my existing configuration in parallel?
-  * Yes! You can use [NVIM_APPNAME](https://neovim.io/doc/user/starting.html#%24NVIM_APPNAME)`=nvim-NAME`
+- Can I keep my existing configuration in parallel?
+  - Yes! You can use [NVIM_APPNAME](https://neovim.io/doc/user/starting.html#_nvim_appname)`=nvim-NAME`
     to maintain multiple configurations. For example, you can install the
     configuration in `~/.config/nvim-powerman` and create an alias:
     ```
@@ -110,8 +107,6 @@ current plugin status. Hit `q` to close the window.
     config directory and the matching local directory
     `~/.local/share/nvim-powerman`. You can apply this approach to any Neovim
     distribution that you would like to try out.
-* What if I want to "uninstall" this configuration:
-  * See [lazy.nvim uninstall](https://github.com/folke/lazy.nvim#-uninstalling) information
 
 ### Install Recipes
 
@@ -119,50 +114,8 @@ Below you can find OS specific install instructions for Neovim and dependencies.
 
 After installing all the dependencies continue with the [Install Config](#Install-Config) step.
 
-#### Windows Installation
-
-<details><summary>Windows with Microsoft C++ Build Tools and CMake</summary>
-Installation may require installing build tools and updating the run command for `telescope-fzf-native`
-
-See `telescope-fzf-native` documentation for [more details](https://github.com/nvim-telescope/telescope-fzf-native.nvim#installation)
-
-This requires:
-
-- Install CMake and the Microsoft C++ Build Tools on Windows
-
-```lua
-{'nvim-telescope/telescope-fzf-native.nvim', build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
-```
-</details>
-<details><summary>Windows with gcc/make using chocolatey</summary>
-Alternatively, one can install gcc and make which don't require changing the config,
-the easiest way is to use choco:
-
-1. install [chocolatey](https://chocolatey.org/install)
-either follow the instructions on the page or use winget,
-run in cmd as **admin**:
-```
-winget install --accept-source-agreements chocolatey.chocolatey
-```
-
-2. install all requirements using choco, exit previous cmd and
-open a new one so that choco path is set, and run in cmd as **admin**:
-```
-choco install -y neovim git ripgrep wget fd unzip gzip mingw make
-```
-</details>
-<details><summary>WSL (Windows Subsystem for Linux)</summary>
-
-```
-wsl --install
-wsl
-sudo add-apt-repository ppa:neovim-ppa/unstable -y
-sudo apt update
-sudo apt install make gcc ripgrep unzip git xclip neovim
-```
-</details>
-
 #### Linux Install
+
 <details><summary>Ubuntu Install Steps</summary>
 
 ```
@@ -170,6 +123,7 @@ sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update
 sudo apt install make gcc ripgrep unzip git xclip neovim
 ```
+
 </details>
 <details><summary>Debian Install Steps</summary>
 
@@ -187,12 +141,14 @@ sudo tar -C /opt -xzf nvim-linux64.tar.gz
 # make it available in /usr/local/bin, distro installs to /usr/bin
 sudo ln -sf /opt/nvim-linux64/bin/nvim /usr/local/bin/
 ```
+
 </details>
 <details><summary>Fedora Install Steps</summary>
 
 ```
 sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 ```
+
 </details>
 
 <details><summary>Arch Install Steps</summary>
@@ -200,4 +156,5 @@ sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 ```
 sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
 ```
+
 </details>
