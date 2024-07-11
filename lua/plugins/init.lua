@@ -15,6 +15,8 @@ return {
     -- Useful for getting pretty icons, but requires a Nerd Font.
     -- Setup it here for lazy loading and DO NOT include in other plugin's dependencies.
     { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font, lazy = true },
+    -- Improve the default vim.ui interfaces.
+    { 'stevearc/dressing.nvim', lazy = true, event = 'VeryLazy', config = true },
     -- TODO: Just an experiment, not sure is it used (by plugins)/useful (to me).
     {
         'rcarriga/nvim-notify',
