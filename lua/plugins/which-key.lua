@@ -1,3 +1,13 @@
+--[[ Displays a popup with possible keybindings of the command you started typing ]]
+--
+--  - Uses the `desc` attributes of your mappings as the default label.
+--  - Opens a popup with suggestions to complete a key binding.
+--  - Built-in plugins:
+--    - marks: shows your marks when you hit one of the jump keys.
+--    - registers: shows the contents of your registers
+--    - presets: help for motions, text-objects, operators, windows, nav, z and g
+--    - spelling: spelling suggestions inside the which-key popup
+--
 -- BUG: Healthcheck show non-existing conflicts because it does not track unmapped keys:
 -- https://github.com/folke/which-key.nvim/issues/615
 
