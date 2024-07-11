@@ -28,6 +28,15 @@ return {
                 enable = true,
                 disable = { 'ruby' },
             },
+            incremental_selection = {
+                enable = true,
+                keymaps = {
+                    init_selection = '<M-v>',
+                    node_incremental = '<M-v>',
+                    scope_incremental = false,
+                    node_decremental = '<BS>',
+                },
+            },
         },
         config = function(_, opts)
             -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
