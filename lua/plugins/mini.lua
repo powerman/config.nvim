@@ -1,3 +1,51 @@
+--[[ 40+ independent plugins improving overall Neovim experience with minimal effort ]]
+--
+--  We use only some of available plugins (all already installed but not loaded).
+--  See all plugins: https://github.com/echasnovski/mini.nvim?tab=readme-ov-file#modules
+
+--[[ mini.ai - Extend and create a/i textobjects ]]
+--
+--  - Enhances some builtin textobjects (like `a(`, `a)`, `a'`, and more).
+--  - Creates new ones (like `a*`, `a<Space>`, `af`, `a?`, and more).
+--  - Allows user to create their own (like based on treesitter, and more).
+--  - Has builtins for brackets, quotes, function call, argument, tag, user prompt, and any
+--    punctuation/digit/whitespace character.
+--
+--  Examples:
+--    - va)  - [V]isually select [A]round [)]paren
+--    - yinq - [Y]ank [I]nside [N]ext [']quote
+--    - ci'  - [C]hange [I]nside [']quote
+
+-- NOTE: 󰴑 a{target}    Match around      b{()}q'"Ft…
+-- NOTE: 󰴑 i{target}    Match inside      b{()}q'"Ft…
+-- NOTE: 󰴑 an{target}   Match around next b{()}q'"Ft…
+-- NOTE: 󰴑 in{target}   Match inside next b{()}q'"Ft…
+-- NOTE: 󰴑 al{target}   Match around last b{()}q'"Ft…
+-- NOTE: 󰴑 il{target}   Match inside last b{()}q'"Ft…
+
+--[[ mini.surround - Add/delete/replace surroundings (brackets, quotes, etc.) ]]
+--
+--  - Add, delete, replace, find, highlight surrounding (pair of parenthesis, quotes, etc.).
+--  - Has builtins for brackets, function call, tag, user prompt, and any
+--    alphanumeric/punctuation/whitespace character.
+--
+--  See: https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-surround.md#features
+--
+--  Examples:
+--    - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+--    - sd'   - [S]urround [D]elete [']quotes
+--    - sr)'  - [S]urround [R]eplace [)] [']
+
+-- NOTE:  sa{motion}{target}   Add })'"… around {motion}.
+-- NOTE:  sr{target}{target}   Replace surround })'"… with })'"….
+-- NOTE:  sd{target}           Delete surround })'"….
+
+--[[ mini.statusline - Minimal and fast statusline module with opinionated default look ]]
+--
+--  - Define own custom statusline structure for active and inactive windows.
+--  - Built-in active mode indicator with colors.
+--  - Sections can hide information when window is too narrow.
+
 --- Status line section for Lazy updates.
 ---
 --- Empty string is returned if window width is lower than `args.trunc_width`.
@@ -40,16 +88,10 @@ end
 
 ---@type LazySpec
 return {
-    { -- Collection of various small independent plugins/modules
+    {
         'echasnovski/mini.nvim',
         version = '*',
         config = function()
-            -- Better Around/Inside textobjects
-            --
-            -- Examples:
-            --  - va)  - [V]isually select [A]round [)]paren
-            --  - yinq - [Y]ank [I]nside [N]ext [']quote
-            --  - ci'  - [C]hange [I]nside [']quote
             local ai_gen_spec = require('mini.ai').gen_spec
             require('mini.ai').setup {
                 n_lines = 500,
@@ -65,11 +107,6 @@ return {
                 },
             }
 
-            -- Add/delete/replace surroundings (brackets, quotes, etc.)
-            --
-            -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-            -- - sd'   - [S]urround [D]elete [']quotes
-            -- - sr)'  - [S]urround [R]eplace [)] [']
             local sur_ts_input = require('mini.surround').gen_spec.input.treesitter
             require('mini.surround').setup {
                 custom_surroundings = {
@@ -80,9 +117,6 @@ return {
                 },
             }
 
-            -- Simple and easy statusline.
-            --  You could remove this setup call if you don't like it,
-            --  and try some other statusline plugin
             require('mini.statusline').setup {
                 use_icons = vim.g.have_nerd_font,
                 content = {
@@ -90,23 +124,19 @@ return {
                 },
             }
 
-            -- You can configure sections in the statusline by overriding their
-            -- default behavior. For example, here we set the section for
-            -- cursor location to LINE:COLUMN
+            -- Set the section for cursor location to LINE:COLUMN/LINES.
             ---@diagnostic disable-next-line: duplicate-set-field
             MiniStatusline.section_location = function()
                 local slash = MiniStatusline.config.use_icons and '' or ' /'
                 return '%3l:%-2v' .. slash .. '%L'
             end
+
+            -- Force short filename.
             local section_filename = MiniStatusline.section_filename
             ---@diagnostic disable-next-line: duplicate-set-field
             MiniStatusline.section_filename = function(args)
-                -- Force short filename.
                 return string.gsub(section_filename(args), '%%F', '%%f')
             end
-
-            -- ... and there is more!
-            --  Check out: https://github.com/echasnovski/mini.nvim
         end,
     },
 }
