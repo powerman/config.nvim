@@ -37,6 +37,9 @@ return {
         init = function()
             vim.opt.sessionoptions:append 'winpos'
             vim.opt.sessionoptions:append 'localoptions'
+            -- HACK: Work around https://github.com/rmagatti/auto-session/issues/325:
+            -- help files may not be available at VimEnter if they're from lazy loaded plugin.
+            vim.opt.sessionoptions:remove 'help'
         end,
         ---@type defaultConf
         opts = {
