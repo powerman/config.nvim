@@ -17,12 +17,4 @@ return {
     { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font, lazy = true },
     -- Improve the default vim.ui interfaces.
     { 'stevearc/dressing.nvim', lazy = true, event = 'VeryLazy', config = true },
-    -- TODO: Just an experiment, not sure is it used (by plugins)/useful (to me).
-    {
-        'rcarriga/nvim-notify',
-        version = '*',
-        init = function()
-            vim.notify = require 'notify'
-        end,
-    },
 }
