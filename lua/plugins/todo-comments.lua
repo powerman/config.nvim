@@ -24,6 +24,7 @@ return {
     {
         'folke/todo-comments.nvim',
         version = '*',
+        dependencies = { 'nvim-lua/plenary.nvim' },
         lazy = true, -- Must be loaded but not critical, so let's use event VeryLazy.
         event = 'VeryLazy',
         keys = {
