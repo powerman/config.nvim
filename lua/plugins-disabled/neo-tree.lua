@@ -5,7 +5,7 @@ return {
     'nvim-neo-tree/neo-tree.nvim',
     version = '*',
     dependencies = {
-        'MunifTanjim/nui.nvim',
+        { 'MunifTanjim/nui.nvim', version = '*' },
     },
     cmd = 'Neotree',
     keys = {

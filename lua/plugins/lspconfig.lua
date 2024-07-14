@@ -47,13 +47,14 @@ return {
         'neovim/nvim-lspconfig',
         dependencies = {
             -- Automatically install LSPs and related tools to stdpath for Neovim
-            { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-            'williamboman/mason-lspconfig.nvim',
+            { 'williamboman/mason.nvim', version = '*', config = true }, -- NOTE: Must be loaded before dependants
+            { 'williamboman/mason-lspconfig.nvim', version = '*' },
             'WhoIsSethDaniel/mason-tool-installer.nvim',
 
             -- Useful status updates for LSP.
             {
                 'j-hui/fidget.nvim',
+                version = '*',
                 -- TODO: Extract to fidget.lua or init.lua? Read docs.
                 opts = {
                     notification = {

@@ -9,17 +9,18 @@
 return {
     -- NOTE: Yes, you can install new plugins here!
     'mfussenegger/nvim-dap',
+    version = '*',
     -- NOTE: And you can specify dependencies as well
     dependencies = {
         -- Creates a beautiful debugger UI
-        'rcarriga/nvim-dap-ui',
+        { 'rcarriga/nvim-dap-ui', version = '*' },
 
         -- Required dependency for nvim-dap-ui
-        'nvim-neotest/nvim-nio',
+        { 'nvim-neotest/nvim-nio', version = '*' },
 
         -- Installs the debug adapters for you
         'williamboman/mason.nvim',
-        'jay-babu/mason-nvim-dap.nvim',
+        { 'jay-babu/mason-nvim-dap.nvim', version = '*' },
 
         -- Add your own debuggers here
         'leoluz/nvim-dap-go',
