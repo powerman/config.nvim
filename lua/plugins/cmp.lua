@@ -1,48 +1,64 @@
--- TODO: Add doc.
+-- [[ A completion engine ]]
+--
+--  - Full support for LSP completion related capabilities.
+--  - Powerful customizability via Lua functions.
+--  - Smart handling of key mappings.
+--  - Completion sources are installed from external repositories and "sourced".
+--
+--  Check available sources: https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
+
+-- NOTE:  <Tab>       Cmp: complete|expand|open menu|next.
+-- NOTE:  <S-Tab>     Cmp: open menu|previous.
+-- NOTE:  <CR>        Cmp: complete/expand selected.
+-- NOTE:  <C-e>       Cmp: abort and close menu.
+-- NOTE:  <C-Down>    Cmp: scroll item doc.
+-- NOTE:  <C-Up>      Cmp: scroll item doc.
+-- NOTE:  <C-Right>   Snip: expand or jump next.
+-- NOTE:  <C-Left>    Snip: jump previous.
+-- NOTE:  <C-CR>      Snip: change choice.
 
 ---@type LazySpec
 return {
     {
         'hrsh7th/nvim-cmp',
+        lazy = true,
         event = { 'InsertEnter', 'CmdlineEnter' },
         dependencies = {
-            -- Snippet Engine & its associated nvim-cmp source
-            -- TODO: Move to `luasnip.lua`.
-            -- TODO: Read docs and configure (e.g. add friendly-snippets).
-            {
-                'L3MON4D3/LuaSnip',
-                build = 'make install_jsregexp',
-                dependencies = {
-                    -- `friendly-snippets` contains a variety of premade snippets.
-                    --    See the README about individual language/framework/plugin snippets:
-                    --    https://github.com/rafamadriz/friendly-snippets
-                    -- {
-                    --   'rafamadriz/friendly-snippets',
-                    --   config = function()
-                    --     require('luasnip.loaders.from_vscode').lazy_load()
-                    --   end,
-                    -- },
-                },
-            },
-
             -- Adds completion sources.
-            -- TODO: Read docs for all of them. Setup if needed.
             'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-nvim-lsp-signature-help',
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-cmdline',
-            'saadparwaiz1/cmp_luasnip', -- TODO: Add depencency on luasnip.
+            { 'saadparwaiz1/cmp_luasnip', dependencies = 'L3MON4D3/LuaSnip' },
 
             -- Adds icons for completion types.
             'onsails/lspkind.nvim',
         },
         config = function()
-            -- See `:help cmp`
             local cmp = require 'cmp'
             local types = require 'cmp.types'
             local luasnip = require 'luasnip'
-            luasnip.config.setup {}
             local lspkind = require 'lspkind'
+
+            local max_buf_size = 1024 * 1024 -- Max size for indexing buffer contents.
+            local get_bufnrs_current = function()
+                local buf = vim.api.nvim_get_current_buf()
+                local line_count = vim.api.nvim_buf_line_count(buf)
+                local byte_size = vim.api.nvim_buf_get_offset(buf, line_count)
+                return byte_size > max_buf_size and {} or { buf }
+            end
+            local get_bufnrs_all_visible = function()
+                local bufs = {}
+                local byte_size = 0
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                    local buf = vim.api.nvim_win_get_buf(win)
+                    local line_count = vim.api.nvim_buf_line_count(buf)
+                    byte_size = byte_size + vim.api.nvim_buf_get_offset(buf, line_count)
+                    bufs[buf] = true
+                end
+                return byte_size > max_buf_size and {} or vim.tbl_keys(bufs)
+            end
 
             local has_words_before = function()
                 if string.match(vim.fn.mode(), '^c') then
@@ -55,14 +71,6 @@ return {
 
             ---@diagnostic disable: missing-fields
             cmp.setup {
-                -- TODO: Shouldn't be needed in nvim-0.10. Expand works, but jumps not -
-                -- probably jumps should be configured in luasnip? Or just leave it as is.
-                snippet = {
-                    expand = function(args)
-                        luasnip.lsp_expand(args.body)
-                    end,
-                },
-
                 window = {
                     completion = cmp.config.window.bordered(),
                     documentation = cmp.config.window.bordered(),
@@ -71,15 +79,16 @@ return {
                 formatting = {
                     format = lspkind.cmp_format {
                         mode = 'symbol_text',
-                        maxwidth = 40,
+                        maxwidth = 30,
                         ellipsis_char = '…',
                         show_labelDetails = true,
                         menu = {
-                            buffer = '[Buf]',
-                            nvim_lsp = '[LSP]',
-                            luasnip = '[Snip]',
-                            path = '[Path]',
-                            cmdline = '[Cmd]',
+                            nvim_lsp = 'LSP',
+                            nvim_lsp_signature_help = 'Sig',
+                            buffer = 'Buf',
+                            path = 'Path',
+                            cmdline = 'Cmd',
+                            luasnip = 'Snip',
                         },
                     },
                 },
@@ -98,8 +107,11 @@ return {
                     disallow_prefix_unmatching = true,
                 },
 
+                -- HACK: Work around https://github.com/hrsh7th/nvim-cmp/issues/1809.
+                preselect = 'None',
+
                 mapping = {
-                    -- Smart unabtrusive completion in a shell-like way.
+                    -- Smart unobtrusive completion in a shell-like way.
                     --
                     --  - Menu is shown only when user explicitly asks for it and there are
                     --    multiple possible completions/snippets available.
@@ -138,9 +150,7 @@ return {
                             if cmp.complete_common_string() then
                                 cmp.close()
                             elseif #cmp.get_entries() == 1 then
-                                cmp.confirm {
-                                    select = true,
-                                }
+                                cmp.confirm { select = true }
                             end
                         else
                             fallback()
@@ -170,35 +180,55 @@ return {
                     ['<C-Up>'] = cmp.mapping.scroll_docs(-4),
                     ['<C-Down>'] = cmp.mapping.scroll_docs(4),
 
-                    -- If you have a snippet like:
-                    --  function $name($args)
-                    --    $body
-                    --  end
-                    --
-                    -- <C-Right> will move you to the next of each of the expansion locations.
-                    -- <C-Left> is similar, except moving you backwards.
-                    ['<C-Right>'] = cmp.mapping(function()
+                    -- INFO: These mappings probably should be in luasnip.lua, but here we can
+                    -- easily make them support fallback.
+                    ['<C-Right>'] = cmp.mapping(function(fallback)
                         if luasnip.expand_or_locally_jumpable() then
                             luasnip.expand_or_jump()
+                        else
+                            fallback()
                         end
                     end, { 'i', 's' }),
-                    ['<C-Left>'] = cmp.mapping(function()
+                    ['<C-Left>'] = cmp.mapping(function(fallback)
                         if luasnip.locally_jumpable(-1) then
                             luasnip.jump(-1)
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+                    ['<C-CR>'] = cmp.mapping(function(fallback)
+                        if luasnip.choice_active() then
+                            luasnip.change_choice(1)
+                        else
+                            fallback()
                         end
                     end, { 'i', 's' }),
                 },
+
                 sources = cmp.config.sources({
-                    { name = 'nvim_lsp' },
+                    { name = 'nvim_lsp_signature_help' },
+                    {
+                        name = 'nvim_lsp',
+                        -- Remove Text completions from LSP.
+                        -- entry_filter = function(entry, _)
+                        --     return types.lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+                        -- end,
+                    },
                     { name = 'luasnip' },
                 }, {
-                    { name = 'buffer' },
+                    {
+                        name = 'buffer',
+                        option = { get_bufnrs = get_bufnrs_all_visible },
+                    },
                 }),
             }
 
             cmp.setup.cmdline({ '/', '?' }, {
                 sources = {
-                    { name = 'buffer' },
+                    {
+                        name = 'buffer',
+                        option = { get_bufnrs = get_bufnrs_current },
+                    },
                 },
             })
 
