@@ -1,4 +1,4 @@
-local extra_lsp_augroup = vim.api.nvim_create_augroup('extra-lsp', { clear = true })
+local extra_lsp_augroup = vim.api.nvim_create_augroup('user.extra-lsp', { clear = true })
 
 -- termux-language-server is a language server for some specific bash scripts.
 -- See https://github.com/termux/termux-language-server.
@@ -98,7 +98,7 @@ return {
             --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
             --    function will be executed to configure the current buffer
             vim.api.nvim_create_autocmd('LspAttach', {
-                group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+                group = vim.api.nvim_create_augroup('user.lsp-attach', { clear = true }),
                 callback = function(event)
                     -- NOTE: Remember that Lua is a real programming language, and as such it is possible
                     -- to define small helper and utility functions so you don't have to repeat yourself.
@@ -186,10 +186,8 @@ return {
                     -- When you move your cursor, the highlights will be cleared (the second autocommand).
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
                     if client and client.server_capabilities.documentHighlightProvider then
-                        local highlight_augroup = vim.api.nvim_create_augroup(
-                            'kickstart-lsp-highlight',
-                            { clear = false }
-                        )
+                        local highlight_augroup =
+                            vim.api.nvim_create_augroup('user.lsp-highlight', { clear = false })
                         vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
                             buffer = event.buf,
                             group = highlight_augroup,
@@ -204,13 +202,13 @@ return {
 
                         vim.api.nvim_create_autocmd('LspDetach', {
                             group = vim.api.nvim_create_augroup(
-                                'kickstart-lsp-detach',
+                                'user.lsp-detach',
                                 { clear = true }
                             ),
                             callback = function(event2)
                                 vim.lsp.buf.clear_references()
                                 vim.api.nvim_clear_autocmds {
-                                    group = 'kickstart-lsp-highlight',
+                                    group = 'user.lsp-highlight',
                                     buffer = event2.buf,
                                 }
                             end,
