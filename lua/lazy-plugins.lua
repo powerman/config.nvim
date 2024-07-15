@@ -8,6 +8,8 @@
 --  To update plugins you can run:
 --    :Lazy update
 
+-- NOTE:  :Lazy   Install/upgrade/clean plugins.
+
 require('lazy').setup({ import = 'plugins' }, {
     checker = {
         enabled = true,
