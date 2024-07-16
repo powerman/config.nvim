@@ -73,13 +73,16 @@ return {
             ---@diagnostic disable: missing-fields
             cmp.setup {
                 window = {
-                    completion = cmp.config.window.bordered(),
+                    completion = cmp.config.window.bordered {
+                        col_offset = -4, -- Offset icon before completion to the left.
+                    },
                     documentation = cmp.config.window.bordered(),
                 },
 
                 formatting = {
+                    fields = { 'kind', 'abbr', 'menu' },
                     format = lspkind.cmp_format {
-                        mode = 'symbol_text',
+                        mode = 'symbol',
                         maxwidth = 30,
                         ellipsis_char = '…',
                         show_labelDetails = true,
