@@ -17,6 +17,7 @@
 -- NOTE:  <C-Left>    Snip: jump previous.
 -- NOTE:  <C-CR>      Snip: change choice.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

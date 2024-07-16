@@ -19,6 +19,7 @@
 -- NOTE:  :TodoTelescope cwd=..  Search all TODO in ../.
 -- NOTE:  :TodoQuickFix          All TODO in a quickfix.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

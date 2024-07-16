@@ -26,6 +26,7 @@
 -- NOTE:  :Gitsigns blame   Git: blame.
 -- NOTE: 󰴑 ih                Git: match hunk around cursor.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

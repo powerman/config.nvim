@@ -11,6 +11,8 @@
 --
 --  Place your own SnipMate-like snippets in ~/.config/nvim/snippets/.
 
+---@module 'lazy'
+---@type LazySpec
 return {
     {
         'L3MON4D3/LuaSnip',

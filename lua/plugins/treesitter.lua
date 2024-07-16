@@ -1,3 +1,4 @@
+---@module 'lazy'
 ---@type LazySpec
 return {
     { -- Highlight, edit, and navigate code

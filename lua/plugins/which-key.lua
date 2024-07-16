@@ -11,6 +11,7 @@
 -- BUG: Healthcheck show non-existing conflicts because it does not track unmapped keys:
 -- https://github.com/folke/which-key.nvim/issues/615
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     { -- Useful plugin to show you pending keybinds.

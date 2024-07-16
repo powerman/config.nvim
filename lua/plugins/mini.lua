@@ -86,6 +86,7 @@ local function statusline_active()
     }
 end
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

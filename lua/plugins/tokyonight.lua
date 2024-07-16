@@ -2,6 +2,7 @@
 
 -- NOTE:  Telescope colorscheme  Select colorscheme.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

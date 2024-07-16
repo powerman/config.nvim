@@ -28,6 +28,7 @@ local ignore_paths = {
     '/go/pkg/mod/', -- Maybe run `go env GOMODCACHE` instead of hardcode?
 }
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     { -- Autoformat

@@ -4,6 +4,7 @@
 --
 -- TODO: It also provides a plugin to help run tests - document it here!
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

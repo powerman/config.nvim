@@ -1,3 +1,4 @@
+---@module 'lazy'
 ---@type LazySpec
 return {
     { -- Fuzzy Finder (files, lsp, etc)

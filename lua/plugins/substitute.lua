@@ -15,6 +15,7 @@
 -- NOTE:  ss          Replaces line with yank.
 -- NOTE:  S           Replaces to the end of line with yank.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     'gbprod/substitute.nvim',

@@ -1,5 +1,6 @@
 --[[ Plugins without complicated configuration ]]
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     -- This plugin automatically adjusts 'shiftwidth' and 'expandtab' heuristically based on

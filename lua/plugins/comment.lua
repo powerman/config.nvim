@@ -18,6 +18,7 @@
 -- NOTE:  <C-C>  Backup line(s) into comment and edit.
 -- NOTE: 󰴑 gc     Match a whole comment around cursor.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {

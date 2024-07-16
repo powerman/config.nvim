@@ -16,6 +16,7 @@
 
 -- NOTE:  <Leader>sa  List/delete sessions.
 
+---@module 'lazy'
 ---@type LazySpec
 return {
     {
