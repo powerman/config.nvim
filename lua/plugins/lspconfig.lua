@@ -28,6 +28,8 @@
 -- NOTE:  :LspInfo     LSP: Status for active/configured servers.
 -- NOTE:  K            LSP: Hover documentation.
 -- NOTE:  KK           LSP: Into hover documentation.
+-- NOTE:  <C-k>        LSP: Signature documentation.
+-- NOTE:  <C-k><C-k>   LSP: Into signature documentation.
 -- NOTE:  <Leader>r    LSP: Rename identifier.
 -- NOTE:  <Leader>ca   LSP: Code action.
 -- NOTE:  gd           LSP: Goto definition.
@@ -157,6 +159,9 @@ local function handle_LspAttach(ev)
     -- Opens a popup that displays documentation about the word under your cursor
     -- See `:help K` for why this keymap.
     map('K', vim.lsp.buf.hover, 'Hover Documentation')
+
+    -- Opens a popup that displays signature for the function param under your cursor.
+    map('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
     -- Rename the identifier under your cursor.
     -- Most Language Servers support renaming across files, etc.
