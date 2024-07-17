@@ -92,19 +92,20 @@ local function make_client_capabilities()
     )
 end
 
+local function create_lsp_augroup(name, client_id, bufnr)
+    return vim.api.nvim_create_augroup(
+        ---@diagnostic disable-next-line: redundant-parameter
+        vim.fn.printf('user.lsp.%s.%s.%s', name, client_id, bufnr),
+        { clear = true }
+    )
+end
+
 -- Highlight references of the word under your cursor when your cursor
 -- rests there for a little while.
 -- When you move your cursor, the highlights will be cleared.
 local function highlight_references(client_id, bufnr)
-    local create_lsp_augroup = function(name)
-        return vim.api.nvim_create_augroup(
-            ---@diagnostic disable-next-line: redundant-parameter
-            vim.fn.printf('user.lsp.%s.%s.%s', name, client_id, bufnr),
-            { clear = true }
-        )
-    end
-    local hl_group = create_lsp_augroup 'highlight'
-    local detach_group = create_lsp_augroup 'detach'
+    local hl_group = create_lsp_augroup('highlight', client_id, bufnr)
+    local detach_group = create_lsp_augroup('detach', client_id, bufnr)
 
     vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
         buffer = bufnr,
@@ -209,6 +210,21 @@ local function handle_LspAttach(ev)
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
         end, '[T]oggle Inlay [H]ints')
     end
+
+    vim.api.nvim_create_autocmd('CursorHold', {
+        buffer = ev.buf,
+        group = create_lsp_augroup('auto_float', client.id, ev.buf),
+        callback = function()
+            if not vim.g.auto_open_diagnostic then
+                return
+            end
+            vim.diagnostic.open_float {
+                focusable = false,
+                -- Append InsertEnter to defaults.
+                close_events = { 'CursorMoved', 'CursorMovedI', 'InsertCharPre', 'InsertEnter' },
+            }
+        end,
+    })
 
     if client.server_capabilities.documentHighlightProvider then
         highlight_references(client.id, ev.buf)

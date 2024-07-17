@@ -17,6 +17,9 @@ vim.g.have_nerd_font = true
 -- Set to true if you use a Nerd Font with "Mono" suffix in font name (small icons).
 vim.g.mono_nerd_font = false
 
+-- Set to false if you prefer to manually open diagnostic with <Leader>e.
+vim.g.auto_open_diagnostic = true
+
 -- Border for floating windows.
 -- See allowed values in `:h nvim_open_win()`.
 vim.g.float_border = 'rounded'
