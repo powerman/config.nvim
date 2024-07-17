@@ -114,6 +114,9 @@ return {
                     grep_string = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
                     help_tags = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
                     live_grep = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
+                    lsp_dynamic_workspace_symbols = {
+                        mappings = { i = { ['<CR>'] = 'select_tab' } },
+                    },
                     oldfiles = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
                 },
                 extensions = {
