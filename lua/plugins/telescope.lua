@@ -92,12 +92,30 @@ return {
                     },
                     mappings = {
                         i = {
-                            -- <F3> both opens (Search Project files) and closes.
-                            ['<F3>'] = 'close',
+                            ['<C-Bslash>'] = 'close', -- Alternative to inconvenient <C-c>.
+                            ['<C-u>'] = false,
+                            ['<C-Up>'] = 'preview_scrolling_up',
+                            ['<C-d>'] = false,
+                            ['<C-Down>'] = 'preview_scrolling_down',
                         },
                     },
                 },
-                -- pickers = {}
+                -- Pickers which usually opens another file should do this in a tab by default.
+                pickers = {
+                    find_files = {
+                        mappings = {
+                            i = {
+                                -- <F3> both opens (Search Project files) and closes.
+                                ['<F3>'] = 'close',
+                                ['<CR>'] = 'select_tab',
+                            },
+                        },
+                    },
+                    grep_string = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
+                    help_tags = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
+                    live_grep = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
+                    oldfiles = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
+                },
                 extensions = {
                     ['ui-select'] = {
                         require('telescope.themes').get_dropdown(),
@@ -111,14 +129,7 @@ return {
 
             -- See `:help telescope.builtin`
             local builtin = require 'telescope.builtin'
-            vim.keymap.set('n', '<Leader>sh', function()
-                builtin.help_tags {
-                    attach_mappings = function(_, map)
-                        map('i', '<CR>', 'select_tab')
-                        return true
-                    end,
-                }
-            end, { desc = '[S]earch [H]elp' })
+            vim.keymap.set('n', '<Leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
             vim.keymap.set('n', '<Leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
             vim.keymap.set('n', '<Leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
             vim.keymap.set(
@@ -195,14 +206,6 @@ return {
                 local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
                 return '<Cmd>TodoTelescope cwd=' .. dir .. '<CR>'
             end, { expr = true, desc = '[S]earch Project [T]odo' })
-
-            -- Open files in a new tab by default.
-            local actions_state = require 'telescope.actions.state'
-            local select_key_to_edit_key = actions_state.select_key_to_edit_key
-            actions_state.select_key_to_edit_key = function(type) ---@diagnostic disable-line: duplicate-set-field
-                local key = select_key_to_edit_key(type)
-                return key == 'edit' and 'tabedit' or key
-            end
         end,
     },
 }
