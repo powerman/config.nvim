@@ -74,8 +74,22 @@ return {
             require('telescope').setup {
                 -- You can put your default mappings / updates / etc. in here
                 --  All the info you're looking for is in `:help telescope.setup()`
-                --
                 defaults = {
+                    -- Tune layout for about 100 columns.
+                    layout_strategy = 'vertical',
+                    layout_config = {
+                        horizontal = {
+                            height = 0.96,
+                            width = 0.96,
+                            preview_cutoff = 30,
+                        },
+                        vertical = {
+                            height = 0.96,
+                            width = 0.96,
+                            preview_cutoff = 8,
+                            preview_height = 8,
+                        },
+                    },
                     mappings = {
                         i = {
                             -- <F3> both opens (Search Project files) and closes.
