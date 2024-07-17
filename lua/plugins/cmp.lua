@@ -32,6 +32,7 @@ return {
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-cmdline',
             { 'saadparwaiz1/cmp_luasnip', dependencies = 'L3MON4D3/LuaSnip' },
+            'folke/lazydev.nvim',
 
             -- Adds icons for completion types.
             'onsails/lspkind.nvim',
@@ -210,7 +211,10 @@ return {
                 },
 
                 sources = cmp.config.sources({
+                    { name = 'lazydev' },
+                }, {
                     { name = 'nvim_lsp_signature_help' },
+                }, {
                     {
                         name = 'nvim_lsp',
                         -- Remove Text completions from LSP.

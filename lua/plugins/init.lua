@@ -18,4 +18,21 @@ return {
     { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font, lazy = true },
     -- Improve the default vim.ui interfaces.
     { 'stevearc/dressing.nvim', lazy = true, event = 'VeryLazy', config = true },
+    -- Extensible UI for Neovim notifications and LSP progress messages.
+    {
+        'j-hui/fidget.nvim',
+        version = '*',
+        lazy = false,
+        opts = {
+            notification = {
+                override_vim_notify = true,
+                window = {
+                    winblend = 0,
+                },
+            },
+        },
+        config = true,
+    },
+    -- Configures LuaLS for editing your Neovim config and provides completion source.
+    { 'folke/lazydev.nvim', version = '*', lazy = true, ft = 'lua', config = true },
 }
