@@ -2,6 +2,13 @@
 --
 --  See `:help vim.keymap.set()`.
 
+-- NOTE:  <F2>         Save current buffer.
+-- NOTE:  <F5>         Toggle wrap.
+-- NOTE:  <F10>        Quit if no unsaved changes.
+-- NOTE:  ]d [d        LSP: Next/prev diagnostic.
+-- NOTE:  <Leader>e    LSP: Show diagnostic under cursor.
+-- NOTE:  <Leader>q    LSP: Open diagnostics in quickfix list.
+
 -- Add hotkey to save current buffer: <F2>.
 vim.keymap.set('n', '<F2>', ':w<CR>', { desc = 'Save current buffer' })
 vim.keymap.set('v', '<F2>', '<Esc>:w<CR>gv', { desc = 'Save current buffer' })
