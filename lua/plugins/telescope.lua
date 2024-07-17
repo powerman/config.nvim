@@ -1,3 +1,5 @@
+-- NOTE:  <C-/>           Telescope: Help on keys.
+
 ---@module 'lazy'
 ---@type LazySpec
 return {
@@ -93,7 +95,17 @@ return {
                     },
                     mappings = {
                         i = {
-                            ['<C-Bslash>'] = 'close', -- Alternative to inconvenient <C-c>.
+                            -- Alternative to inconvenient <C-c>.
+                            ['<C-Bslash>'] = 'close',
+                            -- Unmap <C-L> to restore it default action (clear screen).
+                            ['<C-l>'] = false,
+                            ['<C-Tab>'] = 'complete_tag',
+                            -- Use Alt instead of Ctrl (like in Midnight Commander).
+                            ['<C-n>'] = false,
+                            ['<C-p>'] = false,
+                            ['<A-n>'] = require('telescope.actions').cycle_history_next,
+                            ['<A-p>'] = require('telescope.actions').cycle_history_prev,
+                            -- Use arrows instead.
                             ['<C-u>'] = false,
                             ['<C-Up>'] = 'preview_scrolling_up',
                             ['<C-d>'] = false,
@@ -148,12 +160,11 @@ return {
                 builtin.grep_string,
                 { desc = '[S]earch current [W]ord' }
             )
-            vim.keymap.set(
-                'n',
-                '<Leader>sg',
-                builtin.live_grep,
-                { desc = '[S]earch by [G]rep' }
-            )
+            vim.keymap.set('n', '<Leader>sg', function()
+                local buf_filename = vim.api.nvim_buf_get_name(0)
+                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
+                builtin.live_grep { cwd = dir or '.' }
+            end, { desc = '[S]earch by [G]rep project' })
             vim.keymap.set(
                 'n',
                 '<Leader>sd',

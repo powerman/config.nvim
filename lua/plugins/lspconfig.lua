@@ -31,7 +31,7 @@
 -- NOTE:  <C-k>        LSP: Signature documentation.
 -- NOTE:  <C-k><C-k>   LSP: Into signature documentation.
 -- NOTE:  <Leader>r    LSP: Rename identifier.
--- NOTE:  <Leader>ca   LSP: Code action.
+-- NOTE:  <Leader>a    LSP: Code action.
 -- NOTE:  gd           LSP: Goto definition.
 -- NOTE:  gD           LSP: Goto type definition.
 -- NOTE:  gI           LSP: Goto implementation.
@@ -153,15 +153,15 @@ local function handle_LspAttach(ev)
     end
 
     local builtin = require 'telescope.builtin'
-    local map = function(keys, func, desc)
-        vim.keymap.set('n', keys, func, { buffer = ev.buf, desc = 'LSP: ' .. desc })
+    local map = function(keys, func, desc, mode)
+        mode = mode or 'n'
+        vim.keymap.set(mode, keys, func, { buffer = ev.buf, desc = 'LSP: ' .. desc })
     end
 
-    -- Opens a popup that displays documentation about the word under your cursor
-    -- See `:help K` for why this keymap.
+    -- Opens a popup that displays documentation about the word under your cursor.
     map('K', vim.lsp.buf.hover, 'Hover Documentation')
 
-    -- Opens a popup that displays signature for the function param under your cursor.
+    -- Opens a popup that displays signature for the function's param under your cursor.
     map('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
     -- Rename the identifier under your cursor.
@@ -170,7 +170,7 @@ local function handle_LspAttach(ev)
 
     -- Execute a code action, usually your cursor needs to be on top of an error
     -- or a suggestion from your LSP for this to activate.
-    map('<Leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+    map('<Leader>a', vim.lsp.buf.code_action, 'Code [A]ction', { 'n', 'v' })
 
     -- Jump to the definition of the word under your cursor.
     -- This is where a variable was first declared, or where a function is
@@ -188,11 +188,11 @@ local function handle_LspAttach(ev)
     map('gI', builtin.lsp_implementations, '[G]oto [I]mplementation')
 
     -- Find references for the word under your cursor.
-    map('gr', builtin.lsp_references, '[G]oto [R]eferences')
+    map('<Leader>gr', builtin.lsp_references, '[G]oto [R]eferences')
 
     -- Jump to the declaration of the word under your cursor.
     -- For example, in C this would take you to the header.
-    map('<Leader>D', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+    map('<Leader>gd', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
     -- Fuzzy find all the symbols in your current document.
     -- Symbols are things like variables, functions, types, etc.
