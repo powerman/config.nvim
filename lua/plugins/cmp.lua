@@ -75,9 +75,12 @@ return {
             cmp.setup {
                 window = {
                     completion = cmp.config.window.bordered {
+                        border = vim.g.float_border,
                         col_offset = -4, -- Offset icon before completion to the left.
                     },
-                    documentation = cmp.config.window.bordered(),
+                    documentation = cmp.config.window.bordered {
+                        border = vim.g.float_border,
+                    },
                 },
 
                 formatting = {

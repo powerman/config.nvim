@@ -48,7 +48,7 @@ return {
                 scroll_up = '<c-up>',
             },
             window = {
-                border = 'single',
+                border = vim.g.float_border,
             },
         },
         config = function(_, opts) -- This is the function that runs, AFTER loading

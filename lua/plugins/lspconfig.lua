@@ -230,10 +230,6 @@ return {
         lazy = false, -- Needs to setup autocommands for LSP before creating buffers.
         init = function()
             setup_filetypes_termux_ls()
-            vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-                border = 'rounded',
-                max_width = 96,
-            })
         end,
         config = function()
             register_termux_ls()

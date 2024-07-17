@@ -23,7 +23,7 @@ return {
             lazy = false, -- Lazy loading is not recommended by Mason author.
             opts = {
                 ui = {
-                    border = 'rounded',
+                    border = vim.g.float_border,
                     icons = {
                         package_installed = '●',
                         package_pending = '➜',

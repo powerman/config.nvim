@@ -79,15 +79,16 @@ return {
                     layout_strategy = 'vertical',
                     layout_config = {
                         horizontal = {
-                            height = 0.96,
-                            width = 0.96,
+                            height = vim.g.float_max_height,
+                            width = vim.g.float_max_width,
                             preview_cutoff = 30,
+                            preview_width = math.floor(vim.fn.winwidth(0) * 0.4),
                         },
                         vertical = {
-                            height = 0.96,
-                            width = 0.96,
+                            height = vim.g.float_max_height,
+                            width = vim.g.float_max_width,
                             preview_cutoff = 8,
-                            preview_height = 8,
+                            preview_height = math.floor(vim.fn.winheight(0) * 0.33),
                         },
                     },
                     mappings = {

@@ -3,6 +3,9 @@
 --  See https://learnxinyminutes.com/docs/lua/.
 --  See `:help lua-guide`.
 
+-- Run `nvim --cmd 'let debug_lsp=1'` to enable LSP debugging.
+vim.g.debug_lsp = vim.g.debug_lsp or false
+
 -- Set <space> as the leader key.
 -- See `:help mapleader`.
 vim.g.mapleader = ' '
@@ -13,6 +16,15 @@ vim.g.have_nerd_font = true
 
 -- Set to true if you use a Nerd Font with "Mono" suffix in font name (small icons).
 vim.g.mono_nerd_font = false
+
+-- Border for floating windows.
+-- See allowed values in `:h nvim_open_win()`.
+vim.g.float_border = 'rounded'
+
+-- Max size for floating windows.
+-- Must be <=1.
+vim.g.float_max_height = 0.96
+vim.g.float_max_width = 0.96
 
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
@@ -25,6 +37,9 @@ require 'keymaps'
 
 -- Setting basic autocommands (working without plugins).
 require 'autocmd'
+
+-- Rest of basic setup (working without plugins).
+require 'setup'
 
 -- Install `lazy.nvim` plugin manager.
 require 'lazy-bootstrap'
