@@ -3,7 +3,11 @@ snapshots:
   ? |
     -- Comment.
     return {}
-  : labels:
+  : fixed: |
+      -- Comment.
+      ---@type LazySpec
+      return {}
+    labels:
     - source: return {}
       style: primary
       start: 12
@@ -11,7 +15,11 @@ snapshots:
   ? |
     ---@type Wrong
     return {}
-  : labels:
+  : fixed: |
+      ---@type Wrong
+      ---@type LazySpec
+      return {}
+    labels:
     - source: return {}
       style: primary
       start: 15
@@ -19,14 +27,21 @@ snapshots:
   ? |
     local v = {}
     return {}
-  : labels:
+  : fixed: |
+      local v = {}
+      ---@type LazySpec
+      return {}
+    labels:
     - source: return {}
       style: primary
       start: 13
       end: 22
   ? |
     return {}
-  : labels:
+  : fixed: |
+      ---@type LazySpec
+      return {}
+    labels:
     - source: return {}
       style: primary
       start: 0

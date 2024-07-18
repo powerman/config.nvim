@@ -6,9 +6,11 @@ severity: hint # error, warning, info, hint
 language: Lua
 files:
   - './lua/plugins/*.lua'
+
 rule:
-  pattern: return { $$$ }
+  pattern: $SPEC
   all:
+    - pattern: return { $$$ }
     - not:
         follows:
           kind: comment
@@ -18,8 +20,16 @@ rule:
           kind: block
           stopBy: end
 
-note: |
+fix: |-
+  ---@type LazySpec
+  $SPEC
+
+note: |-
   Add type annotation for Lazy plugin spec:
 
     ---@type LazySpec
     return {
+
+  You may also need to add this somewhere above:
+
+    ---@module 'lazy'
