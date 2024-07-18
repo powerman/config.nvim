@@ -4,14 +4,23 @@
 --  - Format embedded code blocks in another language (e.g. in markdown, templates, etc.).
 --  - Autoformat on save file.
 --
+--  Formatter vs LSP:
+--    - LSP may provide no/different/same formatting.
+--    - LSP formatting is used as a fallback in case no formatting tool is supported/configured.
+--    - Unlike Formatter, LSP is able to show errors (which result in skipped formatting).
+--      - While you may see Formatter error using `:ConformInfo` it's very inconvenient.
+--    - Unlike LSP, Formatter uses standalone tools, usualy used to validate formatting on CI.
+--      - Thus if both Formatter and LSP are able to format then Formatter tool is used.
+--
 -- INFO: You have to configure formatting for file types you're using! This includes not only
 -- modifying this file, but also installing and configuring required 3rd-party tools.
 -- List of supported formatters: https://github.com/stevearc/conform.nvim#formatters.
--- TODO: Find out is it possible to automate installation of these tools using mason.
+--
+-- TODO: Automate installation of these tools using mason. And fix 'installing' in comment above.
 
--- NOTE:  <Leader>f        Formats current buffer.
--- NOTE:  :FormatDisable   Disables autoformat.
--- NOTE:  :FormatDisable!  Disables autoformat for the buffer.
+-- NOTE:  <Leader>f         Formats current buffer.
+-- NOTE:  :FormatDisable    Disables autoformat.
+-- NOTE:  :FormatDisable!   Disables autoformat for the buffer.
 
 -- Disable autoformat on certain filetypes.
 local ignore_filetypes = {
@@ -31,7 +40,7 @@ local ignore_paths = {
 ---@module 'lazy'
 ---@type LazySpec
 return {
-    { -- Autoformat
+    {
         'stevearc/conform.nvim',
         version = '*',
         lazy = true,
@@ -90,15 +99,17 @@ return {
                 -- BUG: 'prettierd' does not show error
                 -- https://github.com/stevearc/conform.nvim/issues/486
 
-                ['*'] = { 'ast-grep' }, -- Linter/fixer for many treesitter-supported languages.
+                --- Linter/fixer for many treesitter-supported languages.
+                --- TODO: Test is it "fix" issues as LSP and remove it from here.
+                -- ['*'] = { 'ast-grep' },
+
                 asm = { 'asmfmt' }, -- Go Assembler.
-                -- bash = { 'shellcheck' },
-                bash = { 'shfmt' },
+                sh = { 'shfmt' },
                 css = { 'prettierd' },
                 -- css = { 'stylelint' },
                 csv = { 'yq_csv' },
-                dockerfile = { 'dprint' }, -- Require `dprint config add dockerfile`.
-                go = { 'gofumpt', 'gci' }, -- Also: 'gofmt', 'goimports', 'goimports-reviser'.
+                -- dockerfile = { 'dprint' }, -- Require `dprint config add dockerfile`.
+                go = { 'goimports', 'gci', 'gofumpt' }, -- Also: 'gofmt', 'goimports-reviser'.
                 graphql = { 'prettierd' },
                 html = { 'djlint' },
                 -- html = { 'prettierd' }, -- Fail on invalid HTML without error message.
