@@ -10,7 +10,7 @@
 -- NOTE:  <Tab>       Cmp: complete|expand|open menu|next.
 -- NOTE:  <S-Tab>     Cmp: open menu|previous.
 -- NOTE:  <CR>        Cmp: complete/expand selected.
--- NOTE:  <C-e>       Cmp: abort and close menu.
+-- NOTE:  <C-\>       Cmp: abort and close menu.
 -- NOTE:  <C-Down>    Cmp: scroll item doc.
 -- NOTE:  <C-Up>      Cmp: scroll item doc.
 -- NOTE:  <C-Right>   Snip: expand or jump next.
@@ -178,7 +178,7 @@ return {
                             fallback()
                         end
                     end, { 'i', 'c' }),
-                    ['<C-e>'] = cmp.mapping(function(fallback)
+                    ['<C-Bslash>'] = cmp.mapping(function(fallback)
                         if not cmp.abort() then
                             fallback()
                         end
