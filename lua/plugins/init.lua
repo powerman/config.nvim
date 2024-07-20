@@ -35,4 +35,13 @@ return {
     },
     -- Configures LuaLS for editing your Neovim config and provides completion source.
     { 'folke/lazydev.nvim', version = '*', lazy = true, ft = 'lua', config = true },
+    -- Not a plugin, but a library used to setup LSP jsonls and yamlls.
+    { 'b0o/schemastore.nvim', lazy = true },
+    -- Not a plugin, but a library with configs for `efm` LSP.
+    {
+        'creativenull/efmls-configs-nvim',
+        version = 'v1.*',
+        lazy = true,
+        dependencies = 'williamboman/mason.nvim',
+    },
 }

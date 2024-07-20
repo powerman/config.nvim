@@ -1,29 +1,41 @@
--- [[ Configs for the Nvim LSP client ]]
+--[[ Configs for the Nvim LSP client ]]
 --
 --  LSP stands for Language Server Protocol. It's a protocol that helps editors
 --  and language tooling communicate in a standardized fashion.
 --
 --  In general, you have a "server" which is some tool built to understand a particular
 --  language (such as `gopls`, `lua_ls`, `rust_analyzer`, etc.). These Language Servers
---  (sometimes called LSP servers, but that's kind of like ATM Machine) are standalone
---  processes that communicate with some "client" - in this case, Neovim!
+--  (sometimes called LSP servers) are standalone processes that communicate with some
+--  "client" - in this case, Neovim!
 --
---  LSP provides Neovim with features like:
---    - Go to definition
---    - Find references
---    - Autocompletion
---    - Symbol Search
---    - and more!
+--  LSP may provide Neovim with these features (not every LSP server supports all of them):
+--    - Show dianostics (syntax errors, linter issues).
+--    - Show documentation for a symbol under cursor.
+--    - Show signature documentation for a function's arg under cursor.
+--    - Show inlay hints.
+--    - Highlight related symbols.
+--    - Go to symbol's definition (smarter than supported by Neovim without LSP).
+--    - Go to symbol's type definition.
+--    - Go to symbol's implementation/interface.
+--    - Go to symbol's declaration.
+--    - Search for a symbol (in a current file or a whole project).
+--    - Provide smart (context-aware) autocompletions.
+--    - Provide smart (context-aware) snippets.
+--    - Rename identifier (everywhere in a project, not just in current file).
+--    - Code actions (can be anything, but usually it's an automated fix for some diagnostic).
+--    - Autoformat.
 --
 --  All of the code for the language server client is located in the core of neovim.
 --  Lspconfig is a helper plugin that leverages the language client API in neovim core for an
 --  easier to use experience. Lspconfig handles:
 --
 --    - Launching a language server when a matching filetype is detected.
---    - Detecting the root directory of your project.
+--    - Detecting the root directory of your project (it may differs for different LSP).
 --    - Sending the correct initialization options and settings (these are two separate things
 --      in the LSP specification) during launch.
 --    - Attaching new buffers you open to the currently active language server.
+--
+-- INFO: Configure list of enabled LSP in `../tools/lsp.lua`.
 
 -- NOTE:  :LspInfo     LSP: Status for active/configured servers.
 -- NOTE:  K            LSP: Hover documentation.
@@ -36,6 +48,17 @@
 -- NOTE:  gD           LSP: Goto type definition.
 -- NOTE:  gI           LSP: Goto implementation.
 -- NOTE:  <Leader>ts   LSP: Toggle inlay hints.
+
+local function setup_filetypes_docker_compose_language_service()
+    vim.filetype.add {
+        filename = {
+            ['compose.yaml'] = 'yaml.docker-compose',
+            ['compose.yml'] = 'yaml.docker-compose',
+            ['docker-compose.yaml'] = 'yaml.docker-compose',
+            ['docker-compose.yml'] = 'yaml.docker-compose',
+        },
+    }
+end
 
 local function setup_filetypes_termux_ls()
     vim.filetype.add {
@@ -147,7 +170,7 @@ local function handle_LspAttach(ev)
     --
     --  if client.name == 'some' then client.server_capabilities.XXX = nil end
 
-    -- HACK: https://github.com/termux/termux-language-server/issues/19#issuecomment-2200349890
+    -- HACK: Work around https://github.com/termux/termux-language-server/issues/19#issuecomment-2200349890.
     if client.name == 'termux_ls' then
         client.server_capabilities.documentFormattingProvider = nil
     end
@@ -245,6 +268,7 @@ return {
         },
         lazy = false, -- Needs to setup autocommands for LSP before creating buffers.
         init = function()
+            setup_filetypes_docker_compose_language_service()
             setup_filetypes_termux_ls()
         end,
         config = function()
