@@ -4,7 +4,7 @@
 
 This is my Neovim config.
 
-> **NOTE**
+> [!NOTE]
 > It was started as a fork of
 > [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim) and I
 > highly recommend it if you like to create your own config yourself (like I did). I do not
@@ -15,7 +15,7 @@ This is my Neovim config.
 
 ### Install Neovim
 
-Config.nvim targets *only* the latest
+Config.nvim targets _only_ the latest
 ['stable'](https://github.com/neovim/neovim/releases/tag/stable) Neovim.
 If you are experiencing issues, please make sure you have the latest version.
 
@@ -39,7 +39,8 @@ External Requirements:
 
 ### Install Config
 
-> **NOTE**
+> [!NOTE]
+>
 > [Backup](#FAQ) your previous configuration (if any exists)
 
 Neovim's configurations are located under the following paths, depending on your OS:
@@ -54,13 +55,13 @@ Neovim's configurations are located under the following paths, depending on your
 so that you have your own copy that you can modify, then install by cloning the
 fork to your machine using one of the commands below, depending on your OS.
 
-> **NOTE**
+> [!NOTE]
 > Your fork's url will be something like this:
 > `https://github.com/<your_github_username>/config.nvim.git`
 
 #### Clone config.nvim
 
-> **NOTE**
+> [!NOTE]
 > If following the recommended step above (i.e., forking the repo), replace
 > `powerman` with `<your_github_username>` in the commands below
 
