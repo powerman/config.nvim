@@ -28,7 +28,7 @@ External Requirements:
 - Clipboard tool (xclip/xsel or other depending on platform).
 - A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons.
   - If you have it set `vim.g.have_nerd_font` in `init.lua` to true.
-  - If you chose "Mono" font kind set `vim.g.mono_nerd_font ` in `init.lua` to true.
+  - If you chose "Mono" font kind set `vim.g.mono_nerd_font` in `init.lua` to true.
 - Language setup:
   - If want to write Typescript, you need `npm`
   - If want to write Golang, you will need `go`
@@ -41,7 +41,7 @@ External Requirements:
 
 > [!NOTE]
 >
-> [Backup](#FAQ) your previous configuration (if any exists)
+> [Backup](#faq) your previous configuration (if any exists)
 
 Neovim's configurations are located under the following paths, depending on your OS:
 
@@ -94,16 +94,22 @@ version from the lockfile.
 ### FAQ
 
 - What should I do if I already have a pre-existing neovim configuration?
+
   - You should back it up and then delete all associated files.
+
   - This includes your existing init.lua and the neovim files in `~/.local`
     which can be deleted with `rm -rf ~/.local/share/nvim/`
+
 - Can I keep my existing configuration in parallel?
+
   - Yes! You can use [NVIM_APPNAME](https://neovim.io/doc/user/starting.html#_nvim_appname)`=nvim-NAME`
     to maintain multiple configurations. For example, you can install the
     configuration in `~/.config/nvim-powerman` and create an alias:
-    ```
+
+    ```sh
     alias nvim-powerman='NVIM_APPNAME="nvim-powerman" nvim'
     ```
+
     When you run Neovim using `nvim-powerman` alias it will use the alternative
     config directory and the matching local directory
     `~/.local/share/nvim-powerman`. You can apply this approach to any Neovim
@@ -113,13 +119,13 @@ version from the lockfile.
 
 Below you can find OS specific install instructions for Neovim and dependencies.
 
-After installing all the dependencies continue with the [Install Config](#Install-Config) step.
+After installing all the dependencies continue with the [Install Config](#install-config) step.
 
 #### Linux Install
 
 <details><summary>Ubuntu Install Steps</summary>
 
-```
+```sh
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update
 sudo apt install make gcc ripgrep unzip git xclip neovim
@@ -128,7 +134,7 @@ sudo apt install make gcc ripgrep unzip git xclip neovim
 </details>
 <details><summary>Debian Install Steps</summary>
 
-```
+```sh
 sudo apt update
 sudo apt install make gcc ripgrep unzip git xclip curl
 
@@ -146,7 +152,7 @@ sudo ln -sf /opt/nvim-linux64/bin/nvim /usr/local/bin/
 </details>
 <details><summary>Fedora Install Steps</summary>
 
-```
+```sh
 sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 ```
 
@@ -154,7 +160,7 @@ sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 
 <details><summary>Arch Install Steps</summary>
 
-```
+```sh
 sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
 ```
 
