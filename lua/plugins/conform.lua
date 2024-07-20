@@ -99,10 +99,6 @@ return {
                 -- BUG: 'prettierd' does not show error
                 -- https://github.com/stevearc/conform.nvim/issues/486
 
-                --- Linter/fixer for many treesitter-supported languages.
-                --- TODO: Test is it "fix" issues as LSP and remove it from here.
-                -- ['*'] = { 'ast-grep' },
-
                 asm = { 'asmfmt' }, -- Go Assembler.
                 sh = { 'shfmt' },
                 css = { 'prettierd' },
@@ -128,11 +124,11 @@ return {
                 jsonc = { 'prettierd' },
                 less = { 'prettierd' },
                 lua = { 'stylua' },
-                -- markdown = { 'dprint', 'injected' }, -- Require `dprint config add markdown`.
+                -- markdown = { 'dprint', 'injected' }, -- Require `dprint config add markdown`. Almost as good as prettierd.
                 -- markdown = { 'markdownlint', 'injected' },
                 -- markdown = { 'markdownlint-cli2', 'injected' },
-                markdown = { 'mdformat', 'injected' }, -- With plugins almost as good as dprint.
-                -- markdown = { 'prettierd', 'injected' },
+                -- markdown = { 'mdformat', 'injected' }, -- With plugins almost as good as dprint.
+                markdown = { 'prettierd', 'injected' }, -- Best support for Obsidian!
                 nginx = { 'prettierd_nginx' }, -- Require prettier plugin.
                 proto = { 'buf' },
                 scss = { 'prettierd' },
