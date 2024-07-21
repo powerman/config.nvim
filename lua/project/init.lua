@@ -1,38 +1,4 @@
----@param s string String to split.
----@param pat string Pattern to split on.
----@return Iterator string Elements of s including empty before first/after last sep.
-local function split(s, pat)
-    pat = pat or '%s+'
-    local st, g = 1, s:gmatch('()(' .. pat .. ')')
-    local function getter(segs, seps, sep)
-        st = sep and seps + #sep
-        return s:sub(segs, (seps or 0) - 1)
-    end
-    return function()
-        if st then
-            return getter(st, g())
-        end
-    end
-end
-
---- Removes first elem from t.
----@param t any[]
----@param elem any
----@return boolean: True if removed.
-local function remove_elem(t, elem)
-    for i, v in ipairs(t) do
-        if v == elem then
-            table.remove(t, i)
-            return true
-        end
-    end
-    return false
-end
-
 local M = {}
-
--- Keeps current project's paths (to be able to remove them from $PATH).
-M._PATH = {}
 
 ---@class Config
 ---@field root_patterns string[]
@@ -62,20 +28,7 @@ M.prepend_PATH = function(file, bin_subdir)
     if not vim.fn.isdirectory(bin_dir) then
         return
     end
-    table.insert(M._PATH, bin_dir)
     vim.env.PATH = bin_dir .. ':' .. vim.env.PATH
-end
-
--- Remove from $PATH everything added by previous prepend_PATH() calls.
-M.reset_PATH = function()
-    local PATH = {}
-    for path in split(vim.env.PATH, ':') do
-        if not remove_elem(M._PATH, path) then
-            table.insert(PATH, path)
-        end
-    end
-    M._PATH = {}
-    vim.env.PATH = table.concat(PATH, ':')
 end
 
 return M
