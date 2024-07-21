@@ -22,6 +22,7 @@ return {
             version = '*',
             lazy = false, -- Lazy loading is not recommended by Mason author.
             opts = {
+                PATH = 'skip', -- INFO: Add ~/.local/share/nvim/mason/bin manually to your PATH.
                 ui = {
                     border = vim.g.float_border,
                     icons = {
