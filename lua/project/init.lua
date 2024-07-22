@@ -25,7 +25,7 @@ M.prepend_PATH = function(file, bin_subdir)
         return
     end
     local bin_dir = root_dir .. '/' .. bin_subdir
-    if not vim.fn.isdirectory(bin_dir) then
+    if vim.fn.isdirectory(bin_dir) == 0 then
         return
     end
     vim.env.PATH = bin_dir .. ':' .. vim.env.PATH
