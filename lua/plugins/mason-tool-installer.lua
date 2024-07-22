@@ -49,13 +49,13 @@ return {
         opts = opts or {}
         local ensure_installed = {}
 
-        local tools_lsp = require 'tools.lsp'
-        vim.list_extend(ensure_installed, vim.tbl_keys(tools_lsp))
-        if tools_lsp.golangci_lint_ls then
+        local lsp = require 'tools.lsp'
+        vim.list_extend(ensure_installed, vim.tbl_keys(lsp))
+        if lsp.golangci_lint_ls then
             vim.list_extend(ensure_installed, { 'golangci-lint' })
         end
-        if tools_lsp.efm then
-            for _, tools in pairs(tools_lsp.efm.settings.languages) do
+        if lsp.efm then
+            for _, tools in pairs(lsp.efm.settings.languages) do
                 for _, tool in ipairs(tools) do
                     local cmd = tool.lintCommand or tool.formatCommand or tool.hoverCommand
                     local bin = vim.fn.fnamemodify(vim.split(cmd, ' ')[1], ':t')
@@ -64,7 +64,28 @@ return {
             end
         end
 
-        -- TODO: Add 'configs.conform'.
+        local formatters_by_ft = require 'tools.formatters'
+        for _, formatters in pairs(formatters_by_ft) do
+            local names = type(formatters) == 'function' and formatters(0) or formatters
+            ---@type string[]
+            names = type(names) == 'table' and names or { names }
+            for _, name in ipairs(names) do
+                if string.match(name, '^prettierd_') then
+                    name = 'prettierd'
+                elseif string.match(name, '^prettier_') then
+                    name = 'prettier'
+                elseif string.match(name, '^yq_') then
+                    name = 'yq'
+                elseif name == 'xmllint' then -- OS package libxml2, not in Mason.
+                    name = ''
+                elseif name == 'injected' then
+                    name = ''
+                end
+                if name ~= '' then
+                    vim.list_extend(ensure_installed, { name })
+                end
+            end
+        end
 
         vim.list_extend(ensure_installed, opts.ensure_installed or {})
         opts.ensure_installed = ensure_installed
