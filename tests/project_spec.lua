@@ -8,7 +8,7 @@ describe('setup', function()
     local new_PATH
     it('should just add autocmd', function()
         Project.setup {
-            root_patterns = { 'nosuch', '.gitignore', '.git', 'tests/project', 'nosuch2' },
+            root_patterns = { 'nosuch', '.gitignore', '.git', 'lua/project', 'nosuch2' },
         }
         assert.equal(old_PATH, vim.env.PATH)
     end)
@@ -26,7 +26,7 @@ describe('setup', function()
         end)
         it('should include in PATH all existing dirs', function()
             assert.match('/.git:', new_PATH)
-            assert.match('/tests/project:', new_PATH)
+            assert.match('/lua/project:', new_PATH)
         end)
         it('should change PATH just once', function()
             vim.cmd [[set ft=markdown]] -- Trigger autocmd FileType.
