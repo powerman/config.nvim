@@ -48,8 +48,24 @@ return {
 
         opts = opts or {}
         local ensure_installed = {}
-        vim.list_extend(ensure_installed, vim.tbl_keys(require 'tools.lsp' or {}))
+
+        local tools_lsp = require 'tools.lsp'
+        vim.list_extend(ensure_installed, vim.tbl_keys(tools_lsp))
+        if tools_lsp.golangci_lint_ls then
+            vim.list_extend(ensure_installed, { 'golangci-lint' })
+        end
+        if tools_lsp.efm then
+            for _, tools in pairs(tools_lsp.efm.settings.languages) do
+                for _, tool in ipairs(tools) do
+                    local cmd = tool.lintCommand or tool.formatCommand or tool.hoverCommand
+                    local bin = vim.fn.fnamemodify(vim.split(cmd, ' ')[1], ':t')
+                    vim.list_extend(ensure_installed, { bin })
+                end
+            end
+        end
+
         -- TODO: Add 'configs.conform'.
+
         vim.list_extend(ensure_installed, opts.ensure_installed or {})
         opts.ensure_installed = ensure_installed
         require('mason-tool-installer').setup(opts)

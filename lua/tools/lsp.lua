@@ -90,7 +90,6 @@ local gopls_settings = {
 }
 
 -- Configure 3rd-party tools to be executed by EFM.
--- TODO: Install all using Mason.
 local efm_languages = {
     dockerfile = { require 'efmls-configs.linters.hadolint' },
     -- BUG: Leave running processes in unknown curcumstances.
@@ -171,8 +170,6 @@ return {
     },
 
     -- Works after saving file.
-    -- WARN: Looks like mason-tool-installer should also install golangci-lint to make it work.
-    -- TODO: Use project-specific version.
     golangci_lint_ls = {},
 
     gopls = {
