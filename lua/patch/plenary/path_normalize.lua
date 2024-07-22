@@ -7,7 +7,6 @@ local Path = require 'plenary.path'
 
 local normalize = Path.normalize
 
--- TODO: Add tests.
 ---@diagnostic disable-next-line: duplicate-set-field
 Path.normalize = function(self, cwd)
     -- Absolute (DOWN FROM / or ~) or relative (DOWN FROM cwd).
