@@ -2,7 +2,6 @@
 
 -- NOTE:  :Mason   Install/upgrade/uninstall external tools.
 
--- HACK: Monkey-patch because lspconfig don't know about termux language server yet.
 -- https://github.com/termux/termux-language-server/issues/21
 local function register_termux_ls()
     local server = require 'mason-lspconfig.mappings.server'

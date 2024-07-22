@@ -89,7 +89,6 @@ local function setup_filetypes_termux_ls()
     }
 end
 
--- HACK: Monkey-patch because lspconfig don't know about termux language server yet.
 -- https://github.com/termux/termux-language-server/issues/21
 local function register_termux_ls()
     local configs = require 'lspconfig.configs'
