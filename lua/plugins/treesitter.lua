@@ -6,6 +6,11 @@
 --      - indent
 --      - incremental_selection
 --
+--  There are other available modules: https://github.com/nvim-treesitter/nvim-treesitter/wiki/Extra-modules-and-plugins
+--  For example, nvim-treesitter-refactor can provide you with LSP-like features (highlight
+--  definitions/usages of a symbol, symbol rename within a scope, goto definitions) without an
+--  LSP server - but this will work only within single file.
+--
 --  Other plugins may use this one for code editing (e.g. folding) and navivation (e.g. use
 --  'function definition' or 'for loop' syntax node as Neovim text object to
 --  jump/delete/replace/etc.) with full support of corresponding language's syntax tree.
@@ -46,29 +51,30 @@ return {
                 'javascript',
                 'jsdoc',
                 'json',
+                'json5',
+                'jsonc',
+                'jsonnet',
                 'lua',
                 'luadoc',
                 'make',
                 'markdown',
                 'markdown_inline',
-                'vim',
-                'vimdoc',
-                'yaml',
-                'toml',
-                'json5',
-                'jsonc',
-                'jsonnet',
                 'mermaid',
                 'muttrc',
                 'nginx',
+                'printf',
                 'promql',
                 'proto',
                 'sql',
                 'ssh_config',
                 'strace',
                 'tmux',
+                'toml',
                 'udev',
+                'vim',
+                'vimdoc',
                 'xcompose',
+                'yaml',
             },
             -- Autoinstall languages that are not installed. Require `tree-sitter` CLI tool.
             auto_install = true,
