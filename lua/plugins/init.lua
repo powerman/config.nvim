@@ -34,7 +34,19 @@ return {
         config = true,
     },
     -- Configures LuaLS for editing your Neovim config and provides completion source.
-    { 'folke/lazydev.nvim', version = '*', lazy = true, ft = 'lua', config = true },
+    {
+        'folke/lazydev.nvim',
+        version = '*',
+        lazy = true,
+        ft = 'lua',
+        opts = {
+            library = {
+                -- Load luvit types when the `vim.uv` word is found
+                { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+            },
+        },
+    },
+    { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` typings
     -- Not a plugin, but a library used to setup LSP jsonls and yamlls.
     { 'b0o/schemastore.nvim', lazy = true },
     -- Not a plugin, but a library with configs for `efm` LSP.
