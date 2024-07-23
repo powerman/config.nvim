@@ -18,7 +18,7 @@ return {
         -- servers, linters, and formatters through a single interface.
         {
             'williamboman/mason.nvim',
-            version = '*',
+            -- version = '*', -- No releases since Jan 24, want fix for https://github.com/williamboman/mason.nvim/issues/1646
             lazy = false, -- Lazy loading is not recommended by Mason author.
             opts = {
                 PATH = 'skip', -- INFO: Add ~/.local/share/nvim/mason/bin manually to your PATH.
