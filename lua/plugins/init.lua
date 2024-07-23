@@ -56,4 +56,19 @@ return {
         lazy = true,
         dependencies = 'williamboman/mason.nvim',
     },
+    -- Renders diagnostics using virtual lines on top of the real line of code.
+    {
+        'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
+        version = '*',
+        lazy = true,
+        event = 'VeryLazy',
+        init = function()
+            vim.diagnostic.config {
+                virtual_text = false,
+                virtual_lines = { only_current_line = true },
+            }
+            vim.g.auto_open_diagnostic = false
+        end,
+        config = true,
+    },
 }
