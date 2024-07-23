@@ -1,4 +1,4 @@
--- [[ A completion engine ]]
+--[[ A completion engine ]]
 --
 --  - Full support for LSP completion related capabilities.
 --  - Powerful customizability via Lua functions.

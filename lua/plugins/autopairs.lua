@@ -1,4 +1,4 @@
--- [[ A super powerful autopair plugin for Neovim that supports multiple characters ]]
+--[[ A super powerful autopair plugin for Neovim that supports multiple characters ]]
 --
 --  - Automatically adds pair for a quote/bracket/paren/etc.
 --  - Automatically indent when pressing <CR> inside bracket/paren/etc.
