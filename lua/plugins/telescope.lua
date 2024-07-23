@@ -78,30 +78,7 @@ return {
             },
         },
         config = function()
-            -- Telescope is a fuzzy finder that comes with a lot of different things that
-            -- it can fuzzy find! It's more than just a "file finder", it can search
-            -- many different aspects of Neovim, your workspace, LSP, and more!
-            --
-            -- The easiest way to use Telescope, is to start by doing something like:
-            --  :Telescope help_tags
-            --
-            -- After running this command, a window will open up and you're able to
-            -- type in the prompt window. You'll see a list of `help_tags` options and
-            -- a corresponding preview of the help.
-            --
-            -- Two important keymaps to use while in Telescope are:
-            --  - Insert mode: <c-/>
-            --  - Normal mode: ?
-            --
-            -- This opens a window that shows you all of the keymaps for the current
-            -- Telescope picker. This is really useful to discover what Telescope can
-            -- do as well as how to actually do it!
-
-            -- [[ Configure Telescope ]]
-            -- See `:help telescope` and `:help telescope.setup()`
             require('telescope').setup {
-                -- You can put your default mappings / updates / etc. in here
-                --  All the info you're looking for is in `:help telescope.setup()`
                 defaults = {
                     -- Tune layout for about 100 columns.
                     layout_strategy = 'vertical',
@@ -136,6 +113,10 @@ return {
                             ['<C-Up>'] = 'preview_scrolling_up',
                             ['<C-d>'] = false,
                             ['<C-Down>'] = 'preview_scrolling_down',
+                        },
+                        n = {
+                            -- Alternative to <Esc>, same as in Insert mode.
+                            ['<C-Bslash>'] = 'close',
                         },
                     },
                 },
@@ -176,7 +157,6 @@ return {
             pcall(require('telescope').load_extension, 'fzf')
             pcall(require('telescope').load_extension, 'ui-select')
 
-            -- See `:help telescope.builtin`
             local builtin = require 'telescope.builtin'
             vim.keymap.set('n', '<Leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
             vim.keymap.set('n', '<Leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
@@ -218,17 +198,13 @@ return {
                 { desc = '[ ] Find existing buffers' }
             )
 
-            -- Slightly advanced example of overriding default behavior and theme
             vim.keymap.set('n', '<Leader>/', function()
-                -- You can pass additional configuration to Telescope to change the theme, layout, etc.
                 builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
                     winblend = 10,
                     previewer = false,
                 })
             end, { desc = '[/] Fuzzily search in current buffer' })
 
-            -- It's also possible to pass additional configuration options.
-            --  See `:help telescope.builtin.live_grep()` for information about particular keys
             vim.keymap.set('n', '<Leader>s/', function()
                 builtin.live_grep {
                     grep_open_files = true,
