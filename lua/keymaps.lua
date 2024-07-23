@@ -26,6 +26,9 @@ vim.keymap.set('i', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved change
 -- Allow Ctrl-L to clear the screen in insert mode too.
 vim.keymap.set('i', '<C-L>', '<C-O><C-L>', { desc = ':help CTRL-L-default' })
 
+-- Allow Ctrl-W to work with windows in insert mode too.
+vim.keymap.set('i', '<C-W>', '<C-O><C-W>', { desc = '+window' })
+
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>')
