@@ -1,26 +1,52 @@
--- NOTE:  <C-/>           Telescope: Help on keys.
+--[[ Highly extendable fuzzy finder over lists (files, LSP, etc.) ]]
+--
+-- INFO: The "Search" here means fuzzy search (unlike "Grep" which uses regexp) with syntax:
+--    Token         Match type                  Description
+--    sbtrkt        fuzzy-match                 Items that match sbtrkt
+--    'wild         exact-match (quoted)        Items that include wild
+--    ^music        prefix-exact-match          Items that start with music
+--    .mp3$         suffix-exact-match          Items that end with .mp3
+--    !fire         inverse-exact-match         Items that do not include fire
+--    !^music       inverse-prefix-exact-match  Items that do not start with music
+--    !.mp3$        inverse-suffix-exact-match  Items that do not end with .mp3
+--    ^a b$ | c$    OR operator                 Items that start with a and end with b OR c
+--
+-- INFO: The "project" here means either current or some upper directory (detected by `.git/`)
+-- and it subdirectories.
+
+-- NOTE:  <C-?>              Telescope: Help on keys.
+-- NOTE:  <C-\>              Telescope: Close window.
+-- NOTE:  <Leader>sp <F3>    Telescope: Search project's files.
+-- NOTE:  <Leader>sf         Telescope: Search dir's files.
+-- NOTE:  <Leader>s.         Telescope: Search recent files.
+-- NOTE:  <Leader>sn         Telescope: Search Neovim's config files.
+-- NOTE:  <Leader>sT         Telescope: Search project's TODOs.
+-- NOTE:  <Leader>st         Telescope: Search dir's TODOs.
+-- NOTE:  <Leader>sd         Telescope: Search project's diagnostics.
+-- NOTE:  <Leader>sh         Telescope: Search Neovim help.
+-- NOTE:  <Leader>sk         Telescope: Search Neovim keymaps.
+-- NOTE:  <Leader>s/         Telescope: Grep in open files.
+-- NOTE:  <Leader>sg         Telescope: Grep in a project's files.
+-- NOTE:  <Leader>sw         Telescope: Grep current word in a dir's files.
+-- NOTE:  <Leader>/          Telescope: Search in a current buffer.
+-- NOTE:  <Leader>ss         Telescope: Search available searches.
+-- NOTE:  <Leader>sr         Telescope: Resume previous search.
+-- NOTE:  <Leader><Leader>   Telescope: Search Neovim buffers.
+-- NOTE:  <M-;>              Telescope: Insert :icon/emoji:.
 
 ---@module 'lazy'
 ---@type LazySpec
 return {
-    { -- Fuzzy Finder (files, lsp, etc)
+    {
         'nvim-telescope/telescope.nvim',
         version = '*',
         dependencies = {
-            { -- If encountering errors, see telescope-fzf-native README for installation instructions
-                'nvim-telescope/telescope-fzf-native.nvim',
-
-                -- `build` is used to run some command when the plugin is installed/updated.
-                -- This is only run then, not every time Neovim starts up.
-                build = 'make',
-
-                -- `cond` is a condition used to determine whether this plugin should be
-                -- installed and loaded.
-                cond = function()
-                    return vim.fn.executable 'make' == 1
-                end,
-            },
-            { 'nvim-telescope/telescope-ui-select.nvim' },
+            'nvim-lua/plenary.nvim',
+            -- Fastest FZF sorter for telescope written in C.
+            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+            -- Sets vim.ui.select to telescope. That means for example that neovim core stuff
+            -- can fill the telescope picker. Example would be lua vim.lsp.buf.code_action().
+            'nvim-telescope/telescope-ui-select.nvim',
         },
         event = 'VimEnter',
         keys = {
@@ -115,6 +141,13 @@ return {
                 },
                 -- Pickers which usually opens another file should do this in a tab by default.
                 pickers = {
+                    -- Builtin previewer shows Telescope's source files - not interesting.
+                    builtin = { previewer = false },
+                    -- Colorscheme previewer should use less screen space for itself.
+                    colorscheme = {
+                        layout_strategy = 'center',
+                        enable_preview = true,
+                    },
                     find_files = {
                         mappings = {
                             i = {
@@ -134,7 +167,7 @@ return {
                 },
                 extensions = {
                     ['ui-select'] = {
-                        require('telescope.themes').get_dropdown(),
+                        require('telescope.themes').get_dropdown {},
                     },
                 },
             }
@@ -221,6 +254,9 @@ return {
                 local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
                 return '<Cmd>TodoTelescope cwd=' .. dir .. '<CR>'
             end, { expr = true, desc = '[S]earch Project [T]odo' })
+
+            -- Shortcut for searching Nerd Font icons, gitmoji and emoji.
+            vim.keymap.set('i', '<M-;>', builtin.symbols, { desc = 'Insert :icon|emoji:' })
         end,
     },
 }
