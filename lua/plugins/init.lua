@@ -63,11 +63,16 @@ return {
         lazy = true,
         event = 'VeryLazy',
         init = function()
+            vim.g.auto_open_diagnostic = false
             vim.diagnostic.config {
                 virtual_text = false,
                 virtual_lines = { only_current_line = true },
             }
-            vim.g.auto_open_diagnostic = false
+            -- Restore default behaviour for some namespaces.
+            vim.diagnostic.config({
+                virtual_text = true,
+                virtual_lines = false,
+            }, vim.api.nvim_create_namespace 'lazy')
         end,
         config = true,
     },
