@@ -98,6 +98,8 @@ return {
                     },
                     mappings = {
                         i = {
+                            -- No idea how to use NORMAL mode in Telescope, so let's skip it.
+                            ['<Esc>'] = 'close',
                             -- Alternative to inconvenient <C-c>.
                             ['<C-Bslash>'] = 'close',
                             -- Unmap <C-L> to restore it default action (clear screen).
