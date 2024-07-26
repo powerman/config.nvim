@@ -13,12 +13,24 @@ return {
         ---@type tokyonight.Config
         opts = {
             style = 'night',
+            ---@param hl tokyonight.Highlights
+            ---@param c ColorScheme
             on_highlights = function(hl, c)
                 -- Added in `mini.lua`.
                 hl.MiniStatuslineLazyUpdates = {
                     fg = c.info,
                     bg = c.fg_gutter,
                 }
+                -- Markdown: `code inline`.
+                hl['@markup.raw.markdown_inline'].fg = c.blue
+                hl['@markup.raw.markdown_inline'].bg = 'NONE'
+                -- Markdown: url.
+                hl['@markup.link'].fg = c.purple
+                hl['@markup.link.url.markdown_inline'] = '@markup.link'
+                -- Markdown: emphasises.
+                hl['@markup.strong'].fg = c.teal
+                hl['@markup.italic'].fg = c.teal
+                hl['@markup.strikethrough'].fg = c.fg_gutter
             end,
         },
         config = function(_, opts)
