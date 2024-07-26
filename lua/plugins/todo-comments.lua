@@ -27,7 +27,7 @@ return {
         version = '*',
         dependencies = { 'nvim-lua/plenary.nvim' },
         lazy = true, -- Must be loaded but not critical, so let's use event VeryLazy.
-        event = 'VeryLazy',
+        event = 'VimEnter', -- VeryLazy breaks autocmd on BufEnter below, so use VimEnter.
         keys = {
             {
                 ']t',
@@ -63,5 +63,21 @@ return {
                 bg = 'BOLD,NOCOMBINE',
             },
         },
+        config = function(_, opts)
+            require('todo-comments').setup(opts)
+
+            vim.api.nvim_create_autocmd('BufEnter', {
+                desc = 'Enable todo-comments for text',
+                group = vim.api.nvim_create_augroup('user.todo.text', { clear = true }),
+                callback = function(ev)
+                    local config = require 'todo-comments.config'
+                    local comments_only = string.match(ev.file, '%.md$') == nil
+                        and string.match(ev.file, '%.txt$') == nil
+                        and string.match(ev.file, '%.adoc$') == nil
+                        and string.match(ev.file, '%.asciidoc$') == nil
+                    config.options.highlight.comments_only = comments_only
+                end,
+            })
+        end,
     },
 }
