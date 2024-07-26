@@ -23,6 +23,9 @@ vim.keymap.set('n', '<F10>', ':qa<CR>', { desc = 'Quit if no unsaved changes' })
 vim.keymap.set('v', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
 vim.keymap.set('i', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
 
+-- Add hotkey to yank selection: <C-Insert>.
+vim.keymap.set('v', '<C-Insert>', 'y', { desc = 'Yank selection' })
+
 -- Allow Ctrl-L to clear the screen in insert mode too.
 vim.keymap.set('i', '<C-L>', '<C-O><C-L>', { desc = ':help CTRL-L-default' })
 
