@@ -5,6 +5,7 @@
 -- NOTE:  <F2>         Save current buffer.
 -- NOTE:  <F5>         Toggle wrap.
 -- NOTE:  <F10>        Quit if no unsaved changes.
+-- NOTE:  <C-Insert>   Yank (copy) selection.
 -- NOTE:  ]d [d        LSP: Next/prev diagnostic.
 -- NOTE:  <Leader>e    LSP: Show diagnostic under cursor.
 -- NOTE:  <Leader>q    LSP: Open diagnostics in quickfix list.
