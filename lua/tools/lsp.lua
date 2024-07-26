@@ -165,6 +165,7 @@ return {
         settings = {
             rootMarkers = { '.git/' },
             languages = efm_languages,
+            lintDebounce = 1000000000, -- 1 second, to lower CPU usage.
         },
         filetypes = vim.tbl_keys(efm_languages),
     },
