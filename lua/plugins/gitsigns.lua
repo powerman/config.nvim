@@ -56,7 +56,7 @@ return {
                     else
                         gitsigns.nav_hunk 'next'
                     end
-                end, { desc = 'Next git|diff [C]hange' })
+                end, { desc = 'Next git|diff change' })
 
                 map('n', '[c', function()
                     if vim.wo.diff then
@@ -64,53 +64,53 @@ return {
                     else
                         gitsigns.nav_hunk 'prev'
                     end
-                end, { desc = 'Previous git|diff [C]hange' })
+                end, { desc = 'Previous git|diff change' })
 
                 -- Views
                 map(
                     'n',
                     '<Leader>hp',
                     gitsigns.preview_hunk_inline,
-                    { desc = 'Git: [H]unk [P]review Inline' }
+                    { desc = 'Git: Hunk preview inline' }
                 )
                 map(
                     'n',
                     '<Leader>hd',
                     gitsigns.diffthis,
-                    { desc = 'Git: [H]unk [D]iff against Index' }
+                    { desc = 'Git: Hunk diff against index' }
                 )
                 map('n', '<Leader>hD', function()
                     gitsigns.diffthis '@'
-                end, { desc = 'Git: [H]unk [D]iff against last Commit' })
+                end, { desc = 'Git: Hunk diff against last commit' })
                 map(
                     'n',
                     '<Leader>tD',
                     gitsigns.toggle_deleted,
-                    { desc = 'Git: [T]oggle show [D]eleted' }
+                    { desc = 'Git: Toggle show deleted' }
                 )
 
                 -- Actions
                 map('n', '<Leader>hs', gitsigns.stage_hunk, {
-                    desc = 'Git: [H]unk [S]tage',
+                    desc = 'Git: Hunk stage',
                 })
                 map('v', '<Leader>hs', function()
                     gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
-                end, { desc = 'Git: [H]unk(s) [S]tage' })
+                end, { desc = 'Git: Hunk(s) stage' })
                 map(
                     'n',
                     '<Leader>hu',
                     gitsigns.undo_stage_hunk,
-                    { desc = 'Git: [H]unk [U]ndo last Stage' }
+                    { desc = 'Git: Hunk undo last stage' }
                 )
 
                 map('n', '<Leader>hr', gitsigns.reset_hunk, {
-                    desc = 'Git: [H]unk [R]eset',
+                    desc = 'Git: Hunk reset',
                 })
                 map('v', '<Leader>hr', function()
                     gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
-                end, { desc = 'Git: [H]unk(s) [R]eset' })
+                end, { desc = 'Git: Hunk(s) reset' })
                 map('n', '<Leader>hR', gitsigns.reset_buffer, {
-                    desc = 'Git: [H]unks [R]eset all',
+                    desc = 'Git: Hunks reset all',
                 })
 
                 -- Text object

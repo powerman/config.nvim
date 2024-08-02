@@ -181,48 +181,48 @@ local function handle_LspAttach(ev)
     end
 
     -- Opens a popup that displays documentation about the word under your cursor.
-    map('K', vim.lsp.buf.hover, 'Hover Documentation')
+    map('K', vim.lsp.buf.hover, 'Hover documentation')
 
     -- Opens a popup that displays signature for the function's param under your cursor.
-    map('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+    map('<C-k>', vim.lsp.buf.signature_help, 'Signature documentation')
 
     -- Rename the identifier under your cursor.
     -- Most Language Servers support renaming across files, etc.
-    map('<Leader>r', vim.lsp.buf.rename, '[R]ename')
+    map('<Leader>r', vim.lsp.buf.rename, 'Rename')
 
     -- Execute a code action, usually your cursor needs to be on top of an error
     -- or a suggestion from your LSP for this to activate.
-    map('<Leader>a', vim.lsp.buf.code_action, 'Code [A]ction', { 'n', 'v' })
+    map('<Leader>a', vim.lsp.buf.code_action, 'Code action', { 'n', 'v' })
 
     -- Jump to the definition of the word under your cursor.
     -- This is where a variable was first declared, or where a function is
     -- defined, etc.
-    map('gd', builtin.lsp_definitions, '[G]oto [D]efinition')
+    map('gd', builtin.lsp_definitions, 'Goto definition')
 
     -- Jump to the type of the word under your cursor.
     -- Useful when you're not sure what type a variable is and you want to see
     -- the definition of its *type*, not where it was *defined*.
-    map('gD', builtin.lsp_type_definitions, '[G]oto Type [D]efinition')
+    map('gD', builtin.lsp_type_definitions, 'Goto type definition')
 
     -- Jump to the implementation of the word under your cursor.
     -- Useful when your language has ways of declaring types without an actual
     -- implementation (e.g. "interfaces").
-    map('gI', builtin.lsp_implementations, '[G]oto [I]mplementation')
+    map('gI', builtin.lsp_implementations, 'Goto implementation')
 
     -- Find references for the word under your cursor.
-    map('<Leader>gr', builtin.lsp_references, '[G]oto [R]eferences')
+    map('<Leader>gr', builtin.lsp_references, 'Goto references')
 
     -- Jump to the declaration of the word under your cursor.
     -- For example, in C this would take you to the header.
-    map('<Leader>gd', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+    map('<Leader>gd', vim.lsp.buf.declaration, 'Goto declaration')
 
     -- Fuzzy find all the symbols in your current document.
     -- Symbols are things like variables, functions, types, etc.
-    map('<Leader>ds', builtin.lsp_document_symbols, '[D]ocument [S]ymbols')
+    map('<Leader>ds', builtin.lsp_document_symbols, 'Document symbols')
 
     -- Fuzzy find all the symbols in your current workspace.
     -- Similar to document symbols, except searches over your entire project.
-    map('<Leader>ws', builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+    map('<Leader>ws', builtin.lsp_dynamic_workspace_symbols, 'Workspace symbols')
 
     -- Enable inlay hints in your code, if the server supports them.
     -- This may be unwanted, since they displace some of your code.
@@ -230,7 +230,7 @@ local function handle_LspAttach(ev)
         vim.lsp.inlay_hint.enable(true)
         map('<Leader>th', function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
-        end, '[T]oggle Inlay [H]ints')
+        end, 'Toggle inlay hints')
     end
 
     vim.api.nvim_create_autocmd('CursorHold', {

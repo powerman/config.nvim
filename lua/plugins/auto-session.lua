@@ -32,7 +32,7 @@ return {
                 function()
                     require('auto-session.session-lens').search_session()
                 end,
-                desc = '[S]earch [A]uto-sessions',
+                desc = 'Search auto-sessions',
             },
         },
         init = function()

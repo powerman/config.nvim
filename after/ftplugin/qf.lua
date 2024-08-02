@@ -4,5 +4,5 @@ vim.keymap.set('n', 'q', '<Cmd>quit<CR>', {
     buffer = true,
     nowait = true,
     silent = true,
-    desc = '[Q]uit the current window',
+    desc = 'Quit the current window',
 })

@@ -34,14 +34,14 @@ return {
                 function()
                     require('todo-comments').jump_next()
                 end,
-                desc = 'Next [t]odo comment',
+                desc = 'Next todo comment',
             },
             {
                 '[t',
                 function()
                     require('todo-comments').jump_prev()
                 end,
-                desc = 'Previous [t]odo comment',
+                desc = 'Previous todo comment',
             },
         },
         ---@type TodoOptions
