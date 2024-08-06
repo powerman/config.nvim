@@ -43,6 +43,9 @@ return {
         },
     },
     lazy = false, -- Lazy breaks `opts.run_on_start = true`.
+    opts = {
+        auto_update = true,
+    },
     config = function(_, opts)
         register_termux_ls()
 
