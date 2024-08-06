@@ -22,14 +22,14 @@ return {
                     bg = c.fg_gutter,
                 }
                 -- Markdown: `code inline`.
-                hl['@markup.raw.markdown_inline'].fg = c.blue
+                hl['@markup.raw.markdown_inline'].fg = c.teal
                 hl['@markup.raw.markdown_inline'].bg = 'NONE'
                 -- Markdown: url.
                 hl['@markup.link'].fg = c.purple
                 hl['@markup.link.url.markdown_inline'] = '@markup.link'
                 -- Markdown: emphasises.
-                hl['@markup.strong'].fg = c.teal
-                hl['@markup.italic'].fg = c.teal
+                hl['@markup.strong'].fg = c.blue
+                hl['@markup.italic'].fg = c.blue
                 hl['@markup.strikethrough'].fg = c.fg_gutter
             end,
         },
