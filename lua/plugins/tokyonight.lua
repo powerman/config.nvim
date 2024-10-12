@@ -31,6 +31,8 @@ return {
                 hl['@markup.strong'].fg = c.blue
                 hl['@markup.italic'].fg = c.blue
                 hl['@markup.strikethrough'].fg = c.fg_gutter
+                -- Diff: changed line.
+                hl['DiffChange'].bg = c.bg_highlight
             end,
         },
         config = function(_, opts)
