@@ -224,10 +224,9 @@ local function handle_LspAttach(ev)
     -- Similar to document symbols, except searches over your entire project.
     map('<Leader>ws', builtin.lsp_dynamic_workspace_symbols, 'Workspace symbols')
 
-    -- Enable inlay hints in your code, if the server supports them.
+    -- Toggle inlay hints in your code, if the server supports them.
     -- This may be unwanted, since they displace some of your code.
     if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-        vim.lsp.inlay_hint.enable(true)
         map('<Leader>th', function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
         end, 'Toggle inlay hints')
