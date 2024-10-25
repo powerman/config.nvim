@@ -71,6 +71,15 @@ return {
                 return col ~= 0 and lines[1]:sub(col, col):match '%s' == nil
             end
 
+            -- https://github.com/hrsh7th/nvim-cmp/issues/2072
+            vim.keymap.set('c', '<CR>', function()
+                if cmp.visible() then
+                    return '<S-CR>'
+                else
+                    return '<CR>'
+                end
+            end, { remap = true, expr = true })
+
             ---@diagnostic disable: missing-fields
             cmp.setup {
                 window = {
@@ -177,7 +186,12 @@ return {
                         if not cmp.confirm { select = false } then
                             fallback()
                         end
-                    end, { 'i', 'c' }),
+                    end, { 'i' }),
+                    ['<S-CR>'] = cmp.mapping(function(fallback)
+                        if not cmp.confirm { select = false } then
+                            fallback()
+                        end
+                    end, { 'c' }),
                     ['<C-Bslash>'] = cmp.mapping(function(fallback)
                         if not cmp.abort() then
                             fallback()
