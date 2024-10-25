@@ -21,6 +21,7 @@ vim.api.nvim_create_autocmd('VimEnter', {
 })
 
 -- After closing a tab switch to a previous tab instead of a next tab.
+-- TODO: Vim 9.1.0572 and Neovim 0.11(?) has added 'tabclose' option, use it instead.
 local close_tab_group = vim.api.nvim_create_augroup('user.close_tab', { clear = true })
 local closed_tab_nr = 0
 vim.api.nvim_create_autocmd('TabLeave', {
