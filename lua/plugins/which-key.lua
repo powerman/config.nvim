@@ -30,6 +30,9 @@ return {
         ---@type wk.Opts
         opts = {
             preset = 'modern',
+            delay = function(ctx)
+                return ctx.plugin and 0 or 300
+            end,
             expand = 2,
             spec = {
                 { 'Y', desc = 'Yank to the end of line' },
