@@ -29,6 +29,11 @@ vim.g.float_border = 'rounded'
 vim.g.float_max_height = 0.96
 vim.g.float_max_width = 0.96
 
+-- Set to true if you want transparent background.
+-- Auto-detected for urxvt terminal, false in other terminals.
+vim.g.transparent = string.find(vim.env.TERM, '^rxvt') ~= nil
+    and string.find(vim.env.COLORFGBG, '%d$') == nil
+
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
 
