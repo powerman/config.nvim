@@ -139,9 +139,9 @@ return {
                         instructionHealthcheckMultiple = 'warning',
                         instructionJSONInSingleQuotes = 'warning',
                     },
-                    -- formatter = {
-                    --     ignoreMultilineInstructions = false,
-                    -- },
+                    formatter = {
+                        ignoreMultilineInstructions = true,
+                    },
                 },
             },
         },
