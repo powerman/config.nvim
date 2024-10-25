@@ -12,6 +12,11 @@ return {
         priority = 1000, -- Make sure to load this before all the other start plugins.
         ---@type tokyonight.Config
         opts = {
+            transparent = vim.g.transparent,
+            styles = {
+                sidebars = vim.g.transparent and 'transparent' or 'dark',
+                floats = vim.g.transparent and 'transparent' or 'dark',
+            },
             style = 'night',
             ---@param hl tokyonight.Highlights
             ---@param c ColorScheme
