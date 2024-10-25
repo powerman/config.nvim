@@ -57,3 +57,6 @@ vim.opt.wrap = false
 
 -- When formatting text (e.g. using `gq` or `gw`), recognize numbered lists.
 vim.opt.formatoptions:append 'n'
+
+-- Automatically continue current comment when adding new line inside a comment.
+vim.opt.formatoptions:append 'ro'
