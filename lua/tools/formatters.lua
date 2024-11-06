@@ -47,7 +47,8 @@ return {
     template = { 'djlint' }, -- Go/Django/Jinja/Twig/Handlebars/Angular.
     -- template = { 'prettierd' },
     -- toml = { 'dprint' }, -- Require `dprint config add toml`.
-    toml = { 'prettierd' }, -- Require prettier plugin.
+    -- toml = { 'prettierd' }, -- Require prettier plugin.
+    toml = { 'taplo' },
     tsv = { 'yq_tsv' },
     -- typescript = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
     typescript = { 'prettierd' },

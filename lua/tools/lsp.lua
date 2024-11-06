@@ -228,6 +228,8 @@ return {
     -- Configure: https://github.com/sqls-server/sqls?tab=readme-ov-file#db-configuration
     -- sqls = {},
 
+    taplo = {},
+
     termux_ls = {},
 
     yamlls = {
