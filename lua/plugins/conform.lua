@@ -33,7 +33,7 @@ local ignore_paths = {
     '/node_modules/',
     '/vendor/',
     '/go/pkg/mod/', -- Maybe run `go env GOMODCACHE` instead of hardcode?
-    '.golangci*', -- Follow formatting of original `.golangci.reference.yml` for ease diff.
+    '[.]golangci.*[.]yml', -- Follow formatting of original `.golangci.reference.yml` for ease diff.
 }
 
 ---@module 'lazy'
