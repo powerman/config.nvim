@@ -1,0 +1,28 @@
+[settings]
+experimental = true # Required to use lockfile.
+lockfile = true     # DO NOT FORGET TO `touch mise.lock`!
+
+[tools]
+neovim = 'latest'
+# An opinionated Lua code formatter
+'ubi:JohnnyMorganz/stylua' = 'latest'
+# A CLI tool for code structural search, lint and rewriting.
+'ubi:ast-grep/ast-grep' = 'latest'
+# a static analysis tool for shell scripts
+shellcheck = 'latest'
+
+[tasks.test]
+depends = ['lint']
+run = 'scripts/test'
+
+[tasks.lint]
+depends = ['lint/*']
+
+[tasks.'lint/ast-grep']
+run = 'ast-grep scan'
+
+[tasks.'lint/shellcheck']
+run = 'shellcheck scripts/*'
+
+[tasks.'lint/stylua']
+run = 'stylua --check .'
