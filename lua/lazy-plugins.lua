@@ -19,7 +19,7 @@ require('lazy').setup({ import = 'plugins' }, {
         notify = false,
     },
     dev = {
-        path = '~/proj/nvim',
+        path = '~/proj/vim',
     },
     ui = {
         border = vim.g.float_border,
