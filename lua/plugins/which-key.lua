@@ -41,7 +41,7 @@ return {
                 { 'ga', desc = 'Get ASCII code dec/hex/oct' },
                 { 'gq', desc = 'Format lines in a smart way' },
                 { 'gw', desc = 'Format lines as a plain text' },
-                -- BUG: Unable to set << and >>.
+                -- BUG: Unable to set << and >>. https://github.com/folke/which-key.nvim/issues/890
                 -- { '<lt><lt>', desc = 'Lines' },
                 -- { '>>', desc = 'Lines' },
                 { '[', group = 'jump to previous' },
@@ -57,10 +57,23 @@ return {
                 { '<Plug>(fzf-normal)', hidden = true },
             },
             keys = {
-                -- BUG: Hint shows defaults <C-D> <C-U> instead of actual keys.
                 scroll_down = '<C-Down>',
                 scroll_up = '<C-Up>',
             },
         },
+        config = function(_, opts)
+            -- Workaround for Russian keys are not working when WhichKey menu is shown.
+            local lmu = require 'langmapper.utils'
+            local wk_state = require 'which-key.state'
+            local check_orig = wk_state.check
+            wk_state.check = function(state, key) ---@diagnostic disable-line: duplicate-set-field
+                if key ~= nil then
+                    key = lmu.translate_keycode(key, 'default', 'ru')
+                end
+                return check_orig(state, key)
+            end
+
+            require('which-key').setup(opts)
+        end,
     },
 }
