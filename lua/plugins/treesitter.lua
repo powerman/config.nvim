@@ -116,6 +116,13 @@ return {
             --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
             --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
         end,
+        init = function() -- Source: https://github.com/okuuva/mise/blob/main/docs/mise-cookbook/neovim.md
+            require('vim.treesitter.query').add_predicate('is-mise?', function(_, _, bufnr, _)
+                local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
+                local filename = vim.fn.fnamemodify(filepath, ':t')
+                return string.match(filename, '.*mise.*%.toml$') ~= nil
+            end, { force = true, all = false })
+        end,
     },
     {
         'nvim-treesitter/nvim-treesitter-textobjects',
