@@ -5,9 +5,9 @@ lockfile = true     # DO NOT FORGET TO `touch mise.lock`!
 [tools]
 neovim = 'latest'
 # An opinionated Lua code formatter
-'ubi:JohnnyMorganz/stylua' = 'latest'
+stylua = 'latest'
 # A CLI tool for code structural search, lint and rewriting.
-'ubi:ast-grep/ast-grep' = 'latest'
+ast-grep = 'latest'
 # a static analysis tool for shell scripts
 shellcheck = 'latest'
 

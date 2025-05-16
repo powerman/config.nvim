@@ -1,18 +1,24 @@
+[tools.ast-grep]
+version = "0.38.1"
+backend = "aqua:ast-grep/ast-grep"
+
+[tools.ast-grep.checksums]
+"app-x86_64-unknown-linux-gnu.zip" = "sha256:a6f7a1c2c7d5bb9fa3266915c22da20ec576a8c43466492f4f0d5569ccae0bd9"
+
 [tools.neovim]
-version = "0.10.2"
+version = "0.11.1"
 backend = "aqua:neovim/neovim"
+
+[tools.neovim.checksums]
+"nvim-linux-x86_64.tar.gz" = "sha256:92ecb2dbdfbd0c6d79b522e07c879f7743c5d395d0a4f13b0d4f668f8565527a"
 
 [tools.shellcheck]
 version = "0.10.0"
 backend = "aqua:koalaman/shellcheck"
 
-[tools."ubi:JohnnyMorganz/stylua"]
-version = "0.20.0"
-backend = "ubi:JohnnyMorganz/stylua"
+[tools.stylua]
+version = "2.1.0"
+backend = "aqua:JohnnyMorganz/StyLua"
 
-[tools."ubi:JohnnyMorganz/stylua".checksums]
-stylua-linux-x86_64 = "sha256:ea20dbb5612474faf5df539858fd5fb453a4c42ebb803e2776d2ba82b96d32f5"
-
-[tools."ubi:ast-grep/ast-grep"]
-version = "0.29.0"
-backend = "ubi:ast-grep/ast-grep"
+[tools.stylua.checksums]
+"stylua-linux-x86_64-musl.zip" = "sha256:7919a621cecc5be5e66ea01c03038511fa5cb88f6277ccad9ca3460d66b5d82a"
