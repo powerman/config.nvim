@@ -25,17 +25,11 @@ External Requirements:
 
 - Basic utils: `git`, `make`, `unzip`, C Compiler (`gcc`).
 - [ripgrep](https://github.com/BurntSushi/ripgrep#installation).
-- Clipboard tool (xclip/xsel or other depending on platform).
+- Clipboard tool (`xclip`/`xsel` or other depending on platform).
+- You might need some extra tool (e.g. `npm`) used by Mason to auto-install formatter/LSP tools.
 - A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons.
   - If you have it set `vim.g.have_nerd_font` in `init.lua` to true.
   - If you chose "Mono" font kind set `vim.g.mono_nerd_font` in `init.lua` to true.
-- Language setup:
-  - If want to write Typescript, you need `npm`
-  - If want to write Golang, you will need `go`
-  - etc.
-- Setup formatters for file types you need:
-  - Check/update list of tools configured in `lua/plugins/conform.lua`.
-  - Install/setup these tools.
 
 ### Install Config
 
