@@ -18,7 +18,7 @@ local check_version = function()
         return
     end
 
-    if vim.version.cmp(vim.version(), { 0, 9, 4 }) >= 0 then
+    if vim.version.cmp(vim.version(), { 0, 11, 0 }) >= 0 then
         vim.health.ok(string.format("Neovim version is: '%s'", verstr))
     else
         vim.health.error(
@@ -48,7 +48,7 @@ return {
     check = function()
         vim.health.start 'kickstart.nvim'
 
-        vim.health.info [[NOTE: Not every warning is a 'must-fix' in `:checkhealth`
+        vim.health.info [[Not every warning is a 'must-fix' in `:checkhealth`
 
   Fix only warnings for plugins and languages you intend to use.
     Mason will give warnings for languages that are not installed.
