@@ -61,8 +61,10 @@ return {
         'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
         version = '*',
         lazy = true,
+        enabled = vim.g.auto_open_diagnostic,
         event = 'VeryLazy',
         init = function()
+            -- Disable LSP auto-popup because it duplicates virtual lines of this plugin.
             vim.g.auto_open_diagnostic = false
             vim.diagnostic.config {
                 virtual_text = false,
