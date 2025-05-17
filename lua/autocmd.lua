@@ -20,26 +20,6 @@ vim.api.nvim_create_autocmd('VimEnter', {
     command = 'if argc() > 1 && !&diff | tab sball | tabfirst | endif',
 })
 
--- After closing a tab switch to a previous tab instead of a next tab.
--- TODO: Vim 9.1.0572 and Neovim 0.11(?) has added 'tabclose' option, use it instead.
-local close_tab_group = vim.api.nvim_create_augroup('user.close_tab', { clear = true })
-local closed_tab_nr = 0
-vim.api.nvim_create_autocmd('TabLeave', {
-    group = close_tab_group,
-    callback = function()
-        closed_tab_nr = vim.fn.tabpagenr()
-    end,
-})
-vim.api.nvim_create_autocmd('TabEnter', {
-    desc = 'After closing a tab switch to a previous tab instead of a next tab',
-    group = close_tab_group,
-    callback = function()
-        if vim.fn.tabpagenr() ~= 1 and vim.fn.tabpagenr() == closed_tab_nr then
-            vim.cmd 'tabprevious'
-        end
-    end,
-})
-
 -- For usual files <Enter> begins a new line below the cursor and insert text.
 vim.api.nvim_create_autocmd('BufWinEnter', {
     desc = 'Enter begins a new line below the cursor and insert text',

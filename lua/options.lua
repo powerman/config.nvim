@@ -65,3 +65,7 @@ vim.opt.formatoptions:append 'n'
 
 -- Automatically continue current comment when adding new line inside a comment.
 vim.opt.formatoptions:append 'ro'
+
+-- After closing a tab switch to a previous tab instead of a next tab.
+vim.opt.tabclose:append 'left'
+vim.opt.tabclose:append 'uselast'
