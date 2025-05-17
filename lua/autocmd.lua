@@ -2,6 +2,8 @@
 --
 --  See `:help lua-guide-autocommands`.
 
+-- NOTE:  <CR>   Begin a new line below the cursor and insert text.
+
 -- Highlight when yanking (copying) text.
 vim.api.nvim_create_autocmd('TextYankPost', {
     desc = 'Highlight when yanking (copying) text',
