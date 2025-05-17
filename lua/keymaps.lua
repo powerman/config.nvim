@@ -6,6 +6,7 @@
 -- NOTE:  <F5>         Toggle wrap.
 -- NOTE:  <F10>        Quit if no unsaved changes.
 -- NOTE:  <C-Insert>   Yank (copy) selection.
+-- NOTE:  <Esc>        Stop the search highlighting.
 -- NOTE:  ]d [d        LSP: Next/prev diagnostic.
 -- NOTE:  <Leader>e    LSP: Show diagnostic under cursor.
 -- NOTE:  <Leader>q    LSP: Open diagnostics in quickfix list.
@@ -25,7 +26,7 @@ vim.keymap.set('v', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved change
 vim.keymap.set('i', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
 
 -- Add hotkey to yank selection: <C-Insert>.
-vim.keymap.set('v', '<C-Insert>', 'y', { desc = 'Yank selection' })
+vim.keymap.set('v', '<C-Insert>', 'y', { desc = 'Yank (copy) selection' })
 
 -- Allow Ctrl-L to clear the screen in insert mode too.
 vim.keymap.set('i', '<C-L>', '<C-O><C-L>', { desc = 'Clears and redraws the screen' })
@@ -38,30 +39,21 @@ vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Stop the search highlighting' })
 
 -- Diagnostic keymaps
-vim.keymap.set(
-    'n',
-    '[d',
-    vim.diagnostic.goto_prev,
-    { desc = 'Go to previous diagnostic message' }
-)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
+vim.keymap.set('n', '[d', function()
+    vim.diagnostic.jump { count = -1, float = true }
+end, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', ']d', function()
+    vim.diagnostic.jump { count = 1, float = true }
+end, { desc = 'Go to next diagnostic message' })
 vim.keymap.set(
     'n',
     '<Leader>e',
     vim.diagnostic.open_float,
-    { desc = 'Show diagnostic error messages' }
+    { desc = 'Show diagnostic under cursor' }
 )
 vim.keymap.set(
     'n',
     '<Leader>q',
     vim.diagnostic.setloclist,
-    { desc = 'Open diagnostic quickfix list' }
+    { desc = 'Open diagnostic in quickfix list' }
 )
-
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
--- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
