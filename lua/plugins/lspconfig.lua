@@ -181,10 +181,20 @@ local function handle_LspAttach(ev)
     end
 
     -- Opens a popup that displays documentation about the word under your cursor.
-    map('K', vim.lsp.buf.hover, 'Hover documentation')
+    map('K', function()
+        vim.lsp.buf.hover {
+            border = vim.g.float_border,
+            max_width = math.floor(vim.fn.winwidth(0) * vim.g.float_max_width),
+        }
+    end, 'Hover documentation')
 
     -- Opens a popup that displays signature for the function's param under your cursor.
-    map('<C-k>', vim.lsp.buf.signature_help, 'Signature documentation')
+    map('<C-k>', function()
+        vim.lsp.buf.signature_help {
+            border = vim.g.float_border,
+            max_width = math.floor(vim.fn.winwidth(0) * vim.g.float_max_width),
+        }
+    end, 'Signature documentation')
 
     -- Rename the identifier under your cursor.
     -- Most Language Servers support renaming across files, etc.
