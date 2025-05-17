@@ -1,6 +1,6 @@
 --[[ Highly extendable fuzzy finder over lists (files, LSP, etc.) ]]
 --
--- INFO: The "Search" here means fuzzy search (unlike "Grep" which uses regexp) with syntax:
+-- INFO: The "Find" here means fuzzy search (unlike "Grep" which uses regexp) with syntax:
 --    Token         Match type                  Description
 --    sbtrkt        fuzzy-match                 Items that match sbtrkt
 --    'wild         exact-match (quoted)        Items that include wild
@@ -16,22 +16,23 @@
 
 -- NOTE:  <C-?>              Telescope: Help on keys.
 -- NOTE:  <C-\>              Telescope: Close window.
--- NOTE:  <Leader>sp <F3>    Telescope: Search project's files.
--- NOTE:  <Leader>sf         Telescope: Search dir's files.
--- NOTE:  <Leader>s.         Telescope: Search recent files.
--- NOTE:  <Leader>sn         Telescope: Search Neovim's config files.
--- NOTE:  <Leader>sT         Telescope: Search project's TODOs.
--- NOTE:  <Leader>st         Telescope: Search dir's TODOs.
--- NOTE:  <Leader>sd         Telescope: Search project's diagnostics.
--- NOTE:  <Leader>sh         Telescope: Search Neovim help.
--- NOTE:  <Leader>sk         Telescope: Search Neovim keymaps.
--- NOTE:  <Leader>s/         Telescope: Grep in open files.
--- NOTE:  <Leader>sg         Telescope: Grep in a project's files.
--- NOTE:  <Leader>sw         Telescope: Grep current word in a dir's files.
--- NOTE:  <Leader>/          Telescope: Search in a current buffer.
--- NOTE:  <Leader>ss         Telescope: Search available searches.
+-- NOTE:  <Leader>sh         Telescope: Find help.
+-- NOTE:  <Leader>sk         Telescope: Find keymap.
+-- NOTE:  <Leader>sc         Telescope: Find user config cheatsheet.
+-- NOTE:  <Leader>sC         Telescope: Find user config file.
+-- NOTE:  <Leader><Leader>   Telescope: Find buffer.
+-- NOTE:  <Leader>s.         Telescope: Find recent file.
+-- NOTE:  <Leader>s/         Telescope: Grep open files.
+-- NOTE:  <Leader>sd         Telescope: Find diagnostics.
+-- NOTE:  <Leader>sF <F3>    Telescope: Find project's file.
+-- NOTE:  <Leader>sf         Telescope: Find dir's file.
+-- NOTE:  <Leader>sT         Telescope: Find project's TODO/BUG/….
+-- NOTE:  <Leader>st         Telescope: Find dir's TODO/BUG/….
+-- NOTE:  <Leader>sg         Telescope: Grep project.
+-- NOTE:  <Leader>sw         Telescope: Find dir for a current word.
+-- NOTE:  <Leader>/          Telescope: Find in a buffer.
+-- NOTE:  <Leader>ss         Telescope: Find builtin search.
 -- NOTE:  <Leader>sr         Telescope: Resume previous search.
--- NOTE:  <Leader><Leader>   Telescope: Search Neovim buffers.
 -- NOTE:  <M-;>              Telescope: Insert :icon/emoji:.
 
 ---@module 'lazy'
@@ -52,29 +53,24 @@ return {
         keys = {
             {
                 '<F3>',
-                '<Leader>sp',
+                '<Leader>sF',
                 mode = 'n',
                 remap = true,
-                desc = 'Search project files',
+                desc = "Find project's file",
             },
             {
                 '<F3>',
-                '<Esc><Leader>sp',
+                '<Esc><Leader>sF',
                 mode = 'v',
                 remap = true,
-                desc = 'Search project files',
+                desc = "Find project's file",
             },
             {
                 '<F3>',
-                '<Esc><Leader>sp',
+                '<Esc><Leader>sF',
                 mode = 'i',
                 remap = true,
-                desc = 'Search project files',
-            },
-            {
-                '<Leader>st',
-                '<Cmd>TodoTelescope<CR>',
-                desc = 'Search directory todo',
+                desc = "Find project's file",
             },
         },
         config = function()
@@ -134,7 +130,7 @@ return {
                     find_files = {
                         mappings = {
                             i = {
-                                -- <F3> both opens (Search Project files) and closes.
+                                -- <F3> both opens (Find project's file) and closes.
                                 ['<F3>'] = 'close',
                                 ['<CR>'] = 'select_tab',
                             },
@@ -160,81 +156,72 @@ return {
             pcall(require('telescope').load_extension, 'ui-select')
 
             local builtin = require 'telescope.builtin'
-            vim.keymap.set('n', '<Leader>sh', builtin.help_tags, { desc = 'Search help' })
-            vim.keymap.set('n', '<Leader>sk', builtin.keymaps, { desc = 'Search keymaps' })
-            vim.keymap.set('n', '<Leader>sf', builtin.find_files, { desc = 'Search files' })
-            vim.keymap.set(
-                'n',
-                '<Leader>ss',
-                builtin.builtin,
-                { desc = 'Search telescope builtins' }
-            )
-            vim.keymap.set(
-                'n',
-                '<Leader>sw',
-                builtin.grep_string,
-                { desc = 'Search current word' }
-            )
-            vim.keymap.set('n', '<Leader>sg', function()
-                local buf_filename = vim.api.nvim_buf_get_name(0)
-                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
-                builtin.live_grep { cwd = dir or '.' }
-            end, { desc = 'Search by grep project' })
-            vim.keymap.set(
-                'n',
-                '<Leader>sd',
-                builtin.diagnostics,
-                { desc = 'Search diagnostics' }
-            )
-            vim.keymap.set('n', '<Leader>sr', builtin.resume, { desc = 'Search resume' })
-            vim.keymap.set(
-                'n',
-                '<Leader>s.',
-                builtin.oldfiles,
-                { desc = 'Search recent files ("." for repeat)' }
-            )
-            vim.keymap.set(
-                'n',
-                '<Leader><Leader>',
-                builtin.buffers,
-                { desc = 'Find existing buffers' }
-            )
+            vim.keymap.set('n', '<Leader>sh', builtin.help_tags, { desc = 'Find help' })
+            vim.keymap.set('n', '<Leader>sk', builtin.keymaps, { desc = 'Find keymap' })
+            vim.keymap.set('n', '<Leader>sc', function()
+                local dir = vim.fn.stdpath 'config'
+                return '<Cmd>TodoTelescope keywords=NOTE cwd=' .. dir .. '<CR>'
+            end, { expr = true, desc = 'Find user config cheatsheet' })
+            vim.keymap.set('n', '<Leader>sC', function()
+                builtin.find_files { cwd = vim.fn.stdpath 'config' }
+            end, { desc = 'Find user config file' })
 
-            vim.keymap.set('n', '<Leader>/', function()
-                builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-                    winblend = 10,
-                    previewer = false,
-                })
-            end, { desc = 'Fuzzily search in current buffer' })
-
+            vim.keymap.set('n', '<Leader><Leader>', builtin.buffers, { desc = 'Find buffer' })
+            vim.keymap.set('n', '<Leader>s.', builtin.oldfiles, { desc = 'Find recent file' })
             vim.keymap.set('n', '<Leader>s/', function()
                 builtin.live_grep {
                     grep_open_files = true,
                     prompt_title = 'Live Grep in Open Files',
                 }
-            end, { desc = 'Search in open files' })
+            end, { desc = 'Grep open files' })
 
-            -- Shortcut for searching your Neovim configuration files
-            vim.keymap.set('n', '<Leader>sn', function()
-                builtin.find_files { cwd = vim.fn.stdpath 'config' }
-            end, { desc = 'Search Neovim files' })
-
-            -- Shortcut for searching your project files
-            vim.keymap.set('n', '<Leader>sp', function()
+            vim.keymap.set(
+                'n',
+                '<Leader>sd',
+                builtin.diagnostics,
+                { desc = 'Find diagnostics' }
+            )
+            vim.keymap.set('n', '<Leader>sF', function()
                 local buf_filename = vim.api.nvim_buf_get_name(0)
                 local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
                 builtin.find_files { cwd = dir }
-            end, { desc = 'Search project files' })
-
-            -- Shortcut for searching your project todos
+            end, { desc = "Find project's file" })
+            vim.keymap.set('n', '<Leader>sf', builtin.find_files, { desc = "Find dir's file" })
             vim.keymap.set('n', '<Leader>sT', function()
                 local buf_filename = vim.api.nvim_buf_get_name(0)
                 local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
                 return '<Cmd>TodoTelescope cwd=' .. dir .. '<CR>'
-            end, { expr = true, desc = 'Search project todo' })
+            end, { expr = true, desc = "Find project's TODO/BUG/…" })
+            vim.keymap.set('n', '<Leader>st', function()
+                return '<Cmd>TodoTelescope<CR>'
+            end, { expr = true, desc = "Find dir's TODO/BUG/…" })
+            vim.keymap.set('n', '<Leader>sg', function()
+                local buf_filename = vim.api.nvim_buf_get_name(0)
+                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
+                builtin.live_grep { cwd = dir or '.' }
+            end, { desc = 'Grep project' })
+            vim.keymap.set(
+                'n',
+                '<Leader>sw',
+                builtin.grep_string,
+                { desc = 'Find dir for a current word' }
+            )
+            vim.keymap.set('n', '<Leader>/', function()
+                builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+                    winblend = 10,
+                    previewer = false,
+                })
+            end, { desc = 'Find in a buffer' })
 
-            -- Shortcut for searching Nerd Font icons, gitmoji and emoji.
-            vim.keymap.set('i', '<M-;>', builtin.symbols, { desc = 'Insert :icon|emoji:' })
+            vim.keymap.set('n', '<Leader>ss', builtin.builtin, { desc = 'Find builtin search' })
+            vim.keymap.set(
+                'n',
+                '<Leader>sr',
+                builtin.resume,
+                { desc = 'Resume previous search' }
+            )
+
+            vim.keymap.set('i', '<M-;>', builtin.symbols, { desc = 'Insert :icon/emoji:' })
         end,
     },
 }
