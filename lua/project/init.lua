@@ -1,3 +1,7 @@
+-- INFO: This is very basic and limited implementation:
+-- - Project root directory is detected based on directory where Neovim was started.
+-- - That project's tools will be used even if you'll later open file from another project.
+
 local M = {}
 
 ---@class Config
