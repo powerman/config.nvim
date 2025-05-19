@@ -16,9 +16,11 @@
 -- modifying this file, but also configuring required 3rd-party tools.
 -- List of supported formatters: https://github.com/stevearc/conform.nvim#formatters.
 
--- NOTE:  <Leader>f         Formats current buffer.
--- NOTE:  :FormatDisable    Disables autoformat.
--- NOTE:  :FormatDisable!   Disables autoformat for the buffer.
+-- NOTE:  <Leader>f         Format current buffer.
+-- NOTE:  :FormatDisable    Disables autoformat on save.
+-- NOTE:  :FormatDisable!   Disables autoformat on save for the buffer.
+-- NOTE:  :FormatEnable     Re-enable autoformat on save.
+-- NOTE:  :ConformInfo      Show formatters info and log.
 
 -- Disable autoformat on certain filetypes.
 local ignore_filetypes = {
@@ -42,7 +44,6 @@ return {
     {
         'stevearc/conform.nvim',
         version = '*',
-        lazy = true,
         event = { 'BufWritePre' },
         cmd = { 'ConformInfo', 'FormatDisable', 'FormatEnable' },
         keys = {
@@ -101,14 +102,14 @@ return {
                     vim.g.disable_autoformat = true
                 end
             end, {
-                desc = 'Disable autoformat-on-save',
+                desc = 'Disable autoformat on save',
                 bang = true,
             })
             vim.api.nvim_create_user_command('FormatEnable', function()
                 vim.b.disable_autoformat = false
                 vim.g.disable_autoformat = false
             end, {
-                desc = 'Re-enable autoformat-on-save',
+                desc = 'Re-enable autoformat on save',
             })
 
             local util = require 'conform.util'
@@ -133,19 +134,6 @@ return {
                 })
             end
 
-            require('conform').formatters.injected = {
-                options = {
-                    -- lang_to_ext = {
-                    --     lua = 'lua',
-                    -- },
-                    -- Map of treesitter language to formatters to use
-                    -- (defaults to the value from formatters_by_ft).
-                    lang_to_formatters = {
-                        -- HACK: Work around https://github.com/stevearc/conform.nvim/issues/485
-                        html = {},
-                    },
-                },
-            }
             require('conform').formatters.gci = {
                 cwd = util.root_file { 'go.mod' },
                 append_args = { '-s', 'standard', '-s', 'default', '-s', 'localmodule' },

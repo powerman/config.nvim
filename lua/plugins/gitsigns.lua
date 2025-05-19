@@ -16,12 +16,10 @@
 -- INFO: Git branch and diff status provided by this plugin is used by mini.statusline plugin.
 
 -- NOTE:  ]c [c             Git: next/prev hunk.
--- NOTE:  <Leader>hp        Git: preview hunk inline.
+-- NOTE:  <Leader>hi        Git: preview hunk inline.
 -- NOTE:  <Leader>hd        Git: diff against index.
 -- NOTE:  <Leader>hD        Git: diff against last commit.
--- NOTE:  <Leader>tD        Git: toggle show deleted.
--- NOTE:  <Leader>hs        Git: stage hunk.
--- NOTE:  <Leader>hu        Git: undo stage hunk.
+-- NOTE:  <Leader>hs        Git: (undo) stage hunk.
 -- NOTE:  <Leader>hr        Git: reset hunk (get from index).
 -- NOTE:  :Gitsigns blame   Git: blame.
 -- NOTE: 󰴑 ih                Git: match hunk around cursor.
@@ -31,7 +29,7 @@
 return {
     {
         'lewis6991/gitsigns.nvim',
-        lazy = true, -- Must be loaded but not critical, so let's use event VeryLazy.
+        version = '*',
         event = 'VeryLazy',
         opts = {
             signs = {
@@ -69,7 +67,7 @@ return {
                 -- Views
                 map(
                     'n',
-                    '<Leader>hp',
+                    '<Leader>hi',
                     gitsigns.preview_hunk_inline,
                     { desc = 'Git: Hunk preview inline' }
                 )
@@ -82,12 +80,6 @@ return {
                 map('n', '<Leader>hD', function()
                     gitsigns.diffthis '@'
                 end, { desc = 'Git: Hunk diff against last commit' })
-                map(
-                    'n',
-                    '<Leader>tD',
-                    gitsigns.toggle_deleted,
-                    { desc = 'Git: Toggle show deleted' }
-                )
 
                 -- Actions
                 map('n', '<Leader>hs', gitsigns.stage_hunk, {
@@ -96,12 +88,6 @@ return {
                 map('v', '<Leader>hs', function()
                     gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
                 end, { desc = 'Git: Hunk(s) stage' })
-                map(
-                    'n',
-                    '<Leader>hu',
-                    gitsigns.undo_stage_hunk,
-                    { desc = 'Git: Hunk undo last stage' }
-                )
 
                 map('n', '<Leader>hr', gitsigns.reset_hunk, {
                     desc = 'Git: Hunk reset',
@@ -114,7 +100,7 @@ return {
                 })
 
                 -- Text object
-                map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+                map({ 'o', 'x' }, 'ih', gitsigns.select_hunk)
             end,
         },
     },
