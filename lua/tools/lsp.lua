@@ -99,6 +99,11 @@ local efm_languages = {
     proto = { require 'efmls-configs.linters.buf' },
 }
 
+---@module 'lspconfig'
+--- Change `cmd` field type to optional because this config is just extending full config.
+---@class lspConfigExtender : lspconfig.Config
+---@field cmd? string[]|fun(dispatchers: vim.lsp.rpc.Dispatchers): vim.lsp.rpc.PublicClient
+
 -- Enable the following language servers.
 --
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -109,8 +114,7 @@ local efm_languages = {
 --    - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
 --    - settings (table): Override the default settings passed when initializing the server.
 --      For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/.
----@module 'lspconfig'
----@type table<string,lspconfig.Config>
+---@type table<string,lspConfigExtender>
 return {
     -- Linter/fixer for many treesitter-supported languages: https://ast-grep.github.io/reference/languages.html.
     -- Will be used only if configured (run `sg new` in project root dir to create sgconfig.yml).

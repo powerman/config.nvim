@@ -17,12 +17,11 @@ return {
     -- Setup it here for lazy loading and DO NOT include in other plugin's dependencies.
     { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font, lazy = true },
     -- Improve the default vim.ui interfaces.
-    { 'stevearc/dressing.nvim', lazy = true, event = 'VeryLazy', config = true },
+    { 'stevearc/dressing.nvim', event = 'VeryLazy', config = true },
     -- Extensible UI for Neovim notifications and LSP progress messages.
     {
         'j-hui/fidget.nvim',
         version = '*',
-        lazy = false,
         opts = {
             notification = {
                 override_vim_notify = true,
@@ -37,7 +36,6 @@ return {
     {
         'folke/lazydev.nvim',
         version = '*',
-        lazy = true,
         ft = 'lua',
         opts = {
             library = {
@@ -46,9 +44,10 @@ return {
             },
         },
     },
-    { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` typings
+    -- Not a plugin, but a collection of definition files for types in `vim.uv.*`.
+    'Bilal2453/luvit-meta',
     -- Not a plugin, but a library used to setup LSP jsonls and yamlls.
-    { 'b0o/schemastore.nvim', lazy = true },
+    'b0o/schemastore.nvim',
     -- Not a plugin, but a library with configs for `efm` LSP.
     {
         'creativenull/efmls-configs-nvim',

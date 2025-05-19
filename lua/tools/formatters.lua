@@ -1,3 +1,4 @@
+---@module 'conform'
 ---@type table<string, conform.FiletypeFormatter>
 return {
     -- Conform can also run multiple formatters sequentially
@@ -14,6 +15,8 @@ return {
     css = { 'prettierd' },
     -- css = { 'stylelint' },
     csv = { 'yq_csv' },
+    -- TODO: Some basic formatter is already provided by LSP, but there are new tools not
+    -- added to Mason yet which might work better (e.g. https://github.com/reteps/dockerfmt).
     -- dockerfile = { 'dprint' }, -- Require `dprint config add dockerfile`.
     go = { 'goimports', 'gci', 'gofumpt' }, -- Also: 'gofmt', 'goimports-reviser'.
     graphql = { 'prettierd' },
