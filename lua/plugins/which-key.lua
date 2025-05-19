@@ -65,12 +65,20 @@ return {
         },
         config = function(_, opts)
             -- Workaround for Russian keys are not working when WhichKey menu is shown.
+            --
+            -- Uses external command `xkblayout-state` to detect current keyboard layout
+            -- only for ambiguous keys in Russuan layout: .,/
+            local cmd = { 'xkblayout-state', 'print', '%s' }
+            local has_cmd = vim.fn.executable(cmd[1]) == 1
             local lmu = require 'langmapper.utils'
             local wk_state = require 'which-key.state'
             local check_orig = wk_state.check
             wk_state.check = function(state, key) ---@diagnostic disable-line: duplicate-set-field
                 if key ~= nil then
-                    key = lmu.translate_keycode(key, 'default', 'ru')
+                    local ambiguous = key == '.' or key == ',' or key == '/'
+                    if not ambiguous or has_cmd and vim.system(cmd):wait().stdout == 'ru' then
+                        key = lmu.translate_keycode(key, 'default', 'ru')
+                    end
                 end
                 return check_orig(state, key)
             end
