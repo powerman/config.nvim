@@ -10,7 +10,10 @@
 
 -- NOTE:  :Lazy   Install/upgrade/clean plugins.
 
-require('lazy').setup({ import = 'plugins' }, {
+require('lazy').setup {
+    spec = {
+        { import = 'plugins' },
+    },
     checker = {
         enabled = true,
         notify = false,
@@ -45,4 +48,4 @@ require('lazy').setup({ import = 'plugins' }, {
             task = '✔ ',
         },
     },
-})
+}

@@ -17,7 +17,7 @@ return {
     -- dockerfile = { 'dprint' }, -- Require `dprint config add dockerfile`.
     go = { 'goimports', 'gci', 'gofumpt' }, -- Also: 'gofmt', 'goimports-reviser'.
     graphql = { 'prettierd' },
-    html = { 'djlint' },
+    -- html = { 'djlint' }, -- Already provided by LSP (by efmls djlint).
     -- html = { 'prettierd' }, -- Fail on invalid HTML without error message.
     -- javascript = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
     javascript = { 'prettierd' },
