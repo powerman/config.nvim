@@ -30,7 +30,7 @@ return {
         opts = {
             preset = 'modern',
             delay = function(ctx)
-                return ctx.plugin and 0 or 300
+                return ctx.plugin and 0 or vim.o.timeoutlen
             end,
             expand = 2,
             spec = {

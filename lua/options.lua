@@ -34,8 +34,7 @@ vim.opt.signcolumn = 'yes'
 vim.opt.updatetime = 250
 
 -- Decrease mapped sequence wait time.
--- Displays which-key popup sooner. TODO: Not used in which-key v3.
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 500
 
 -- Configure how new splits should be opened.
 vim.opt.splitright = true
