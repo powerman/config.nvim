@@ -14,7 +14,7 @@
 --
 --  See https://github.com/rmagatti/auto-session.
 
--- NOTE:  <Leader>sa  List/delete sessions.
+-- NOTE:  <Leader>sa   List/delete sessions.
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -22,15 +22,12 @@ return {
     {
         'rmagatti/auto-session',
         version = '*',
-        dependencies = {
-            'nvim-telescope/telescope.nvim',
-        },
         lazy = false, -- Needs to restore session on Neovim start.
         keys = {
             {
                 '<Leader>sa',
                 function()
-                    require('auto-session.session-lens').search_session()
+                    require('auto-session.session-lens').search_session {}
                 end,
                 desc = 'Search auto-sessions',
             },
@@ -38,15 +35,11 @@ return {
         init = function()
             vim.opt.sessionoptions:append 'winpos'
             vim.opt.sessionoptions:append 'localoptions'
-            -- HACK: Work around https://github.com/rmagatti/auto-session/issues/325:
-            -- help files may not be available at VimEnter if they're from lazy loaded plugin.
-            vim.opt.sessionoptions:remove 'help'
         end,
-        ---@type defaultConf
+        ---@module "auto-session"
+        ---@type AutoSession.Config
         opts = {
-            auto_session_suppress_dirs = { '/', '~/', '~/proj/' },
-            ---@type session_lens_config
-            ---@diagnostic disable-next-line: missing-fields
+            suppressed_dirs = { '/', '~/', '~/proj' },
             session_lens = {
                 load_on_setup = true,
                 theme_conf = { border = true },
@@ -54,17 +47,17 @@ return {
             -- If `nvim` was started with file(s) arg(s) and previous session wasn't restored,
             -- then save the session if exiting with at least two tabs/windows with usual files.
             args_allow_files_auto_save = function()
-                local valuable = 0
+                local supported = 0
                 for _, tabpage in ipairs(vim.api.nvim_list_tabpages()) do
                     for _, window in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
                         local buffer = vim.api.nvim_win_get_buf(window)
                         local file_name = vim.api.nvim_buf_get_name(buffer)
                         if vim.fn.filereadable(file_name) == 1 then
-                            valuable = valuable + 1
+                            supported = supported + 1
                         end
                     end
                 end
-                return valuable > 1
+                return supported >= 2
             end,
         },
     },

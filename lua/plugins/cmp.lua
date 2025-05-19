@@ -7,12 +7,13 @@
 --
 --  Check available sources: https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
 
--- NOTE:  <Tab>       Cmp: complete|expand|open menu|next.
--- NOTE:  <S-Tab>     Cmp: open menu|previous.
--- NOTE:  <CR>        Cmp: complete/expand selected.
+-- NOTE:  <Tab>       Cmp: complete or open menu|menu next.
+-- NOTE:  <S-Tab>     Cmp: open menu|menu previous.
+-- NOTE:  <CR>        Cmp: complete/expand selected menu item.
 -- NOTE:  <C-\>       Cmp: abort and close menu.
 -- NOTE:  <C-Down>    Cmp: scroll item doc.
 -- NOTE:  <C-Up>      Cmp: scroll item doc.
+-- NOTE:  <Tab>       Snip: expand.
 -- NOTE:  <C-Right>   Snip: expand or jump next.
 -- NOTE:  <C-Left>    Snip: jump previous.
 -- NOTE:  <C-CR>      Snip: change choice.

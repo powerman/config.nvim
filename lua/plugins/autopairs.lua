@@ -7,8 +7,7 @@
 ---@type LazySpec
 return {
     'windwp/nvim-autopairs',
-    dependencies = { 'hrsh7th/nvim-cmp' },
-    lazy = true,
+    dependencies = 'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
     config = true,
 }
