@@ -34,6 +34,7 @@ local ignore_paths = {
     vim.fn.stdpath 'data' .. '/lazy/',
     '/node_modules/',
     '/vendor/',
+    '/fork/',
     '/go/pkg/mod/', -- Maybe run `go env GOMODCACHE` instead of hardcode?
     '[.]golangci.*[.]yml', -- Follow formatting of original `.golangci.reference.yml` for ease diff.
 }
