@@ -13,7 +13,8 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to false if you prefer to manually open diagnostic with <Leader>e.
-vim.g.auto_open_diagnostic = true
+-- See also `vim.diagnostic.config { virtual_lines }` in `setup.lua` as an alternative.
+vim.g.auto_open_diagnostic = false
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal.
 vim.g.have_nerd_font = true

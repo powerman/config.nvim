@@ -54,26 +54,4 @@ return {
         version = 'v1.*',
         dependencies = 'neovim/nvim-lspconfig',
     },
-    -- Renders diagnostics using virtual lines on top of the real line of code.
-    {
-        'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
-        version = '*',
-        lazy = true,
-        enabled = vim.g.auto_open_diagnostic,
-        event = 'VeryLazy',
-        init = function()
-            -- Disable LSP auto-popup because it duplicates virtual lines of this plugin.
-            vim.g.auto_open_diagnostic = false
-            vim.diagnostic.config {
-                virtual_text = false,
-                virtual_lines = { only_current_line = true },
-            }
-            -- Restore default behaviour for some namespaces.
-            vim.diagnostic.config({
-                virtual_text = true,
-                virtual_lines = false,
-            }, vim.api.nvim_create_namespace 'lazy')
-        end,
-        config = true,
-    },
 }
