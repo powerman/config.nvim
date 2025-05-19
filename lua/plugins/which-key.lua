@@ -16,7 +16,6 @@ return {
     { -- Useful plugin to show you pending keybinds.
         'folke/which-key.nvim',
         version = '*',
-        lazy = true,
         event = 'VeryLazy',
         keys = {
             {
@@ -35,25 +34,28 @@ return {
             end,
             expand = 2,
             spec = {
+                -- Improve descriptions like "help <key>-default".
                 { 'Y', desc = 'Yank to the end of line' },
                 { '&', desc = 'Repeat last substitute' },
                 { '<C-L>', desc = 'Clears and redraws the screen' },
+                -- Add missing.
                 { 'ga', desc = 'Get ASCII code dec/hex/oct' },
                 { 'gq', desc = 'Format lines in a smart way' },
+                -- Improve description.
                 { 'gw', desc = 'Format lines as a plain text' },
-                -- BUG: Unable to set << and >>. https://github.com/folke/which-key.nvim/issues/890
-                -- { '<lt><lt>', desc = 'Lines' },
-                -- { '>>', desc = 'Lines' },
-                { '[', group = 'jump to previous' },
-                { ']', group = 'jump to next' },
-                { 's', group = 'surrounding | Substitute with {motion}' },
-                { 'z', group = 'fold | spell | scroll' },
-                { '<Leader>d', group = 'lsp: document' },
-                { '<Leader>g', group = 'lsp: goto' },
-                { '<Leader>h', group = 'git: hunk', mode = 'nx' },
-                { '<Leader>s', group = 'search' },
-                { '<Leader>t', group = 'toggle' },
-                { '<Leader>w', group = 'lsp: workspace' },
+                -- Improve group descriptions.
+                { '[', group = 'Jump to previous' },
+                { ']', group = 'Jump to next' },
+                { 's', group = 'Surrounding, substitute with {motion}' },
+                { 'z', group = 'Fold, spell, scroll' },
+                { 'gr', group = 'LSP' },
+                { '<Leader>d', group = 'LSP: Document' },
+                { '<Leader>g', group = 'LSP: Goto' },
+                { '<Leader>h', group = 'Git: Hunk', mode = 'nx' },
+                { '<Leader>s', group = 'Search' },
+                { '<Leader>t', group = 'Toggle' },
+                { '<Leader>w', group = 'LSP: Workspace' },
+                -- Hide useless things.
                 { '<Plug>(fzf-normal)', hidden = true },
             },
             keys = {
