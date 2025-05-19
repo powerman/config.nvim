@@ -14,9 +14,9 @@
 -- BUG: `gc` and `#` in VISUAL with 1 line works blockwise instead of linewise.
 -- https://github.com/numToStr/Comment.nvim/issues/476
 
--- NOTE:  #      (Un)Comments lines and move on.
--- NOTE:  <C-C>  Backup line(s) into comment and edit.
--- NOTE: 󰴑 gc     Match a whole comment around cursor.
+-- NOTE:  #       (Un)Comments lines and move on.
+-- NOTE:  <C-C>   Backup line(s) into comment and edit.
+-- NOTE: 󰴑 gc      Match a whole comment around cursor.
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -80,5 +80,6 @@ return {
         opts = {
             -- ignore = '^$',
         },
+        config = true,
     },
 }
