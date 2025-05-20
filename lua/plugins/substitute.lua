@@ -20,7 +20,6 @@
 return {
     'gbprod/substitute.nvim',
     version = '*',
-    lazy = true,
     keys = {
         {
             's',

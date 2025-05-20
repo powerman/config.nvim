@@ -8,7 +8,7 @@ rule:
   pattern: $BAD_KEY
   kind: string
   # TODO: `:help keycodes` plus <MouseMove> <Char> <Char-…> <S-Char-…>
-  regex: '<(?i:LocalLeader|Leader|Cmd|CR|Return|Enter|SID|Plug|Tab|Esc)>'
+  regex: '<(?i:LocalLeader|Leader|Cmd|CR|Return|Enter|SID|Plug|Tab|Esc|C-\\\\)>'
   any:
     - regex: '<l[Oo][Cc][Aa][Ll][Ll][Ee][Aa][Dd][Ee][Rr]>'
     - regex: '<[Ll]O[Cc][Aa][Ll][Ll][Ee][Aa][Dd][Ee][Rr]>'
@@ -47,6 +47,7 @@ rule:
     - regex: '<e[Ss][Cc]>'
     - regex: '<[Ee]S[Cc]>'
     - regex: '<[Ee][Ss]C>'
+    - regex: '<[Cc]-\\\\>'
 transform:
   KEY1:
     replace:
@@ -98,4 +99,9 @@ transform:
       source: $KEY9
       replace: '(?i:<Esc>)'
       by: '<Esc>'
-fix: $KEY10
+  KEY11:
+    replace:
+      source: $KEY10
+      replace: '(?i:<C-\\\\>)'
+      by: '<C-Bslash>'
+fix: $KEY11

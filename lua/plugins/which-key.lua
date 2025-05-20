@@ -104,7 +104,7 @@ return {
                 { '<S-Tab>', desc = 'Open menu|Menu previous', mode = 'ic' },
                 { '<CR>', desc = 'Complete/Expand menu item', mode = 'i' },
                 { '<CR>', desc = 'Complete menu item|Start command', mode = 'c' },
-                { '<C-\\>', desc = 'Close menu', mode = 'ic' },
+                { '<C-Bslash>', desc = 'Close menu', mode = 'ic' },
                 { '<C-Up>', desc = 'Scroll up menu item doc', mode = 'i' },
                 { '<C-Down>', desc = 'Scroll down menu item doc', mode = 'i' },
                 { '<C-Right>', desc = 'Expand snippet|Snippet next pos', mode = 'i' },

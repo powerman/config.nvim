@@ -1,6 +1,6 @@
 --[[ Highly extendable fuzzy finder over lists (files, LSP, etc.) ]]
---
--- INFO: The "Find" here means fuzzy search (unlike "Grep" which uses regexp) with syntax:
+
+-- NOTE: 󰋗 Fuzzy search syntax (for "Find …", while "Grep …" uses regexp):
 --    Token         Match type                  Description
 --    sbtrkt        fuzzy-match                 Items that match sbtrkt
 --    'wild         exact-match (quoted)        Items that include wild
@@ -10,7 +10,7 @@
 --    !^music       inverse-prefix-exact-match  Items that do not start with music
 --    !.mp3$        inverse-suffix-exact-match  Items that do not end with .mp3
 --    ^a b$ | c$    OR operator                 Items that start with a and end with b OR c
---
+
 -- INFO: The "project" here means either current or some upper directory (detected by `.git/`)
 -- and it subdirectories.
 

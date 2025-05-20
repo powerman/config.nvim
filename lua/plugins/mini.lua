@@ -36,9 +36,9 @@
 --    - sd'   - [S]urround [D]elete [']quotes
 --    - sr)'  - [S]urround [R]eplace [)] [']
 
--- NOTE:  sa{motion}{target}   Add })'"… around {motion}.
--- NOTE:  sr{target}{target}   Replace surround })'"… with })'"….
--- NOTE:  sd{target}           Delete surround })'"….
+-- NOTE:  sa{motion}{target}   Surround: Add b})q'"… around {motion}.
+-- NOTE:  sr{target}{target}   Surround: Replace b})q'"… with })'"….
+-- NOTE:  sd{target}           Surround: Delete b})q'"….
 
 --[[ mini.statusline - Minimal and fast statusline module with opinionated default look ]]
 --

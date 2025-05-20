@@ -9,7 +9,6 @@
 return {
     {
         'nvim-lua/plenary.nvim',
-        lazy = true, -- Will be loaded only if some other plugin will depend on it.
         config = function()
             require 'patch.plenary.PlenaryBusted'
             require 'patch.plenary.path_normalize'

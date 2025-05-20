@@ -4,20 +4,20 @@
 --  - Optionally only highlights todos in comments using TreeSitter.
 --  - Open todos in a quickfix list.
 --  - Search todos with Telescope.
---
---  Default keywords:
---    - FIX FIXME BUG FIXIT ISSUE
---    - TODO
---    - HACK
---    - WARN WARNING XXX
---    - PERF OPTIM PERFORMANCE OPTIMIZE
---    - NOTE INFO
---    - TEST TESTING PASSED FAILED
 
--- NOTE:  ]t [t                  Jump to next/prev TODO.
--- NOTE:  :TodoTelescope         Search all TODO in cwd.
--- NOTE:  :TodoTelescope cwd=..  Search all TODO in ../.
--- NOTE:  :TodoQuickFix          All TODO in a quickfix.
+-- NOTE: 󰋗 Known TODO keywords:
+--  - FIX FIXME BUG FIXIT ISSUE
+--  - TODO
+--  - HACK
+--  - WARN WARNING XXX
+--  - PERF OPTIM PERFORMANCE OPTIMIZE
+--  - NOTE INFO
+--  - TEST TESTING PASSED FAILED
+
+-- NOTE:  ]t [t                   Jump to next/prev TODO.
+-- NOTE:  :TodoTelescope          Search all TODO in cwd.
+-- NOTE:  :TodoTelescope cwd=..   Search all TODO in ../.
+-- NOTE:  :TodoQuickFix           All TODO in a quickfix.
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -26,7 +26,6 @@ return {
         'folke/todo-comments.nvim',
         version = '*',
         dependencies = { 'nvim-lua/plenary.nvim' },
-        lazy = true, -- Must be loaded but not critical, so let's use event VeryLazy.
         event = 'VimEnter', -- VeryLazy breaks autocmd on BufEnter below, so use VimEnter.
         keys = {
             {
