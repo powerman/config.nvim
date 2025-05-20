@@ -22,7 +22,6 @@ vim.diagnostic.config {
         },
     },
     float = {
-        border = vim.g.float_border,
         source = true, -- Useful for debugging issues with LSP/linters.
     },
     severity_sort = true, -- Ensure higher severity sign will be shown.
