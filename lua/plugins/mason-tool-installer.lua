@@ -45,6 +45,9 @@ return {
     lazy = false, -- Lazy breaks `opts.run_on_start = true`.
     opts = {
         auto_update = true,
+        ensure_installed = {
+            'tree-sitter-cli', -- Needed for auto_install option in treesitter.lua.
+        },
     },
     config = function(_, opts)
         register_termux_ls()
