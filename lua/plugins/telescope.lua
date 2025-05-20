@@ -108,9 +108,9 @@ return {
                             ['<A-p>'] = require('telescope.actions').cycle_history_prev,
                             -- Use arrows instead.
                             ['<C-u>'] = false,
-                            ['<C-Up>'] = 'preview_scrolling_up',
+                            ['<C-PageUp>'] = 'preview_scrolling_up',
                             ['<C-d>'] = false,
-                            ['<C-Down>'] = 'preview_scrolling_down',
+                            ['<C-PageDown>'] = 'preview_scrolling_down',
                         },
                         n = {
                             -- Alternative to <Esc>, same as in Insert mode.

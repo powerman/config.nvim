@@ -7,16 +7,16 @@
 --
 --  Check available sources: https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
 
--- NOTE:  <Tab>       Cmp: complete or open menu|menu next.
--- NOTE:  <S-Tab>     Cmp: open menu|menu previous.
--- NOTE:  <CR>        Cmp: complete/expand selected menu item.
--- NOTE:  <C-\>       Cmp: abort and close menu.
--- NOTE:  <C-Down>    Cmp: scroll item doc.
--- NOTE:  <C-Up>      Cmp: scroll item doc.
--- NOTE:  <Tab>       Snip: expand.
--- NOTE:  <C-Right>   Snip: expand or jump next.
--- NOTE:  <C-Left>    Snip: jump previous.
--- NOTE:  <C-CR>      Snip: change choice.
+-- NOTE:  <Tab>          Cmp: complete or open menu|menu next.
+-- NOTE:  <S-Tab>        Cmp: open menu|menu previous.
+-- NOTE:  <CR>           Cmp: complete/expand selected menu item.
+-- NOTE:  <C-\>          Cmp: abort and close menu.
+-- NOTE:  <C-PageDown>   Cmp: scroll item doc.
+-- NOTE:  <C-PageUp>     Cmp: scroll item doc.
+-- NOTE:  <Tab>          Snip: expand.
+-- NOTE:  <C-Right>      Snip: expand or jump next.
+-- NOTE:  <C-Left>       Snip: jump previous.
+-- NOTE:  <C-CR>         Snip: change choice.
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -137,7 +137,7 @@ return {
                     --      (i.e. after at least two <Tab> or <S-Tab>, meaning active
                     --      interaction with menu):
                     --      - <CR> completes/expands current item.
-                    --      - <C-Down>, <C-Up> scroll current item docs.
+                    --      - <C-PageDown>, <C-PageUp> scroll current item docs.
                     --  - <Tab> action for a current word, with or without menu opened:
                     --    - If there only one possible snippet then expand it.
                     --    - If there only one possible completion then complete it.
@@ -197,8 +197,8 @@ return {
                     end, { 'i', 'c' }),
 
                     -- Scroll the documentation window.
-                    ['<C-Up>'] = cmp.mapping.scroll_docs(-4),
-                    ['<C-Down>'] = cmp.mapping.scroll_docs(4),
+                    ['<C-PageUp>'] = cmp.mapping.scroll_docs(-4),
+                    ['<C-PageDown>'] = cmp.mapping.scroll_docs(4),
 
                     -- INFO: These mappings probably should be in luasnip.lua, but here we can
                     -- easily make them support fallback.

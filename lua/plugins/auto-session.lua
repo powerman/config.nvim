@@ -14,7 +14,7 @@
 --
 --  See https://github.com/rmagatti/auto-session.
 
--- NOTE:  <Leader>sa   List/delete sessions.
+-- NOTE:  <Leader>sa   List/manage auto-sessions.
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -29,7 +29,7 @@ return {
                 function()
                     require('auto-session.session-lens').search_session {}
                 end,
-                desc = 'Search auto-sessions',
+                desc = 'List/manage auto-sessions',
             },
         },
         init = function()

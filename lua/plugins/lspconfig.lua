@@ -47,7 +47,7 @@
 -- NOTE:  gd           LSP: Goto definition.
 -- NOTE:  gD           LSP: Goto type definition.
 -- NOTE:  gI           LSP: Goto implementation.
--- NOTE:  <Leader>ts   LSP: Toggle inlay hints.
+-- NOTE:  <Leader>th   LSP: Toggle inlay hints.
 
 local function setup_filetypes_docker_compose_language_service()
     vim.filetype.add {

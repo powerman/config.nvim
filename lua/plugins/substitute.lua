@@ -11,9 +11,9 @@
 -- INFO: Used mapping will be shadowing the change character key `s` so you will have to use
 -- the longer form `cl`. Same for `S` (use `cc` instead).
 
--- NOTE:  s{motion}   Replaces motion target or selection with yank.
--- NOTE:  ss          Replaces line with yank.
--- NOTE:  S           Replaces to the end of line with yank.
+-- NOTE:  s{motion}   Replace selection/{motion} with yank.
+-- NOTE:  ss          Replace line with yank.
+-- NOTE:  S           Replace to EOL with yank.
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -28,7 +28,7 @@ return {
                 require('substitute').operator()
             end,
             mode = 'n',
-            desc = 'Substitute with motion',
+            desc = 'Replace {motion} with yank',
         },
         {
             's',
@@ -36,7 +36,7 @@ return {
                 require('substitute').visual()
             end,
             mode = 'x',
-            desc = 'Substitute selection',
+            desc = 'Replace selection with yank',
         },
         {
             'ss',
@@ -44,7 +44,7 @@ return {
                 require('substitute').line()
             end,
             mode = 'n',
-            desc = 'Substitute line',
+            desc = 'Replace line with yank',
         },
         {
             'S',
@@ -52,7 +52,7 @@ return {
                 require('substitute').eol()
             end,
             mode = 'n',
-            desc = 'Substitute to the end of line',
+            desc = 'Replace to EOL with yank',
         },
     },
     opts = {
