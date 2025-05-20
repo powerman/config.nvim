@@ -23,6 +23,7 @@ return {
             opts = {
                 PATH = 'skip', -- INFO: Add ~/.local/share/nvim/mason/bin manually to your PATH.
                 ui = {
+                    border = vim.g.float_border,
                     icons = {
                         package_installed = '●',
                         package_pending = '➜',

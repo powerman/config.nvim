@@ -22,6 +22,10 @@ vim.g.have_nerd_font = true
 -- Set to true if you use a Nerd Font with "Mono" suffix in font name (small icons).
 vim.g.mono_nerd_font = false
 
+-- Border for floating windows.
+-- See allowed values in `:h nvim_open_win()`.
+vim.g.float_border = 'rounded'
+
 -- Max size for floating windows.
 -- Must be <=1.
 vim.g.float_max_height = 0.96
