@@ -194,7 +194,7 @@ local function handle_LspAttach(ev)
             border = vim.g.float_border,
             max_width = math.floor(vim.fn.winwidth(0) * vim.g.float_max_width),
         }
-    end, 'Signature documentation')
+    end, 'Signature documentation', { 'n', 'i' })
 
     -- Rename the identifier under your cursor.
     -- Most Language Servers support renaming across files, etc.
