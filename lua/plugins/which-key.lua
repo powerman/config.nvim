@@ -39,28 +39,48 @@ return {
         ---@type wk.Opts
         opts = {
             preset = 'modern',
+            win = {
+                zindex = 1001, -- Should be >1000 to show over nvim-cmp windows.
+            },
             delay = function(ctx)
                 return ctx.plugin and 0 or vim.o.timeoutlen
             end,
+            filter = function(mapping)
+                return mapping.desc
+                    and mapping.desc ~= 'telescope|nop'
+                    and mapping.desc ~= 'autopairs map key'
+            end,
+            replace = {
+                desc = {
+                    { 'telescope|(.*)', '%1' },
+                    { '(.*) LM %(translate .*', '%1' },
+                },
+            },
             expand = 2,
             spec = {
                 -- WARN: There is a conflict between usual mapping and operator-pending mode
                 -- mapping with same prefix keys. E.g. '>' starts both '>>' and '>{motion}'.
                 -- Adding '>>' result in replacing predefined list with {motion} keys.
                 --
-                -- Improve descriptions like "help <key>-default".
-                { 'Y', desc = 'Yank to the end of line' },
-                { '&', desc = 'Repeat last substitute' },
-                { '<C-L>', desc = 'Clears and redraws the screen' },
-                -- Add missing.
+                -- Hide useless things.
+                {
+                    hidden = true,
+                    { '<Plug>(fzf-normal)' },
+                    { '<S-CR>', desc = 'duplicates <CR>', mode = 'c' },
+                    { '<C-S>', desc = 'duplicates <C-K>', mode = 'i' },
+                    { 'h', desc = 'Left' },
+                    { 'j', desc = 'Down' },
+                    { 'k', desc = 'Up' },
+                    { 'l', desc = 'Right' },
+                },
+                -- Add some useful Neovim mappings.
                 { 'ga', desc = 'Get ASCII code dec/hex/oct' },
                 { 'gq', desc = 'Format lines in a smart way' },
                 { '[[', desc = 'Previous help/markdown/… section' },
                 { ']]', desc = 'Next help/markdown/… section' },
+                -- Add missing user mappings. BUG: Probably they should not be missing?
                 { '<Leader>s.', desc = 'Find recent file' },
                 { '<Leader>s/', desc = 'Grep open files' },
-                -- Improve description.
-                { 'gw', desc = 'Format lines as a plain text' },
                 -- Improve group descriptions.
                 { '[', group = 'Jump to previous' },
                 { ']', group = 'Jump to next' },
@@ -73,8 +93,31 @@ return {
                 { '<Leader>s', group = 'Search' },
                 { '<Leader>t', group = 'Toggle' },
                 { '<Leader>w', group = 'LSP: Workspace' },
-                -- Hide useless things.
-                { '<Plug>(fzf-normal)', hidden = true },
+                -- Improve description.
+                { 'Y', desc = 'Yank to the end of line' },
+                { '&', desc = 'Repeat last substitute' },
+                { '<C-L>', desc = 'Clears and redraws the screen' },
+                { '<C-U>', desc = 'Delete characters before cursor', mode = 'i' },
+                { 'gw', desc = 'Format lines as a plain text' },
+                { '<Tab>', desc = 'Complete|Open menu|Menu next|Expand snippet', mode = 'i' },
+                { '<Tab>', desc = 'Complete|Open menu|Menu next', mode = 'c' },
+                { '<S-Tab>', desc = 'Open menu|Menu previous', mode = 'ic' },
+                { '<CR>', desc = 'Complete/Expand menu item', mode = 'i' },
+                { '<CR>', desc = 'Complete menu item|Start command', mode = 'c' },
+                { '<C-\\>', desc = 'Close menu', mode = 'ic' },
+                { '<C-Up>', desc = 'Scroll up menu item doc', mode = 'i' },
+                { '<C-Down>', desc = 'Scroll down menu item doc', mode = 'i' },
+                { '<C-Right>', desc = 'Expand snippet|Snippet next pos', mode = 'i' },
+                { '<C-Left>', desc = 'Snippet previous pos', mode = 'i' },
+                { '<C-CR>', desc = 'Snippet change choice', mode = 'i' },
+                -- Improve icons.
+                -- Colors: azure | blue | cyan | green | grey | orange | purple | red | yellow
+                {
+                    icon = { icon = '󰋗', color = 'grey' },
+                    mode = { 'n', 'i', 'c', 'x', 's', 't' },
+                    { '<F1>', desc = 'All keymaps' },
+                    { '<F11>', desc = 'Buffer local keymaps' },
+                },
             },
             keys = {
                 scroll_down = '<C-PageDown>',
