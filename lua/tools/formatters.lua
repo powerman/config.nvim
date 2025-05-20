@@ -42,11 +42,11 @@ return {
     -- markdown = { 'markdownlint-cli2', 'injected' },
     -- markdown = { 'mdformat', 'injected' }, -- With plugins almost as good as dprint.
     markdown = { 'prettierd', 'injected' }, -- Best support for Obsidian!
-    nginx = { 'prettierd_nginx' }, -- Require prettier plugin.
+    nginx = { 'prettierd_nginx' }, -- Require `npm i prettier-plugin-nginx` plus config.
     proto = { 'buf' },
     scss = { 'prettierd' },
-    solidity = { 'prettierd' }, -- Require prettier plugin.
-    sql = { 'prettierd' }, -- Require prettier plugin.
+    solidity = { 'prettierd' }, -- Require `npm i prettier-plugin-solidity` plus config.
+    sql = { 'prettierd' }, -- Require `npm i prettier-plugin-sql` plus config.
     template = { 'djlint' }, -- Go/Django/Jinja/Twig/Handlebars/Angular.
     -- template = { 'prettierd' },
     -- toml = { 'dprint' }, -- Require `dprint config add toml`.

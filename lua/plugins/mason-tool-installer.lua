@@ -87,6 +87,10 @@ return {
                 if name ~= '' then
                     vim.list_extend(ensure_installed, { name })
                 end
+                -- Dependencies:
+                if name == 'prettierd' then
+                    vim.list_extend(ensure_installed, { 'prettier' })
+                end
             end
         end
 
