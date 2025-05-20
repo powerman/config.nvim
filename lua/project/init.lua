@@ -4,11 +4,11 @@
 
 local M = {}
 
----@class Config
+---@class project.Config
 ---@field root_patterns string[]
 
 -- Setup project-specific $PATH to use required version of a tool (Formatter|Linter|LSP|…).
----@param cfg Config
+---@param cfg project.Config
 M.setup = function(cfg)
     vim.api.nvim_create_autocmd('FileType', { -- Use FileType just to run before LSPAttach.
         desc = 'Setup project-specific $PATH',

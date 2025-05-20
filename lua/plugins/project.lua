@@ -7,7 +7,7 @@ return {
         'project',
         dir = '~/.config/nvim',
 
-        ---@type Config
+        ---@type project.Config
         opts = {
             root_patterns = {
                 '.buildcache/bin',
