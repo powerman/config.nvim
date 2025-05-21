@@ -99,17 +99,17 @@ return {
                             -- Alternative to inconvenient <C-c>.
                             ['<C-Bslash>'] = 'close',
                             -- Unmap <C-L> to restore it default action (clear screen).
-                            ['<C-l>'] = false,
+                            ['<C-L>'] = false,
                             ['<C-Tab>'] = 'complete_tag',
                             -- Use Alt instead of Ctrl (like in Midnight Commander).
-                            ['<C-n>'] = false,
-                            ['<C-p>'] = false,
-                            ['<A-n>'] = require('telescope.actions').cycle_history_next,
-                            ['<A-p>'] = require('telescope.actions').cycle_history_prev,
+                            ['<C-N>'] = false,
+                            ['<C-P>'] = false,
+                            ['<M-N>'] = require('telescope.actions').cycle_history_next,
+                            ['<M-P>'] = require('telescope.actions').cycle_history_prev,
                             -- Use arrows instead.
-                            ['<C-u>'] = false,
+                            ['<C-U>'] = false,
                             ['<C-Up>'] = 'preview_scrolling_up',
-                            ['<C-d>'] = false,
+                            ['<C-D>'] = false,
                             ['<C-Down>'] = 'preview_scrolling_down',
                         },
                         n = {

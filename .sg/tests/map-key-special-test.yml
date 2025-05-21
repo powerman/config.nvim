@@ -1,4 +1,4 @@
-id: map-key-case
+id: map-key-special
 valid:
   - 'v = "<Leader>"'
   - 'v = "<Leader><Cmd>cmd<CR>"'

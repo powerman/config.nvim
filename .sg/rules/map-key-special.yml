@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: map-key-special
+message: Wrong case for a special <Key>.
+severity: info # error, warning, info, hint
+language: Lua
+rule:
+  pattern: $BAD_KEY
+  kind: string
+  # TODO: `:help keycodes` plus <MouseMove> <Char> <Char-…> <S-Char-…>
+  regex: '<(?i:LocalLeader|Leader|Cmd|CR|Return|Enter|SID|Plug|Tab|Esc|C-\\\\)>'
+  any:
+    - regex: '<l[Oo][Cc][Aa][Ll][Ll][Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll]O[Cc][Aa][Ll][Ll][Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo]C[Aa][Ll][Ll][Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc]A[Ll][Ll][Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa]L[Ll][Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa][Ll]l[Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa][Ll][Ll]E[Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa][Ll][Ll][Ee]A[Dd][Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa][Ll][Ll][Ee][Aa]D[Ee][Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa][Ll][Ll][Ee][Aa][Dd]E[Rr]>'
+    - regex: '<[Ll][Oo][Cc][Aa][Ll][Ll][Ee][Aa][Dd][Ee]R>'
+    - regex: '<l[Ee][Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll]E[Aa][Dd][Ee][Rr]>'
+    - regex: '<[Ll][Ee]A[Dd][Ee][Rr]>'
+    - regex: '<[Ll][Ee][Aa]D[Ee][Rr]>'
+    - regex: '<[Ll][Ee][Aa][Dd]E[Rr]>'
+    - regex: '<[Ll][Ee][Aa][Dd][Ee]R>'
+    - regex: '<c[Mm][Dd]>'
+    - regex: '<[Cc]M[Dd]>'
+    - regex: '<[Cc][Mm]D>'
+    - regex: '<c[Rr]>'
+    - regex: '<[Cc]r>'
+    - regex: '<(?i:Return)>'
+    - regex: '<(?i:Enter)>'
+    - regex: '<s[Ii][Dd]>'
+    - regex: '<[Ss]i[Dd]>'
+    - regex: '<[Ss][Ii]d>'
+    - regex: '<p[Ll][Uu][Gg]>'
+    - regex: '<[Pp]L[Uu][Gg]>'
+    - regex: '<[Pp][Ll]U[Gg]>'
+    - regex: '<[Pp][Ll][Uu]G>'
+    - regex: '<t[Aa][Bb]>'
+    - regex: '<[Tt]A[Bb]>'
+    - regex: '<[Tt][Aa]B>'
+    - regex: '<e[Ss][Cc]>'
+    - regex: '<[Ee]S[Cc]>'
+    - regex: '<[Ee][Ss]C>'
+    - regex: '<[Cc]-\\\\>'
+transform:
+  KEY1:
+    replace:
+      source: $BAD_KEY
+      replace: '(?i:<LocalLeader>)'
+      by: '<LocalLeader>'
+  KEY2:
+    replace:
+      source: $KEY1
+      replace: '(?i:<Leader>)'
+      by: '<Leader>'
+  KEY3:
+    replace:
+      source: $KEY2
+      replace: '(?i:<Cmd>)'
+      by: '<Cmd>'
+  KEY4:
+    replace:
+      source: $KEY3
+      replace: '(?i:<CR>)'
+      by: '<CR>'
+  KEY5:
+    replace:
+      source: $KEY4
+      replace: '(?i:<Return>)'
+      by: '<CR>'
+  KEY6:
+    replace:
+      source: $KEY5
+      replace: '(?i:<Enter>)'
+      by: '<CR>'
+  KEY7:
+    replace:
+      source: $KEY6
+      replace: '(?i:<SID>)'
+      by: '<SID>'
+  KEY8:
+    replace:
+      source: $KEY7
+      replace: '(?i:<Plug>)'
+      by: '<Plug>'
+  KEY9:
+    replace:
+      source: $KEY8
+      replace: '(?i:<Tab>)'
+      by: '<Tab>'
+  KEY10:
+    replace:
+      source: $KEY9
+      replace: '(?i:<Esc>)'
+      by: '<Esc>'
+  KEY11:
+    replace:
+      source: $KEY10
+      replace: '(?i:<C-\\\\>)'
+      by: '<C-Bslash>'
+fix: $KEY11

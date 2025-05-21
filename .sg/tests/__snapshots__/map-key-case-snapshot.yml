@@ -1,88 +1,79 @@
 id: map-key-case
 snapshots:
-  map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame'):
-    fixed: map('<Leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  v = "<A-Z>":
+    fixed: v = "<M-Z>"
     labels:
-    - source: '''<leader>rn'''
+    - source: '"<A-Z>"'
       style: primary
       start: 4
-      end: 16
-  ? |
-    return {
-      {
-        keys = {
-          '<leader>a',
-        },
-      }
-    }
-  : fixed: |
-      return {
-        {
-          keys = {
-            '<Leader>a',
-          },
-        }
-      }
+      end: 11
+  v = "<A-z>":
+    fixed: v = "<M-Z>"
     labels:
-    - source: '''<leader>a'''
-      style: primary
-      start: 32
-      end: 43
-  v = "<Enter>":
-    fixed: v = "<CR>"
-    labels:
-    - source: '"<Enter>"'
+    - source: '"<A-z>"'
       style: primary
       start: 4
-      end: 13
-  v = "<LEADER>":
-    fixed: v = "<Leader>"
+      end: 11
+  v = "<C-z>":
+    fixed: v = "<C-Z>"
     labels:
-    - source: '"<LEADER>"'
+    - source: '"<C-z>"'
       style: primary
       start: 4
-      end: 14
-  v = "<Leader><cmd>cmd<CR>":
-    fixed: v = "<Leader><Cmd>cmd<CR>"
+      end: 11
+  v = "<M-z>":
+    fixed: v = "<M-Z>"
     labels:
-    - source: '"<Leader><cmd>cmd<CR>"'
+    - source: '"<M-z>"'
       style: primary
       start: 4
-      end: 26
-  v = "<Return>":
-    fixed: v = "<CR>"
+      end: 11
+  v = "<a-Z>":
+    fixed: v = "<M-Z>"
     labels:
-    - source: '"<Return>"'
+    - source: '"<a-Z>"'
       style: primary
       start: 4
-      end: 14
-  v = "<lEADER>":
-    fixed: v = "<Leader>"
+      end: 11
+  v = "<a-z>":
+    fixed: v = "<M-Z>"
     labels:
-    - source: '"<lEADER>"'
+    - source: '"<a-z>"'
       style: primary
       start: 4
-      end: 14
-  v = "<leader>":
-    fixed: v = "<Leader>"
+      end: 11
+  v = "<c-Z>":
+    fixed: v = "<C-Z>"
     labels:
-    - source: '"<leader>"'
+    - source: '"<c-Z>"'
       style: primary
       start: 4
-      end: 14
-  v = "<leader><cmd>cmd<cr>":
-    fixed: v = "<Leader><Cmd>cmd<CR>"
+      end: 11
+  v = "<c-z>":
+    fixed: v = "<C-Z>"
     labels:
-    - source: '"<leader><cmd>cmd<cr>"'
+    - source: '"<c-z>"'
       style: primary
       start: 4
-      end: 26
-  ? |
-    vim.keymap.set('i', '<C-O><leader>sp', function()
-  : fixed: |
-      vim.keymap.set('i', '<C-O><Leader>sp', function()
+      end: 11
+  v = "<m-Z>":
+    fixed: v = "<M-Z>"
     labels:
-    - source: '''<C-O><leader>sp'''
+    - source: '"<m-Z>"'
       style: primary
-      start: 20
-      end: 37
+      start: 4
+      end: 11
+  v = "<m-z>":
+    fixed: v = "<M-Z>"
+    labels:
+    - source: '"<m-z>"'
+      style: primary
+      start: 4
+      end: 11
+  v = '<A-Z>':
+    fixed: v = '<M-Z>'
+    labels:
+    - source: '''<A-Z>'''
+      style: primary
+      start: 4
+      end: 11

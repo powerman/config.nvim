@@ -130,7 +130,7 @@ local function handle_LspAttach(ev)
     end, 'Hover documentation')
 
     -- Opens a popup that displays signature for the function's param under your cursor.
-    map('<C-k>', function()
+    map('<C-K>', function()
         vim.lsp.buf.signature_help {
             border = vim.g.float_border,
             max_width = math.floor(vim.fn.winwidth(0) * vim.g.float_max_width),
