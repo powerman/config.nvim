@@ -234,8 +234,6 @@ return {
 
     taplo = {},
 
-    termux_ls = {},
-
     yamlls = {
         filetypes = {
             'yaml',

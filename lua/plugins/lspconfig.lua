@@ -60,60 +60,6 @@ local function setup_filetypes_docker_compose_language_service()
     }
 end
 
-local function setup_filetypes_termux_ls()
-    vim.filetype.add {
-        extension = {
-            -- ArchLinux/Windows Msys2
-            install = 'sh.install',
-            -- Gentoo
-            ebuild = 'sh.ebuild',
-            eclass = 'sh.eclass',
-            -- Zsh
-            mdd = 'sh.mdd',
-        },
-        filename = {
-            -- Android Termux
-            ['build.sh'] = 'sh.build',
-            -- ArchLinux/Windows Msys2
-            ['PKGBUILD'] = 'sh.PKGBUILD',
-            ['makepkg.conf'] = 'sh.makepkg.conf',
-        },
-        pattern = {
-            -- Android Termux
-            ['.*%.subpackage%.sh'] = 'sh.subpackage',
-            -- Gentoo
-            ['.*/etc/make%.conf'] = 'sh.make.conf',
-            ['.*/etc/portage/make%.conf'] = 'sh.make.conf',
-            ['.*/etc/portage/color%.map'] = 'sh.color.map',
-        },
-    }
-end
-
--- https://github.com/termux/termux-language-server/issues/21
-local function register_termux_ls()
-    local configs = require 'lspconfig.configs'
-    if not configs['termux_ls'] then
-        configs['termux_ls'] = require 'lspconfig/server_configurations/termux_ls'
-    end
-end
-
--- LSP servers and clients are able to communicate to each other what features they support.
--- By default, Neovim doesn't support everything that is in the LSP specification.
--- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
--- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
---
--- All client capabilities: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#clientCapabilities
-local function make_client_capabilities()
-    local override = {} -- You can override any of `cmp` capabilities.
-    return vim.tbl_deep_extend(
-        'force',
-        -- Take Neovim's capabilities...
-        vim.lsp.protocol.make_client_capabilities(),
-        -- ...and extend it with `cmp` plugin's completion capabilities.
-        require('cmp_nvim_lsp').default_capabilities(override)
-    )
-end
-
 local function create_lsp_augroup(name, client_id, bufnr)
     return vim.api.nvim_create_augroup(
         ---@diagnostic disable-next-line: redundant-parameter
@@ -168,11 +114,6 @@ local function handle_LspAttach(ev)
     -- All server capabilities: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#serverCapabilities
     --
     --  if client.name == 'some' then client.server_capabilities.XXX = nil end
-
-    -- HACK: Work around https://github.com/termux/termux-language-server/issues/19#issuecomment-2200349890.
-    if client.name == 'termux_ls' then
-        client.server_capabilities.documentFormattingProvider = nil
-    end
 
     local builtin = require 'telescope.builtin'
     local map = function(keys, func, desc, mode)
@@ -267,6 +208,8 @@ end
 return {
     {
         'neovim/nvim-lspconfig',
+        version = '*',
+        lazy = false, -- Needs to setup autocommands for LSP before creating buffers.
         dependencies = {
             -- Setup $PATH for current project before running LSP servers.
             'project',
@@ -276,24 +219,26 @@ return {
             -- locations provided by LSP in telescope UI instead of quickfix window.
             'nvim-telescope/telescope.nvim',
         },
-        lazy = false, -- Needs to setup autocommands for LSP before creating buffers.
         init = function()
             setup_filetypes_docker_compose_language_service()
-            setup_filetypes_termux_ls()
         end,
         config = function()
-            register_termux_ls()
-
             vim.api.nvim_create_autocmd('LspAttach', {
                 group = vim.api.nvim_create_augroup('user.lsp.attach', { clear = true }),
                 callback = handle_LspAttach,
             })
 
-            local client_capabilities = make_client_capabilities()
+            -- LSP servers and clients are able to communicate to each other what features they support.
+            -- By default, Neovim doesn't support everything that is in the LSP specification.
+            -- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
+            -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
+            vim.lsp.config('*', {
+                capabilities = require('cmp_nvim_lsp').default_capabilities(),
+            })
+
             for server_name, server in pairs(require 'tools.lsp') do
-                server.capabilities =
-                    vim.tbl_deep_extend('force', client_capabilities, server.capabilities or {})
-                require('lspconfig')[server_name].setup(server)
+                vim.lsp.enable(server_name)
+                vim.lsp.config(server_name, server)
             end
         end,
     },

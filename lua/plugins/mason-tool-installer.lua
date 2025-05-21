@@ -2,23 +2,17 @@
 
 -- NOTE:  :Mason   Install/upgrade/uninstall external tools.
 
--- https://github.com/termux/termux-language-server/issues/21
-local function register_termux_ls()
-    local server = require 'mason-lspconfig.mappings.server'
-    server.lspconfig_to_package['termux_ls'] = 'termux-language-server'
-    server.package_to_lspconfig['termux-language-server'] = 'termux_ls'
-end
-
 ---@module 'lazy'
 ---@type LazySpec
 return {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
+    lazy = false, -- Lazy breaks `opts.run_on_start = true`.
     dependencies = {
         -- Mason allows you to easily manage external editor tooling such as LSP servers, DAP
         -- servers, linters, and formatters through a single interface.
         {
             'williamboman/mason.nvim',
-            -- version = '*', -- No releases since Jan 24, want fix for https://github.com/williamboman/mason.nvim/issues/1646
+            version = '*',
             lazy = false, -- Lazy loading is not recommended by Mason author.
             opts = {
                 PATH = 'skip', -- INFO: Add ~/.local/share/nvim/mason/bin manually to your PATH.
@@ -42,7 +36,6 @@ return {
             dependencies = 'neovim/nvim-lspconfig',
         },
     },
-    lazy = false, -- Lazy breaks `opts.run_on_start = true`.
     opts = {
         auto_update = true,
         ensure_installed = {
@@ -50,18 +43,18 @@ return {
         },
     },
     config = function(_, opts)
-        register_termux_ls()
-
         opts = opts or {}
         local ensure_installed = {}
 
         local lsp = require 'tools.lsp'
         vim.list_extend(ensure_installed, vim.tbl_keys(lsp))
+        -- Dependencies:
         if lsp.golangci_lint_ls then
             vim.list_extend(ensure_installed, { 'golangci-lint' })
         end
         if lsp.efm then
-            for _, tools in pairs(lsp.efm.settings.languages) do
+            local languages = lsp.efm.settings.languages --[[@as table<string, table<string, string>[]>]]
+            for _, tools in pairs(languages) do
                 for _, tool in ipairs(tools) do
                     local cmd = tool.lintCommand or tool.formatCommand or tool.hoverCommand
                     local bin = vim.fn.fnamemodify(vim.split(cmd, ' ')[1], ':t')
