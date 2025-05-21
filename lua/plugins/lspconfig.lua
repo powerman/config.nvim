@@ -40,14 +40,15 @@
 -- NOTE:  :LspInfo     LSP: Status for active/configured servers.
 -- NOTE:  K            LSP: Hover documentation.
 -- NOTE:  KK           LSP: Into hover documentation.
--- NOTE:  <C-k>        LSP: Signature documentation.
--- NOTE:  <C-k><C-k>   LSP: Into signature documentation.
--- NOTE:  <Leader>r    LSP: Rename identifier.
+-- NOTE:  <C-K>        LSP: Signature help.
+-- NOTE:  <C-K><C-K>   LSP: Into signature help.
+-- NOTE:  <Leader>r    LSP: Rename.
 -- NOTE:  <Leader>a    LSP: Code action.
--- NOTE:  gd           LSP: Goto definition.
--- NOTE:  gD           LSP: Goto type definition.
--- NOTE:  gI           LSP: Goto implementation.
+-- NOTE:  gd           LSP: Definition.
+-- NOTE:  gD           LSP: Type definition.
+-- NOTE:  gI           LSP: Implementation.
 -- NOTE:  <Leader>th   LSP: Toggle inlay hints.
+-- NOTE:  gr{…}        LSP: …
 
 local function setup_filetypes_docker_compose_language_service()
     vim.filetype.add {
@@ -117,12 +118,15 @@ local function handle_LspAttach(ev)
 
     local builtin = require 'telescope.builtin'
     local map = function(keys, func, desc, mode)
+        keys = type(keys) == 'table' and keys or { keys }
         mode = mode or 'n'
-        vim.keymap.set(mode, keys, func, { buffer = ev.buf, desc = 'LSP: ' .. desc })
+        for _, lhs in ipairs(keys) do
+            vim.keymap.set(mode, lhs, func, { buffer = ev.buf, desc = 'LSP: ' .. desc })
+        end
     end
 
     -- Opens a popup that displays documentation about the word under your cursor.
-    map('K', function()
+    map({ 'K', 'grK' }, function()
         vim.lsp.buf.hover {
             border = vim.g.float_border,
             max_width = math.floor(vim.fn.winwidth(0) * vim.g.float_max_width),
@@ -130,56 +134,56 @@ local function handle_LspAttach(ev)
     end, 'Hover documentation')
 
     -- Opens a popup that displays signature for the function's param under your cursor.
-    map('<C-K>', function()
+    map({ '<C-S>', '<C-K>' }, function()
         vim.lsp.buf.signature_help {
             border = vim.g.float_border,
             max_width = math.floor(vim.fn.winwidth(0) * vim.g.float_max_width),
         }
-    end, 'Signature documentation', { 'n', 'i' })
+    end, 'Signature help', { 's', 'i' })
 
     -- Rename the identifier under your cursor.
     -- Most Language Servers support renaming across files, etc.
-    map('<Leader>r', vim.lsp.buf.rename, 'Rename')
+    map({ 'grn', '<Leader>r' }, vim.lsp.buf.rename, 'Rename')
 
     -- Execute a code action, usually your cursor needs to be on top of an error
     -- or a suggestion from your LSP for this to activate.
-    map('<Leader>a', vim.lsp.buf.code_action, 'Code action', { 'n', 'v' })
+    map({ 'gra', '<Leader>a' }, vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
 
     -- Jump to the definition of the word under your cursor.
     -- This is where a variable was first declared, or where a function is
     -- defined, etc.
-    map('gd', builtin.lsp_definitions, 'Goto definition')
+    map({ 'gd', 'grd' }, builtin.lsp_definitions, 'Definition')
 
     -- Jump to the type of the word under your cursor.
     -- Useful when you're not sure what type a variable is and you want to see
     -- the definition of its *type*, not where it was *defined*.
-    map('gD', builtin.lsp_type_definitions, 'Goto type definition')
+    map({ 'gD', 'grt' }, builtin.lsp_type_definitions, 'Type definition')
 
     -- Jump to the implementation of the word under your cursor.
     -- Useful when your language has ways of declaring types without an actual
     -- implementation (e.g. "interfaces").
-    map('gI', builtin.lsp_implementations, 'Goto implementation')
+    map({ 'gri', 'gI' }, builtin.lsp_implementations, 'Implementation')
 
     -- Find references for the word under your cursor.
-    map('<Leader>gr', builtin.lsp_references, 'Goto references')
+    map({ 'grr' }, builtin.lsp_references, 'References')
 
     -- Jump to the declaration of the word under your cursor.
     -- For example, in C this would take you to the header.
-    map('<Leader>gd', vim.lsp.buf.declaration, 'Goto declaration')
+    map({ 'grD' }, vim.lsp.buf.declaration, 'Declaration')
 
     -- Fuzzy find all the symbols in your current document.
     -- Symbols are things like variables, functions, types, etc.
-    map('<Leader>ds', builtin.lsp_document_symbols, 'Document symbols')
+    map({ 'gO', 'grs' }, builtin.lsp_document_symbols, 'Document symbols')
 
     -- Fuzzy find all the symbols in your current workspace.
     -- Similar to document symbols, except searches over your entire project.
-    map('<Leader>ws', builtin.lsp_dynamic_workspace_symbols, 'Workspace symbols')
+    map('grS', builtin.lsp_dynamic_workspace_symbols, 'Workspace symbols')
 
     -- Toggle inlay hints in your code, if the server supports them.
     -- This may be unwanted, since they displace some of your code.
-    if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-        map('<Leader>th', function()
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {})
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, ev.buf) then
+        map({ '<Leader>th', 'grh' }, function()
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = ev.buf })
         end, 'Toggle inlay hints')
     end
 
@@ -198,7 +202,9 @@ local function handle_LspAttach(ev)
         end,
     })
 
-    if client.server_capabilities.documentHighlightProvider then
+    if
+        client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, ev.buf)
+    then
         highlight_references(client.id, ev.buf)
     end
 end
