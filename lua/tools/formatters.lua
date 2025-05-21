@@ -6,9 +6,6 @@ return {
     --
     -- You can use a sub-list to tell conform to run *until* a formatter is found.
     -- javascript = { { "prettierd", "prettier" } },
-    --
-    -- BUG: 'prettierd' does not show error
-    -- https://github.com/stevearc/conform.nvim/issues/486
 
     asm = { 'asmfmt' }, -- Go Assembler.
     sh = { 'shfmt' },
