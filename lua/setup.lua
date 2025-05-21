@@ -17,7 +17,7 @@ vim.diagnostic.config {
         text = { -- Use icons instead of letters E/W/I/H.
             [vim.diagnostic.severity.ERROR] = '❌', -- 󰅚
             [vim.diagnostic.severity.WARN] = '', -- 󰀪
-            [vim.diagnostic.severity.INFO] = '', -- 
+            [vim.diagnostic.severity.INFO] = '', -- 󰋽
             [vim.diagnostic.severity.HINT] = '󰌶', -- 󰌵💡󱠂
         },
     },
