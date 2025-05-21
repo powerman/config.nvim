@@ -1,0 +1,18 @@
+id: map-key-modifier-case
+valid:
+  - 'v = "<M-Z>"'
+  - "v = '<M-z>'"
+  - "v = '<c-z>'"
+  - "v = ' <a-z>'"
+  - 'v =  <a-z> '
+invalid:
+  - "v = '<A-Z>'"
+  - 'v = "<A-Z>"'
+  - 'v = "<a-Z>"'
+  - 'v = "<A-z>"'
+  - 'v = "<a-z>"'
+  - "v = '<a-z> '"
+  - 'v = "<a-z> "'
+  - 'v = "<m-Z>"'
+  - 'v = "<m-z>"'
+

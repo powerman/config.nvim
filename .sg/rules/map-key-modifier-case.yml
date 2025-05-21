@@ -1,19 +1,17 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
 
-id: map-key-case
-message: Wrong case for a <C-[A-Z]>.
+id: map-key-modifier-case
+message: Wrong case for <[MA]-.
 severity: info # error, warning, info, hint
 language: Lua
 rule:
   pattern: $BAD_KEY
   kind: string
-  regex: ^["']<[Cc]-[a-zA-Z]>["']$
-  any:
-    - regex: '<c-[a-zA-Z]>'
-    - regex: '<C-[a-z]>'
+  regex: ^["']<[mAa]-
 transform:
   GOOD_KEY:
-    convert:
+    replace:
       source: $BAD_KEY
-      toCase: upperCase
+      replace: (["'])<[mAa]-(.*)
+      by: $1<M-$2
 fix: $GOOD_KEY

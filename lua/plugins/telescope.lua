@@ -104,8 +104,8 @@ return {
                             -- Use Alt instead of Ctrl (like in Midnight Commander).
                             ['<C-N>'] = false,
                             ['<C-P>'] = false,
-                            ['<M-N>'] = require('telescope.actions').cycle_history_next,
-                            ['<M-P>'] = require('telescope.actions').cycle_history_prev,
+                            ['<M-n>'] = require('telescope.actions').cycle_history_next,
+                            ['<M-p>'] = require('telescope.actions').cycle_history_prev,
                             -- Use arrows instead.
                             ['<C-U>'] = false,
                             ['<C-Up>'] = 'preview_scrolling_up',

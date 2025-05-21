@@ -1,4 +1,4 @@
-id: map-key-case
+id: map-key-modifier-case
 snapshots:
   v = "<A-Z>":
     fixed: v = "<M-Z>"
@@ -8,23 +8,9 @@ snapshots:
       start: 4
       end: 11
   v = "<A-z>":
-    fixed: v = "<M-Z>"
+    fixed: v = "<M-z>"
     labels:
     - source: '"<A-z>"'
-      style: primary
-      start: 4
-      end: 11
-  v = "<C-z>":
-    fixed: v = "<C-Z>"
-    labels:
-    - source: '"<C-z>"'
-      style: primary
-      start: 4
-      end: 11
-  v = "<M-z>":
-    fixed: v = "<M-Z>"
-    labels:
-    - source: '"<M-z>"'
       style: primary
       start: 4
       end: 11
@@ -35,24 +21,17 @@ snapshots:
       style: primary
       start: 4
       end: 11
+  v = "<a-z> ":
+    fixed: v = "<M-z> "
+    labels:
+    - source: '"<a-z> "'
+      style: primary
+      start: 4
+      end: 12
   v = "<a-z>":
-    fixed: v = "<M-Z>"
+    fixed: v = "<M-z>"
     labels:
     - source: '"<a-z>"'
-      style: primary
-      start: 4
-      end: 11
-  v = "<c-Z>":
-    fixed: v = "<C-Z>"
-    labels:
-    - source: '"<c-Z>"'
-      style: primary
-      start: 4
-      end: 11
-  v = "<c-z>":
-    fixed: v = "<C-Z>"
-    labels:
-    - source: '"<c-z>"'
       style: primary
       start: 4
       end: 11
@@ -64,7 +43,7 @@ snapshots:
       start: 4
       end: 11
   v = "<m-z>":
-    fixed: v = "<M-Z>"
+    fixed: v = "<M-z>"
     labels:
     - source: '"<m-z>"'
       style: primary
@@ -77,10 +56,10 @@ snapshots:
       style: primary
       start: 4
       end: 11
-  v = '<C-z>':
-    fixed: v = '<C-Z>'
+  v = '<a-z> ':
+    fixed: v = '<M-z> '
     labels:
-    - source: '''<C-z>'''
+    - source: '''<a-z> '''
       style: primary
       start: 4
-      end: 11
+      end: 12
