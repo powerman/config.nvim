@@ -6,6 +6,13 @@
 --      - indent
 --      - incremental_selection
 --
+-- There are additional nvim-treesitter modules that you can use to interact
+-- with nvim-treesitter. You should go explore a few and see what interests you:
+--
+--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
+--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
+--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+--
 --  There are other available modules: https://github.com/nvim-treesitter/nvim-treesitter/wiki/Extra-modules-and-plugins
 --  For example, nvim-treesitter-refactor can provide you with LSP-like features (highlight
 --  definitions/usages of a symbol, symbol rename within a scope, goto definitions) without an
@@ -28,6 +35,7 @@ return {
     {
         'nvim-treesitter/nvim-treesitter',
         build = ':TSUpdate',
+        main = 'nvim-treesitter.configs', -- Sets main module to use for opts
         opts = {
             ensure_installed = {
                 'bash',
@@ -65,6 +73,7 @@ return {
                 'printf',
                 'promql',
                 'proto',
+                'query',
                 'sql',
                 'ssh_config',
                 'strace',
@@ -102,20 +111,6 @@ return {
                 },
             },
         },
-        config = function(_, opts)
-            -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-            -- Prefer git instead of curl in order to improve connectivity in some environments
-            require('nvim-treesitter.install').prefer_git = true
-            require('nvim-treesitter.configs').setup(opts)
-
-            -- There are additional nvim-treesitter modules that you can use to interact
-            -- with nvim-treesitter. You should go explore a few and see what interests you:
-            --
-            --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-            --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-            --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-        end,
         init = function() -- Source: https://github.com/okuuva/mise/blob/main/docs/mise-cookbook/neovim.md
             require('vim.treesitter.query').add_predicate('is-mise?', function(_, _, bufnr, _)
                 local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)

@@ -34,8 +34,7 @@ vim.keymap.set('i', '<C-L>', '<C-O><C-L>', { desc = 'Clears and redraws the scre
 -- Allow Ctrl-W to work with windows in insert mode too.
 vim.keymap.set('i', '<C-W>', '<C-O><C-W>', { desc = '+window' })
 
--- Set highlight on search, but clear on pressing <Esc> in normal mode
-vim.opt.hlsearch = true
+-- Clear highlights on search when pressing <Esc> in normal mode.
 vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Stop the search highlighting' })
 
 -- Diagnostic keymaps

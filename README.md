@@ -50,7 +50,7 @@ so that you have your own copy that you can modify, then install by cloning the
 fork to your machine using one of the commands below, depending on your OS.
 
 > [!NOTE]
-> Your fork's url will be something like this:
+> Your fork's URL will be something like this:
 > `https://github.com/<your_github_username>/config.nvim.git`
 
 #### Clone config.nvim
@@ -76,7 +76,7 @@ nvim
 ```
 
 That's it! Lazy will install all the plugins you have. Use `:Lazy` to view
-current plugin status. Hit `q` to close the window.
+the current plugin status. Hit `q` to close the window.
 
 If you are on another machine, you can do `:Lazy restore`, to update all your plugins to the
 version from the lockfile.
@@ -87,11 +87,11 @@ version from the lockfile.
 
 ### FAQ
 
-- What should I do if I already have a pre-existing neovim configuration?
+- What should I do if I already have a pre-existing Neovim configuration?
 
   - You should back it up and then delete all associated files.
 
-  - This includes your existing init.lua and the neovim files in `~/.local`
+  - This includes your existing init.lua and the Neovim files in `~/.local`
     which can be deleted with `rm -rf ~/.local/share/nvim/`
 
 - Can I keep my existing configuration in parallel?
@@ -133,14 +133,14 @@ sudo apt update
 sudo apt install make gcc ripgrep unzip git xclip curl
 
 # Now we install nvim
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-sudo rm -rf /opt/nvim-linux64
-sudo mkdir -p /opt/nvim-linux64
-sudo chmod a+rX /opt/nvim-linux64
-sudo tar -C /opt -xzf nvim-linux64.tar.gz
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+sudo rm -rf /opt/nvim-linux-x86_64
+sudo mkdir -p /opt/nvim-linux-x86_64
+sudo chmod a+rX /opt/nvim-linux-x86_64
+sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 
 # make it available in /usr/local/bin, distro installs to /usr/bin
-sudo ln -sf /opt/nvim-linux64/bin/nvim /usr/local/bin/
+sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/
 ```
 
 </details>

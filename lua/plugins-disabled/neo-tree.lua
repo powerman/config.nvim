@@ -7,9 +7,9 @@ return {
     dependencies = {
         { 'MunifTanjim/nui.nvim', version = '*' },
     },
-    cmd = 'Neotree',
+    lazy = false,
     keys = {
-        { '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
+        { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
     },
     opts = {
         filesystem = {
