@@ -118,7 +118,9 @@ local efm_languages = {
 return {
     -- Linter/fixer for many treesitter-supported languages: https://ast-grep.github.io/reference/languages.html.
     -- Will be used only if configured (run `sg new` in project root dir to create sgconfig.yml).
-    ast_grep = {},
+    ast_grep = {
+        workspace_required = true, -- TODO: Remove after updating nvim-lspconfig.
+    },
 
     -- It actually uses `shellcheck` and `shfmt`.
     -- Configure it in file `.shellcheckrc` in project's root dir (check `:LspInfo`).
