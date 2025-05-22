@@ -177,7 +177,27 @@ return {
     },
 
     -- Works after saving file.
-    golangci_lint_ls = {},
+    golangci_lint_ls = {
+        -- https://github.com/neovim/nvim-lspconfig/issues/3863
+        before_init = function(_, config)
+            -- Add support for golangci-lint V1 (in V2 `--out-format=json` was replaced by
+            -- `--output.json.path=stdout`).
+            local v1 = false
+            -- PERF: `golangci-lint version` is very slow (about 0.1 sec) so let's find
+            -- version using `go version -m $(which golangci-lint) | grep '^\smod'`.
+            if vim.fn.executable 'go' == 1 then
+                local exe = vim.fn.exepath 'golangci-lint'
+                local version = vim.system({ 'go', 'version', '-m', exe }):wait()
+                v1 = string.match(version.stdout, '\tmod\tgithub.com/golangci/golangci%-lint\t')
+            else
+                local version = vim.system({ 'golangci-lint', 'version' }):wait()
+                v1 = string.match(version.stdout, 'version v?1%.')
+            end
+            if v1 then
+                config.init_options.command = { 'golangci-lint', 'run', '--out-format', 'json' }
+            end
+        end,
+    },
 
     gopls = {
         cmd = { 'gopls', '-remote=auto' }, -- Autostart daemon.
