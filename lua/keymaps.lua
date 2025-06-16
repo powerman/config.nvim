@@ -5,6 +5,8 @@
 -- NOTE:  <F2>         Save current buffer.
 -- NOTE:  <F5>         Toggle wrap.
 -- NOTE:  <F10>        Quit if no unsaved changes.
+-- NOTE:  <C-Up>       Scroll window up.
+-- NOTE:  <C-Down>     Scroll window down.
 -- NOTE:  <C-Insert>   Yank (copy) selection.
 -- NOTE:  <Esc>        Stop the search highlighting.
 -- NOTE:  ]d [d        LSP: Next/prev diagnostic.
@@ -24,6 +26,14 @@ vim.keymap.set('i', '<F5>', '<C-O>:set wrap!<CR>', { desc = 'Toggle wrap' })
 vim.keymap.set('n', '<F10>', ':qa<CR>', { desc = 'Quit if no unsaved changes' })
 vim.keymap.set('v', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
 vim.keymap.set('i', '<F10>', '<Esc>:qa<CR>', { desc = 'Quit if no unsaved changes' })
+
+-- Scroll window without moving cursor.
+vim.keymap.set('n', '<C-Up>', '<C-Y>', { desc = 'Scroll window up' })
+vim.keymap.set('v', '<C-Up>', '<C-Y>', { desc = 'Scroll window up' })
+vim.keymap.set('i', '<C-Up>', '<C-O><C-Y>', { desc = 'Scroll window up' })
+vim.keymap.set('n', '<C-Down>', '<C-E>', { desc = 'Scroll window down' })
+vim.keymap.set('v', '<C-Down>', '<C-E>', { desc = 'Scroll window down' })
+vim.keymap.set('i', '<C-Down>', '<C-O><C-E>', { desc = 'Scroll window down' })
 
 -- Add hotkey to yank selection: <C-Insert>.
 vim.keymap.set('v', '<C-Insert>', 'y', { desc = 'Yank (copy) selection' })
