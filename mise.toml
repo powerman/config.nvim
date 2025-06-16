@@ -38,10 +38,8 @@ run = 'ast-grep scan'
 
 [tasks.'test:plenary']
 description = 'Test Neovim config using Plenary'
-run = '''
-nvim --headless -u NONE \
-    -c 'set rtp+=~/.local/share/nvim/lazy/plenary.nvim' \
-    -c 'runtime plugin/plenary.vim' \
-    -c "PlenaryBustedDirectory ${1-tests/} { minimal_init = 'tests/minimal_init.lua' }" \
-    +qa
+usage = '''
+arg "[test]"
+complete "test" run="cd tests && fd -tf -td -E minimal_init.lua"
 '''
+run = 'nvim --headless -u run_plenary.vim +qa -- tests/${usage_test}'
