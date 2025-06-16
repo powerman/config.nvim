@@ -183,11 +183,11 @@ return {
 
     -- Works after saving file.
     golangci_lint_ls = {
-        -- https://github.com/neovim/nvim-lspconfig/issues/3863
+        -- TODO: Remove after updating nvim-lspconfig.
         before_init = function(_, config)
             -- Add support for golangci-lint V1 (in V2 `--out-format=json` was replaced by
             -- `--output.json.path=stdout`).
-            local v1 = false
+            local v1
             -- PERF: `golangci-lint version` is very slow (about 0.1 sec) so let's find
             -- version using `go version -m $(which golangci-lint) | grep '^\smod'`.
             if vim.fn.executable 'go' == 1 then
