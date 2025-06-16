@@ -120,6 +120,11 @@ return {
     -- Will be used only if configured (run `sg new` in project root dir to create sgconfig.yml).
     ast_grep = {
         workspace_required = true, -- TODO: Remove after updating nvim-lspconfig.
+        -- https://github.com/neovim/nvim-lspconfig/issues/3850#issuecomment-2901164705
+        reuse_client = function(client, config)
+            config.cmd_cwd = config.root_dir
+            return client.config.cmd_cwd == config.cmd_cwd
+        end,
     },
 
     -- It actually uses `shellcheck` and `shfmt`.
