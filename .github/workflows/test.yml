@@ -1,0 +1,31 @@
+name: Test
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel testing of a previous commit for the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # Increase GitHub API rate limits.
+
+      - run: mise run test
