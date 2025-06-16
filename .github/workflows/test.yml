@@ -28,9 +28,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }} # Increase GitHub API rate limits.
 
-      - run: |
+      - name: Cache Lazy plugins
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/nvim/lazy*
+          key: v1-lazy-${{ runner.os }}-${{ hashFiles('lazy-lock.json') }}
+
+      - name: Install Lazy plugins
+        run: |
           mkdir -p ~/.config
-          ln -s "$PWD" ~/.config/nvim
+          ln -snf "$PWD" ~/.config/nvim
           nvim --headless -c "Lazy restore" +qa
 
       - run: mise run test
