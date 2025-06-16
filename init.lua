@@ -33,8 +33,8 @@ vim.g.float_max_width = 0.96
 
 -- Set to true if you want transparent background.
 -- Auto-detected for urxvt terminal, false in other terminals.
-vim.g.transparent = string.find(vim.env.TERM, '^rxvt') ~= nil
-    and string.find(vim.env.COLORFGBG, '%d$') == nil
+vim.g.transparent = string.find(vim.env.TERM or '', '^rxvt') ~= nil
+    and string.find(vim.env.COLORFGBG or '', '%d$') == nil
 
 -- You can start Neovim this way to enable it: `nvim --cmd 'let debug_lsp=1'`.
 vim.g.debug_lsp = vim.g.debug_lsp or false
