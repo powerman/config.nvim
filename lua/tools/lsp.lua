@@ -118,14 +118,7 @@ local efm_languages = {
 return {
     -- Linter/fixer for many treesitter-supported languages: https://ast-grep.github.io/reference/languages.html.
     -- Will be used only if configured (run `sg new` in project root dir to create sgconfig.yml).
-    ast_grep = {
-        workspace_required = true, -- TODO: Remove after updating nvim-lspconfig.
-        -- https://github.com/neovim/nvim-lspconfig/issues/3850#issuecomment-2901164705
-        reuse_client = function(client, config)
-            config.cmd_cwd = config.root_dir
-            return client.config.cmd_cwd == config.cmd_cwd
-        end,
-    },
+    ast_grep = {},
 
     -- It actually uses `shellcheck` and `shfmt`.
     -- Configure it in file `.shellcheckrc` in project's root dir (check `:LspInfo`).
@@ -182,27 +175,7 @@ return {
     },
 
     -- Works after saving file.
-    golangci_lint_ls = {
-        -- TODO: Remove after updating nvim-lspconfig.
-        before_init = function(_, config)
-            -- Add support for golangci-lint V1 (in V2 `--out-format=json` was replaced by
-            -- `--output.json.path=stdout`).
-            local v1
-            -- PERF: `golangci-lint version` is very slow (about 0.1 sec) so let's find
-            -- version using `go version -m $(which golangci-lint) | grep '^\smod'`.
-            if vim.fn.executable 'go' == 1 then
-                local exe = vim.fn.exepath 'golangci-lint'
-                local version = vim.system({ 'go', 'version', '-m', exe }):wait()
-                v1 = string.match(version.stdout, '\tmod\tgithub.com/golangci/golangci%-lint\t')
-            else
-                local version = vim.system({ 'golangci-lint', 'version' }):wait()
-                v1 = string.match(version.stdout, 'version v?1%.')
-            end
-            if v1 then
-                config.init_options.command = { 'golangci-lint', 'run', '--out-format', 'json' }
-            end
-        end,
-    },
+    golangci_lint_ls = {},
 
     gopls = {
         cmd = { 'gopls', '-remote=auto' }, -- Autostart daemon.

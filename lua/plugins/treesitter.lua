@@ -34,6 +34,11 @@
 return {
     {
         'nvim-treesitter/nvim-treesitter',
+        lazy = false,
+        -- TODO: Update to 'main' branch after
+        -- https://github.com/nvim-treesitter/nvim-treesitter-textobjects/issues/772
+        -- Also check for telescope errors on <F3> after upgrade.
+        branch = 'master',
         build = ':TSUpdate',
         main = 'nvim-treesitter.configs', -- Sets main module to use for opts
         opts = {
