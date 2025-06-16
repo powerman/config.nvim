@@ -43,6 +43,9 @@ return {
         config = function(_, opts)
             require('tokyonight').setup(opts)
             vim.cmd.colorscheme 'tokyonight'
+
+            -- Git word diff: deleted letter in changed line.
+            vim.cmd 'hi GitSignsDeleteVirtLnInline guibg=#60222c'
         end,
     },
 }
