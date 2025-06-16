@@ -28,4 +28,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }} # Increase GitHub API rate limits.
 
+      - run: nvim --headless "+Lazy! restore" +qa
+
       - run: mise run test
