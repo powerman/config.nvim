@@ -46,9 +46,10 @@ vim.o.timeoutlen = 500
 vim.o.splitright = true
 vim.o.splitbelow = true
 
--- Sets how neovim will display certain whitespace characters in the editor.
+-- Sets how neovim will display certain whitespace/separator characters in the editor.
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.fillchars:append { fold = '┄' }
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
