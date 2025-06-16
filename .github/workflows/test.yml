@@ -28,6 +28,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }} # Increase GitHub API rate limits.
 
-      - run: nvim --headless -u lua/lazy-bootstrap.lua -c "try | Lazy! restore | catch | cquit 1 | endtry" +qa
+      - run: nvim --headless -u lua/lazy-bootstrap.lua -c "Lazy restore" +qa
 
       - run: mise run test
