@@ -16,6 +16,8 @@
 -- INFO: Git branch and diff status provided by this plugin is used by mini.statusline plugin.
 
 -- NOTE:  ]c [c             Git: next/prev hunk.
+-- NOTE:  <Leader>td        Git: toggle preview all hunks inline.
+-- NOTE:  <Leader>tw        Git: toggle word diff.
 -- NOTE:  <Leader>hi        Git: preview hunk inline.
 -- NOTE:  <Leader>hd        Git: diff against index.
 -- NOTE:  <Leader>hD        Git: diff against last commit.
@@ -65,6 +67,17 @@ return {
                 end, { desc = 'Previous git|diff change' })
 
                 -- Views
+                map('n', '<Leader>td', function()
+                    -- https://github.com/lewis6991/gitsigns.nvim/issues/899#issuecomment-2040481347
+                    gitsigns.toggle_linehl()
+                    gitsigns.toggle_word_diff()
+                    gitsigns.toggle_deleted()
+                end, { desc = 'Git: toggle preview all hunks inline' })
+                map('n', '<Leader>tw', function()
+                    gitsigns.toggle_deleted()
+                    gitsigns.toggle_word_diff()
+                    gitsigns.toggle_deleted()
+                end, { desc = 'Git: toggle word diff' })
                 map(
                     'n',
                     '<Leader>hi',
