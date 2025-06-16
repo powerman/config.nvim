@@ -116,6 +116,9 @@ local efm_languages = {
 --      For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/.
 ---@type table<string,lspConfigExtender>
 return {
+    -- Language server for GitHub Actions.
+    gh_actions_ls = {},
+
     -- Linter/fixer for many treesitter-supported languages: https://ast-grep.github.io/reference/languages.html.
     -- Will be used only if configured (run `sg new` in project root dir to create sgconfig.yml).
     ast_grep = {},
