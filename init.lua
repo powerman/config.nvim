@@ -39,6 +39,23 @@ vim.g.transparent = string.find(vim.env.TERM or '', '^rxvt') ~= nil
 -- You can start Neovim this way to enable it: `nvim --cmd 'let debug_lsp=1'`.
 vim.g.debug_lsp = vim.g.debug_lsp or false
 
+-- Set to true if you agree to send your files to 3rd-party companies.
+vim.g.allow_remote_llm = (function()
+    -- Neovim is running under firejail in these dirs, so it's safe to use LLM.
+    local base_dirs = {
+        vim.env.HOME .. '/proj',
+        vim.env.HOME .. '/fork',
+        vim.env.HOME .. '/work',
+    }
+    local cwd = vim.fn.getcwd()
+    for _, base in ipairs(base_dirs) do
+        if cwd == base or cwd:sub(1, #base + 1) == base .. '/' then
+            return true
+        end
+    end
+    return false
+end)()
+
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
 
