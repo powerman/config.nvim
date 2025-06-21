@@ -13,14 +13,15 @@ return {
         },
         suggestion = {
             enabled = true,
-            auto_trigger = true,
+            auto_trigger = false, -- Disabled while evaluating copilot-lsp.
             keymap = {
                 accept = '<M-CR>',
                 accept_word = '<M-Right>',
                 accept_line = '<M-Down>',
                 next = '<M-]>',
                 prev = '<M-[>',
-                dismiss = '<M-\\>',
+                -- dismiss = '<M-\\>',
+                dismiss = false, -- Already implemented in copilot-lsp config.
             },
         },
         should_attach = function(_, bufname)

@@ -44,7 +44,9 @@ return {
     },
     config = function(_, opts)
         opts = opts or {}
-        local ensure_installed = {}
+        local ensure_installed = {
+            'copilot-language-server', -- For copilot-lsp plugin.
+        }
 
         local lsp = require 'tools.lsp'
         vim.list_extend(ensure_installed, vim.tbl_keys(lsp))
