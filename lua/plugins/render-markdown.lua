@@ -4,6 +4,7 @@
 ---@type LazySpec
 return {
     'MeanderingProgrammer/render-markdown.nvim',
+    version = '*',
     enabled = vim.g.have_nerd_font,
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ft = { 'markdown', 'codecompanion' },
