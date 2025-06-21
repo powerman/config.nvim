@@ -56,6 +56,20 @@ vim.g.allow_remote_llm = (function()
     return false
 end)()
 
+-- List of shell commands allowed to LLM without manual approve.
+vim.g.llm_allowed_cmds = {
+    'make test',
+    'go test',
+    'go test ./...',
+    'mise run test',
+    'mise run lint',
+    'mise tasks',
+    'golangci-lint run',
+    'actionlint',
+    'git status',
+    'git diff',
+}
+
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
 

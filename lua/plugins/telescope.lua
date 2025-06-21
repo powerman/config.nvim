@@ -35,6 +35,13 @@
 -- NOTE:  <Leader>sr         Telescope: Resume previous search.
 -- NOTE:  <M-;>              Telescope: Insert :icon/emoji:.
 
+local default_tab = { -- mappings
+    i = {
+        ['<CR>'] = 'select_tab',
+        ['<S-CR>'] = 'select_default',
+    },
+}
+
 ---@module 'lazy'
 ---@type LazySpec
 return {
@@ -128,21 +135,19 @@ return {
                         enable_preview = true,
                     },
                     find_files = {
-                        mappings = {
+                        mappings = vim.tbl_deep_extend('force', default_tab, {
                             i = {
                                 -- <F3> both opens (Find project's file) and closes.
                                 ['<F3>'] = 'close',
-                                ['<CR>'] = 'select_tab',
                             },
-                        },
+                        }),
                     },
-                    grep_string = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
-                    help_tags = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
-                    live_grep = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
-                    lsp_dynamic_workspace_symbols = {
-                        mappings = { i = { ['<CR>'] = 'select_tab' } },
-                    },
-                    oldfiles = { mappings = { i = { ['<CR>'] = 'select_tab' } } },
+                    grep_string = { mappings = default_tab },
+                    help_tags = { mappings = default_tab },
+                    live_grep = { mappings = default_tab },
+                    lsp_dynamic_workspace_symbols = { mappings = default_tab },
+                    oldfiles = { mappings = default_tab },
+                    buffers = { mappings = default_tab },
                 },
                 extensions = {
                     ['ui-select'] = {

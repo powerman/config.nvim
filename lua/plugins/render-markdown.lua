@@ -74,6 +74,124 @@ return {
                 youtube = { icon = '󰗃' },
             },
         },
+
+        overrides = {
+            filetype = {
+                codecompanion = {
+                    heading = {
+                        custom = {
+                            codecompanion_me = {
+                                pattern = '^## Me$',
+                                icon = '  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm = {
+                                pattern = '^## CodeCompanion',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_anthropic = {
+                                pattern = '^## Anthropic',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_azure_openai = {
+                                pattern = '^## Azure OpenAI',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_copilot = {
+                                pattern = '^## Copilot',
+                                icon = '  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_deepseek = {
+                                pattern = '^## DeepSeek',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_gemini = {
+                                pattern = '^## Gemini',
+                                icon = '  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_githubmodels = {
+                                pattern = '^## GitHub Models',
+                                icon = '󰊤  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_huggingface = {
+                                pattern = '^## Hugging Face',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_mistral = {
+                                pattern = '^## Mistral',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_novita = {
+                                pattern = '^## Novita',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_ollama = {
+                                pattern = '^## Ollama',
+                                icon = '  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_openai = {
+                                pattern = '^## OpenAI',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_tavily = {
+                                pattern = '^## Tavily',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                            codecompanion_llm_xai = {
+                                pattern = '^## xAI',
+                                icon = '󰚩  ',
+                                background = 'CodeCompanionInputHeader',
+                            },
+                        },
+                    },
+                    html = {
+                        tag = {
+                            buf = {
+                                icon = '',
+                                highlight = 'Comment',
+                            },
+                            file = {
+                                icon = '󰨸',
+                                highlight = 'Comment',
+                            },
+                            help = {
+                                icon = '',
+                                highlight = 'Comment',
+                            },
+                            image = {
+                                icon = '󰥶',
+                                highlight = 'Comment',
+                            },
+                            symbols = {
+                                icon = '',
+                                highlight = 'Comment',
+                            },
+                            tool = {
+                                icon = '',
+                                highlight = 'Comment',
+                            },
+                            url = {
+                                icon = '󰌹',
+                                highlight = 'Comment',
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
     config = function(_, opts)
         require('render-markdown.config.checkbox').default.custom.todo = nil

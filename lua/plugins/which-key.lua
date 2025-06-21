@@ -87,6 +87,7 @@ return {
                 { 's', group = 'Surrounding, Replace {motion} with yank' },
                 { 'z', group = 'Fold, Spell, Scroll' },
                 { 'gr', group = 'LSP' },
+                { '<Leader>c', group = 'AI Chat' },
                 { '<Leader>d', group = 'LSP: Document' },
                 { '<Leader>g', group = 'LSP: Goto' },
                 { '<Leader>h', group = 'Git: Hunk', mode = 'nx' },

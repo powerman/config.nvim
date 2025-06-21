@@ -38,6 +38,8 @@ return {
                 hl['@markup.strikethrough'].fg = c.fg_gutter
                 -- Diff: changed line.
                 hl['DiffChange'].bg = c.bg_highlight
+                -- Window: separator.
+                hl['WinSeparator'].fg = c.dark3
             end,
         },
         config = function(_, opts)
