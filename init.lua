@@ -58,6 +58,9 @@ vim.g.allow_remote_llm = (function()
         vim.env.HOME .. '/proj',
         vim.env.HOME .. '/fork',
         vim.env.HOME .. '/work',
+        vim.env.HOME .. '/.config/nvim',
+        vim.env.HOME .. '/.local/share/nvim/lazy',
+        vim.env.HOME .. '/.zsh',
     }
     local cwd = vim.fn.getcwd()
     for _, base in ipairs(base_dirs) do
