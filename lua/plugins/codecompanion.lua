@@ -287,7 +287,7 @@ return {
                     window = {
                         width = 0.66,
                     },
-                    -- start_in_insert_mode = true,
+                    start_in_insert_mode = true,
                 },
                 diff = {
                     provider = 'mini_diff',
