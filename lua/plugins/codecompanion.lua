@@ -178,7 +178,8 @@ return {
                 inline = {
                     adapter = {
                         name = 'copilot',
-                        model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        -- model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        model = 'claude-3.5-sonnet', -- Multiplier = 1.
                     },
                     keymaps = {
                         accept_change = {
@@ -193,12 +194,12 @@ return {
                     adapter = {
                         name = 'copilot',
                         -- https://docs.github.com/en/copilot/managing-copilot/understanding-and-managing-copilot-usage/understanding-and-managing-requests-in-copilot
-                        model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        -- model = 'gpt-4.1', -- Multiplier = 0 (free).
                         -- model = 'gemini-2.0-flash-001', -- Multiplier = 0.25.
                         -- model = 'o3-mini', -- Multiplier = 0.33.
                         -- model = 'o4-mini', -- Multiplier = 0.33.
                         -- model = 'gemini-2.5-pro', -- Multiplier = 1.
-                        -- model = 'claude-3.5-sonnet', -- Multiplier = 1.
+                        model = 'claude-3.5-sonnet', -- Multiplier = 1.
                         -- model = 'claude-3.7-sonnet', -- Multiplier = 1.
                         -- model = 'claude-sonnet-4', -- Multiplier = 1.
                         -- model = 'claude-3.7-sonnet-thought', -- Multiplier = 1.25.
