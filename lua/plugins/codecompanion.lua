@@ -16,8 +16,8 @@
 -- NOTE:  <Leader>ca    AI chat: change adapter.
 -- NOTE:  <Leader>cz    AI chat: fold code.
 -- NOTE:  <Leader>cd    AI chat: debug.
--- NOTE:  ga            AI diff: accept.
--- NOTE:  gr            AI diff: reject.
+-- NOTE:  <Leader>da    AI diff: accept.
+-- NOTE:  <Leader>dr    AI diff: reject.
 -- NOTE:  <M-r>         AI chat history: rename.
 -- NOTE:  <M-d>         AI chat history: delete.
 -- NOTE:  <C-Y>         AI chat history: duplicate.
@@ -50,14 +50,17 @@ return {
     {
         'echasnovski/mini.diff',
         version = '*',
-        lazy = true, -- Will be loaded as codecompanion dependency.
         config = function()
             local diff = require 'mini.diff'
             diff.setup {
                 -- Disabled by default
                 source = diff.gen_source.none(),
+                -- Use same signs as gitsigns.
+                view = {
+                    signs = { add = '┃', change = '┃', delete = '_' },
+                },
                 -- I'm using gitsigns, so disable these mappings to avoid conflict.
-                -- Wiil use codecompanion's mappings `ga` for accept, 'gr' for reject.
+                -- Will use codecompanion's mappings for accept|reject.
                 mappings = {
                     apply = '',
                     reset = '',
@@ -68,6 +71,26 @@ return {
                     goto_last = '',
                 },
             }
+            -- Use mini.diff overlay by default.
+            vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
+                desc = 'Enable mini.diff overlay by default',
+                group = vim.api.nvim_create_augroup('user.mini_diff_overlay', { clear = true }),
+                pattern = '*',
+                callback = function(ev)
+                    if
+                        not vim.bo.readonly
+                        and ev.file ~= 'quickfix'
+                        and vim.bo.ft ~= 'qf'
+                        and not vim.wo.diff
+                        and vim.bo.ft ~= 'diff'
+                    then
+                        vim.schedule(function()
+                            MiniDiff.enable(ev.buf)
+                            MiniDiff.toggle_overlay(ev.buf)
+                        end)
+                    end
+                end,
+            })
         end,
     },
     -- Copy images from your system clipboard into a chat buffer via :PasteImage.
@@ -156,6 +179,14 @@ return {
                     adapter = {
                         name = 'copilot',
                         model = 'gpt-4.1', -- Multiplier = 0 (free).
+                    },
+                    keymaps = {
+                        accept_change = {
+                            modes = { n = '<Leader>da' },
+                        },
+                        reject_change = {
+                            modes = { n = '<Leader>dr' },
+                        },
                     },
                 },
                 chat = {
