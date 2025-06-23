@@ -217,8 +217,6 @@ return {
         version = '*',
         lazy = false, -- Needs to setup autocommands for LSP before creating buffers.
         dependencies = {
-            -- Setup $PATH for current project before running LSP servers.
-            'project',
             -- Provides 'cmp' capabilities for LSP clients.
             'hrsh7th/cmp-nvim-lsp',
             -- Use telescope builtin handlers instead of Neovim builtins to open lists of

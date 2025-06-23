@@ -39,6 +39,18 @@ vim.g.transparent = string.find(vim.env.TERM or '', '^rxvt') ~= nil
 -- You can start Neovim this way to enable it: `nvim --cmd 'let debug_lsp=1'`.
 vim.g.debug_lsp = vim.g.debug_lsp or false
 
+-- Used to setup PATH and some plugins. Configure your markers for vim.fs.root as needed.
+vim.g.project_root = vim.fs.root(0, '.git') or vim.fn.getcwd()
+
+-- Setup project-specific PATH.
+vim.g.project_bin = { '.buildcache/bin' }
+for _, bin_dir in ipairs(vim.g.project_bin) do
+    bin_dir = vim.fs.joinpath(vim.g.project_root, bin_dir)
+    if vim.fn.isdirectory(bin_dir) ~= 0 then
+        vim.env.PATH = bin_dir .. ':' .. vim.env.PATH
+    end
+end
+
 -- Set to true if you agree to send your files to 3rd-party companies.
 vim.g.allow_remote_llm = (function()
     -- Neovim is running under firejail in these dirs, so it's safe to use LLM.

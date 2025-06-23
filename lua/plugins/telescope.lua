@@ -11,9 +11,6 @@
 --    !.mp3$        inverse-suffix-exact-match  Items that do not end with .mp3
 --    ^a b$ | c$    OR operator                 Items that start with a and end with b OR c
 
--- INFO: The "project" here means either current or some upper directory (detected by `.git/`)
--- and it subdirectories.
-
 -- NOTE:  <C-?>              Telescope: Help on keys.
 -- NOTE:  <C-\>              Telescope: Close window.
 -- NOTE:  <Leader>sh         Telescope: Find help.
@@ -187,23 +184,17 @@ return {
                 { desc = 'Find diagnostics' }
             )
             vim.keymap.set('n', '<Leader>sF', function()
-                local buf_filename = vim.api.nvim_buf_get_name(0)
-                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
-                builtin.find_files { cwd = dir }
+                builtin.find_files { cwd = vim.g.project_root }
             end, { desc = "Find project's file" })
             vim.keymap.set('n', '<Leader>sf', builtin.find_files, { desc = "Find dir's file" })
             vim.keymap.set('n', '<Leader>sT', function()
-                local buf_filename = vim.api.nvim_buf_get_name(0)
-                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
-                return '<Cmd>TodoTelescope cwd=' .. dir .. '<CR>'
+                return '<Cmd>TodoTelescope cwd=' .. vim.g.project_root .. '<CR>'
             end, { expr = true, desc = "Find project's TODO/BUG/…" })
             vim.keymap.set('n', '<Leader>st', function()
                 return '<Cmd>TodoTelescope<CR>'
             end, { expr = true, desc = "Find dir's TODO/BUG/…" })
             vim.keymap.set('n', '<Leader>sg', function()
-                local buf_filename = vim.api.nvim_buf_get_name(0)
-                local dir = require('lspconfig').util.find_git_ancestor(buf_filename)
-                builtin.live_grep { cwd = dir or '.' }
+                builtin.live_grep { cwd = vim.g.project_root }
             end, { desc = 'Grep project' })
             vim.keymap.set(
                 'n',

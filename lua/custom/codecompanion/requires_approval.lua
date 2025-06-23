@@ -1,11 +1,11 @@
 ---@class CodeCompanionRequiresApprovalConfig
 ---@field allowed_cmds? string[] Allowed commands for cmd_runner and mcp execute_command.
----@field allow_cwd? boolean If true then allow file operations in cwd without git repo.
+---@field project_root? string Allow file operations in this directory and below.
 ---@field std? string[] List of Code Companion tools to protect.
 ---@field mcp_neovim? boolean If true then protect @mcp Neovim tools.
 local defaults = {
     allowed_cmds = {},
-    allow_cwd = false,
+    project_root = nil,
     std = {
         'cmd_runner',
         'create_file',
@@ -76,12 +76,11 @@ function M.cmd_runner(tool, _)
 end
 
 local function is_project_path(filepath)
-    local git_dir = vim.fn.finddir('.git', '.;')
-    if git_dir == '' and not M.config.allow_cwd then
+    if not M.config.project_root or M.config.project_root == '' then
         return false
     end
 
-    local project_dir = vim.uv.fs_realpath(vim.fn.fnamemodify(git_dir, ':h'))
+    local project_dir = vim.uv.fs_realpath(M.config.project_root)
     if not project_dir then
         return false
     end

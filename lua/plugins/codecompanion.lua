@@ -336,6 +336,7 @@ return {
         config = function(_, opts)
             require('codecompanion').setup(opts)
             require('custom.codecompanion.requires_approval').setup {
+                project_root = vim.g.project_root,
                 allowed_cmds = vim.g.llm_allowed_cmds or {},
             }
 
