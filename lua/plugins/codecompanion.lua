@@ -497,6 +497,10 @@ return {
                 config.config.prompt_library['Edit<->Test workflow'].prompts[1][1].content()
             vim.g.codecompanion_auto_tool_mode = orig_mode
 
+            -- Fix default chat when opened from INSERT mode.
+            local static_actions = require 'codecompanion.actions.static'
+            static_actions[1].prompts.i = static_actions[1].prompts.n
+
             -- To include @mcp in your own @dev group, it's not enough to just add a couple of
             -- tools from the @mcp group. You also need to set the system_prompt, which can't
             -- be done in opts — so we have to do it here.
