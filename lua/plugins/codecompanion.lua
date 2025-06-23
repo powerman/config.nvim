@@ -18,7 +18,6 @@
 -- NOTE:  <Leader>cd    AI chat: debug.
 -- NOTE:  ga            AI diff: accept.
 -- NOTE:  gr            AI diff: reject.
--- NOTE:  <Leader>ch    AI chat history: manage.
 -- NOTE:  <M-r>         AI chat history: rename.
 -- NOTE:  <M-d>         AI chat history: delete.
 -- NOTE:  <C-Y>         AI chat history: duplicate.
@@ -270,8 +269,8 @@ return {
                 history = {
                     enabled = true,
                     opts = {
-                        keymap = '<Leader>ch',
-                        save_chat_keymap = nil,
+                        keymap = '<Leader><Nop>', -- Use Action Palette to open.
+                        save_chat_keymap = '<Leader><Nop>', -- Use autosave.
                         expiration_days = 30,
                         auto_generate_title = true,
                         title_generation_opts = {
@@ -474,6 +473,9 @@ return {
                 table.insert(tools.groups.dev.tools, tool)
             end
             tools.groups.dev.system_prompt = tools.groups.mcp.system_prompt
+
+            -- Remove fake mapping used for history extension.
+            vim.api.nvim_del_keymap('n', '<Leader><Nop>')
         end,
     },
 }
