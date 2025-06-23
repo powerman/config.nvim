@@ -79,3 +79,5 @@ vim.opt.formatoptions:append 'ro'
 -- After closing a tab switch to a previous tab instead of a next tab.
 vim.opt.tabclose:append 'left'
 vim.opt.tabclose:append 'uselast'
+
+vim.opt.diffopt:append 'algorithm:histogram'
