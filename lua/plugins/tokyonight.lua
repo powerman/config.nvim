@@ -36,18 +36,34 @@ return {
                 hl['@markup.strong'].fg = c.blue
                 hl['@markup.italic'].fg = c.blue
                 hl['@markup.strikethrough'].fg = c.fg_gutter
-                -- Diff: changed line.
-                hl['DiffChange'].bg = c.bg_highlight
                 -- Window: separator.
-                hl['WinSeparator'].fg = c.dark3
+                hl.WinSeparator.fg = c.dark3
+                -- Diff:
+                hl.DiffAdd.bg = '#2b3c3e'
+                hl.DiffChange.bg = hl.DiffAdd.bg
+                hl.DiffDelete.bg = '#472a36'
+                hl.DiffText.bg = '#508050'
+                -- Added in `gitsigns.lua`.
+                hl.GitSignsAdd = { fg = c.green }
+                hl.GitSignsChange = { fg = c.yellow }
+                hl.GitSignsDelete = { fg = c.red }
+                hl.GitSignsDeleteVirtLnInline = { bg = '#602020' }
+                hl.GitSignsAddInline = { fg = hl.DiffText.bg, reverse = true }
+                hl.GitSignsChangeInline = hl.GitSignsAddInline
+                hl.GitSignsDeleteInline = hl.GitSignsAddInline
+                -- Added in `codecompanion.lua`.
+                hl.MiniDiffOverContext = { bg = hl.DiffDelete.bg }
+                hl.MiniDiffOverContextBuf = { bg = hl.DiffAdd.bg }
+                hl.MiniDiffOverChange = hl.GitSignsDeleteVirtLnInline
+                hl.MiniDiffOverChangeBuf = { bg = hl.DiffText.bg }
+                hl.MiniDiffSignAdd = hl.GitSignsAdd
+                hl.MiniDiffSignChange = hl.GitSignsChange
+                hl.MiniDiffSignDelete = hl.GitSignsDelete
             end,
         },
         config = function(_, opts)
             require('tokyonight').setup(opts)
             vim.cmd.colorscheme 'tokyonight'
-
-            -- Git word diff: deleted letter in changed line.
-            vim.cmd 'hi GitSignsDeleteVirtLnInline guibg=#60222c'
         end,
     },
 }
