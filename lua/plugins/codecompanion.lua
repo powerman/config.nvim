@@ -4,7 +4,7 @@
 -- NOTE:  :CodeCompanion /<name>   Library prompt inline AI assistant.
 -- NOTE:  :PasteImage   Add image from clipboard into Markdown.
 -- NOTE:  :MCPHub       AI chat: manage @mcp tool.
--- NOTE:  <M-a>         Open AI actions.
+-- NOTE:  <M-a>         AI Action Palette.
 -- NOTE:  <F6>          AI chat: toggle.
 -- NOTE:  <C-CR>        AI chat: send.
 -- NOTE:  <Leader>cr    AI chat: regenerate.
@@ -22,6 +22,26 @@
 -- NOTE:  <M-r>         AI chat history: rename.
 -- NOTE:  <M-d>         AI chat history: delete.
 -- NOTE:  <C-Y>         AI chat history: duplicate.
+
+local const = {
+    USER_ROLE = 'user',
+    SYSTEM_ROLE = 'system',
+}
+
+local function chat_filter(chat_data)
+    return chat_data.project_root == vim.g.project_root
+end
+
+local function send_code(context)
+    local actions = require 'codecompanion.helpers.actions'
+    local text = actions.get_code(context.start_line, context.end_line)
+
+    return 'I have the following code:\n\n```'
+        .. context.filetype
+        .. '\n'
+        .. text
+        .. '\n```\n\n'
+end
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -261,9 +281,7 @@ return {
                             refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
                         },
                         -- Show chats only from the current project.
-                        chat_filter = function(chat_data)
-                            return chat_data.cwd == vim.fn.getcwd()
-                        end,
+                        chat_filter = chat_filter,
                     },
                 },
                 mcphub = {
@@ -327,6 +345,105 @@ return {
                         },
                     })
                 end,
+            },
+            prompt_library = {
+                --- Reserve index intervals:
+                ---     - 1-9       System (Chat, Open chats, Custom Prompt, Saved Chats, etc.)
+                ---     - 100-199   User Inline Prompts
+                ---     - 200-299   User Chat Prompts
+                ---     - 300-399   User Workflows
+                ['Unit Tests'] = { opts = { index = 50 } },
+                ['Fix code'] = { opts = { index = 150 } },
+                ['Explain LSP Diagnostics'] = { opts = { index = 151 } },
+                ['Explain'] = { opts = { index = 152 } },
+                ['Generate a Commit Message'] = { opts = { index = 153 } },
+                ['Workspace File'] = { opts = { index = 250 } },
+                ['Code workflow'] = { opts = { index = 350 } },
+                ['Edit<->Test workflow'] = { opts = { index = 351 } },
+
+                ['Saved Project Chats ...'] = {
+                    strategy = 'chat',
+                    description = 'Browse saved project chats',
+                    opts = {
+                        index = 4,
+                        stop_context_insertion = true,
+                    },
+                    condition = function()
+                        local history = require('codecompanion').extensions.history
+                        local have_chats = not vim.tbl_isempty(history.get_chats(chat_filter))
+                        local mode = vim.api.nvim_get_mode()
+                        return have_chats and (mode.mode == 'n' or mode.mode == 'i')
+                    end,
+                    prompts = {
+                        n = function()
+                            local history = require('codecompanion').extensions.history
+                            history.browse_chats(chat_filter)
+                        end,
+                        i = function()
+                            local history = require('codecompanion').extensions.history
+                            history.browse_chats(chat_filter)
+                        end,
+                    },
+                },
+                ['Saved Chats ...'] = {
+                    strategy = 'chat',
+                    description = 'Browse all saved chats',
+                    opts = {
+                        index = 5,
+                        stop_context_insertion = true,
+                    },
+                    condition = function()
+                        local history = require('codecompanion').extensions.history
+                        local have_chats = not vim.tbl_isempty(history.get_chats())
+                        local mode = vim.api.nvim_get_mode()
+                        return have_chats and (mode.mode == 'n' or mode.mode == 'i')
+                    end,
+                    prompts = {
+                        n = function()
+                            local history = require('codecompanion').extensions.history
+                            history.browse_chats()
+                        end,
+                        i = function()
+                            local history = require('codecompanion').extensions.history
+                            history.browse_chats()
+                        end,
+                    },
+                },
+                ['Free Chat (GPT-4.1)'] = {
+                    strategy = 'chat',
+                    description = 'Create a new chat buffer to converse with an LLM for free',
+                    opts = {
+                        index = 6,
+                        stop_context_insertion = true,
+                        adapter = {
+                            name = 'copilot',
+                            model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        },
+                    },
+                    prompts = {
+                        n = { { role = const.USER_ROLE, content = '' } },
+                        i = { { role = const.USER_ROLE, content = '' } },
+                        v = { -- Same as in default "Chat" menu item.
+                            {
+                                role = const.SYSTEM_ROLE,
+                                content = function(context)
+                                    return 'I want you to act as a senior '
+                                        .. context.filetype
+                                        .. ' developer. I will give you specific code examples and ask you questions. I want you to advise me with explanations and code examples.'
+                                end,
+                            },
+                            {
+                                role = const.USER_ROLE,
+                                content = function(context)
+                                    return send_code(context)
+                                end,
+                                opts = {
+                                    contains_code = true,
+                                },
+                            },
+                        },
+                    },
+                },
             },
             opts = {
                 language = 'Russian', -- The language used for LLM responses.
