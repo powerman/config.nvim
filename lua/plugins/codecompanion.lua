@@ -45,6 +45,15 @@ end
 ---@module 'lazy'
 ---@type LazySpec
 return {
+    {
+        'auto_approve',
+        dir = '~/.config/nvim/lua/custom',
+        lazy = true, -- Will be loaded as a dependency of other plugins.
+        opts = {
+            project_root = vim.g.project_root,
+            allowed_cmds = vim.g.llm_allowed_cmds or {},
+        },
+    },
     -- Use mini.diff for a cleaner diff when using the inline assistant or
     -- the @insert_edit_into_file tool.
     {
@@ -124,9 +133,15 @@ return {
         cmd = 'MCPHub',
         dependencies = {
             'nvim-lua/plenary.nvim',
+            'auto_approve',
         },
         -- build = 'npm install -g mcp-hub@latest', -- Binary `mcp-hub` is installed by Mise.
-        config = true,
+        config = function()
+            ---@diagnostic disable-next-line: missing-fields
+            require('mcphub').setup {
+                auto_approve = require('auto_approve').mcphub,
+            }
+        end,
     },
     {
         'olimorris/codecompanion.nvim',
@@ -151,6 +166,7 @@ return {
             'nvim-lua/plenary.nvim',
             'nvim-treesitter/nvim-treesitter',
             -- Optional:
+            'auto_approve',
             'ravitemer/codecompanion-history.nvim', -- Save and load conversation history.
             'ravitemer/mcphub.nvim', -- Manage MCP servers.
             'j-hui/fidget.nvim', -- Display status.
@@ -318,7 +334,7 @@ return {
                 mcphub = {
                     callback = 'mcphub.extensions.codecompanion',
                     opts = {
-                        show_result_in_chat = true, -- Show mcp tool results in chat.
+                        show_result_in_chat = false, -- Show mcp tool results in chat.
                         make_vars = true, -- Convert resources to #variables.
                         make_slash_commands = true, -- Add prompts as /slash commands.
                     },
@@ -483,10 +499,7 @@ return {
         },
         config = function(_, opts)
             require('codecompanion').setup(opts)
-            require('custom.codecompanion.requires_approval').setup {
-                project_root = vim.g.project_root,
-                allowed_cmds = vim.g.llm_allowed_cmds or {},
-            }
+            require('auto_approve').setup_codecompanion()
 
             local config = require 'codecompanion.config'
             local tools = config.config.strategies.chat.tools

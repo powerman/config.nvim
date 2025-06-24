@@ -4,5 +4,6 @@
 --  - https://lunarmodules.github.io/busted/ (plenary mimics part of it)
 
 vim.opt.rtp:append '~/.local/share/nvim/lazy/plenary.nvim'
+vim.opt.rtp:append 'lua/custom'
 
 require 'patch.plenary.busted_format_results'
