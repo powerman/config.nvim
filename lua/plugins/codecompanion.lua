@@ -317,8 +317,8 @@ return {
                 history = {
                     enabled = true,
                     opts = {
-                        keymap = '<Leader><Nop>', -- Use Action Palette to open.
-                        save_chat_keymap = '<Leader><Nop>', -- Use autosave.
+                        keymap = false, -- Use Action Palette to open.
+                        save_chat_keymap = false, -- Use autosave.
                         expiration_days = 30,
                         auto_generate_title = true,
                         title_generation_opts = {
@@ -522,9 +522,6 @@ return {
                 table.insert(tools.groups.dev.tools, tool)
             end
             tools.groups.dev.system_prompt = tools.groups.mcp.system_prompt
-
-            -- Remove fake mapping used for history extension.
-            vim.api.nvim_del_keymap('n', '<Leader><Nop>')
         end,
     },
 }
