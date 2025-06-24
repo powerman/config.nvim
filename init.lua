@@ -43,13 +43,8 @@ vim.g.debug_lsp = vim.g.debug_lsp or false
 vim.g.project_root = vim.fs.root(0, '.git') or vim.fn.getcwd()
 
 -- Setup project-specific PATH.
-vim.g.project_bin = { '.buildcache/bin' }
-for _, bin_dir in ipairs(vim.g.project_bin) do
-    bin_dir = vim.fs.joinpath(vim.g.project_root, bin_dir)
-    if vim.fn.isdirectory(bin_dir) ~= 0 then
-        vim.env.PATH = bin_dir .. ':' .. vim.env.PATH
-    end
-end
+local project_bin_dirs = { '.buildcache/bin' }
+vim.env.PATH = require('custom.util').project_path(project_bin_dirs) .. vim.env.PATH
 
 -- Set to true if you agree to send your files to 3rd-party companies.
 vim.g.allow_remote_llm = (function()
