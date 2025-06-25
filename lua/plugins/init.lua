@@ -30,7 +30,19 @@ return {
                 },
             },
         },
-        config = true,
+        config = function(_, opts)
+            require('fidget').setup(opts)
+
+            local orig_notify = vim.notify
+            ---@diagnostic disable-next-line: duplicate-set-field
+            vim.notify = function(msg, ...)
+                -- This one happens all the time because in firejail `nvim --embed` has pid 10.
+                if msg == 'W325: Ignoring swapfile from Nvim process 10' then
+                    return
+                end
+                orig_notify(msg, ...)
+            end
+        end,
     },
     -- Configures LuaLS for editing your Neovim config and provides completion source.
     {
