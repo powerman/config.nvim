@@ -493,6 +493,17 @@ return {
             -- Fix default chat when opened from INSERT mode.
             local static_actions = require 'codecompanion.actions.static'
             static_actions[1].prompts.i = static_actions[1].prompts.n
+
+            vim.api.nvim_create_autocmd('WinLeave', {
+                desc = 'Reload buffers when leaving CodeCompanion Chat window',
+                pattern = '*',
+                group = vim.api.nvim_create_augroup('user.cc_checktime', { clear = true }),
+                callback = function()
+                    if vim.bo.filetype == 'codecompanion' then
+                        vim.cmd 'checktime'
+                    end
+                end,
+            })
         end,
     },
 }
