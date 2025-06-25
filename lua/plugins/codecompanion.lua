@@ -228,26 +228,6 @@ return {
                                 .. (adapter.model and ' (' .. adapter.model.name .. ')' or '')
                         end,
                     },
-                    tools = {
-                        groups = {
-                            dev = { -- full_stack_dev + mcp
-                                description = 'Real Developer - Can do everything a real dev can do',
-                                tools = {
-                                    'cmd_runner',
-                                    'create_file',
-                                    'file_search',
-                                    'grep_search',
-                                    'insert_edit_into_file',
-                                    -- 'read_file', -- Returned error confuses GPT-4.1.
-                                    'web_search',
-                                    -- 'mcp' -- This one will be added later, in config().
-                                },
-                                opts = {
-                                    collapse_tools = true,
-                                },
-                            },
-                        },
-                    },
                     keymaps = {
                         send = {
                             modes = { n = '<C-CR>', i = '<C-CR>' },
@@ -502,7 +482,6 @@ return {
             require('auto_approve').setup_codecompanion()
 
             local config = require 'codecompanion.config'
-            local tools = config.config.strategies.chat.tools
 
             -- Change this workflow to not touch vim.g.codecompanion_auto_tool_mode.
             local orig_mode = vim.g.codecompanion_auto_tool_mode
@@ -514,14 +493,6 @@ return {
             -- Fix default chat when opened from INSERT mode.
             local static_actions = require 'codecompanion.actions.static'
             static_actions[1].prompts.i = static_actions[1].prompts.n
-
-            -- To include @mcp in your own @dev group, it's not enough to just add a couple of
-            -- tools from the @mcp group. You also need to set the system_prompt, which can't
-            -- be done in opts — so we have to do it here.
-            for _, tool in ipairs(tools.groups.mcp.tools) do
-                table.insert(tools.groups.dev.tools, tool)
-            end
-            tools.groups.dev.system_prompt = tools.groups.mcp.system_prompt
         end,
     },
 }
