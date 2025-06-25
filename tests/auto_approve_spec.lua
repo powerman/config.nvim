@@ -23,6 +23,7 @@ describe('auto_approve', function()
                 mcphub_neovim = true,
                 mcphub_filesystem = true,
                 mcphub_git = true,
+                mcphub_shell = true,
             }, auto_approve.config)
         end)
 
@@ -46,6 +47,7 @@ describe('auto_approve', function()
                 mcphub_neovim = true,
                 mcphub_filesystem = true,
                 mcphub_git = true,
+                mcphub_shell = true,
             }, auto_approve.config)
         end)
     end)
@@ -345,6 +347,50 @@ describe('auto_approve', function()
                     params.tool_name = tool_name
                     local approved = auto_approve.mcphub(params)
                     assert.is_true(approved, 'Failed for ' .. tool_name)
+                end
+            end)
+        end)
+
+        describe('shell server', function()
+            it('auto-approves when enabled', function()
+                local params = {
+                    server_name = 'shell',
+                    tool_name = 'shell_exec',
+                    arguments = { command = 'ls' },
+                }
+
+                auto_approve.setup { mcphub_shell = true, allowed_cmds = { 'ls' } }
+                local approved = auto_approve.mcphub(params)
+                assert.is_true(approved)
+
+                auto_approve.setup { mcphub_shell = false, allowed_cmds = { 'ls' } }
+                approved = auto_approve.mcphub(params)
+                assert.is_nil(approved)
+            end)
+
+            it('checks allowed commands for shell operations', function()
+                auto_approve.setup { mcphub_shell = true, allowed_cmds = { 'ls' } }
+
+                local test_cases = {
+                    {
+                        name = 'allowed command',
+                        command = 'ls',
+                        expected = true,
+                    },
+                    {
+                        name = 'not allowed command',
+                        command = 'rm',
+                        expected = nil,
+                    },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local approved = auto_approve.mcphub {
+                        server_name = 'shell',
+                        tool_name = 'shell_exec',
+                        arguments = { command = tc.command },
+                    }
+                    assert.equal(tc.expected, approved, tc.name)
                 end
             end)
         end)

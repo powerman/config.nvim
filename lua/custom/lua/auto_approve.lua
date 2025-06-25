@@ -5,6 +5,7 @@
 ---@field mcphub_neovim? boolean If true then protect @mcp Neovim tools.
 ---@field mcphub_filesystem? boolean If true then protect @mcp filesystem tools.
 ---@field mcphub_git? boolean If true then protect @mcp git tools.
+---@field mcphub_shell? boolean If true then protect @mcp shell tools.
 local defaults = {
     allowed_cmds = nil,
     project_root = nil,
@@ -17,6 +18,7 @@ local defaults = {
     mcphub_neovim = true,
     mcphub_filesystem = true,
     mcphub_git = true,
+    mcphub_shell = true,
 }
 
 local M = {
@@ -115,6 +117,9 @@ end
 -- Auto-approve file operations only in project dir (current git repo or cwd).
 -- Supported MCP servers:
 --  - Neovim
+--  - Filesystem
+--  - Git
+--  - Shell
 ---@module 'mcphub'
 ---@param params MCPHub.ParsedParams
 ---@return boolean | nil | string auto_approve Nil same as false, string to deny with error.
@@ -166,6 +171,10 @@ function M.mcphub(params)
         end
     elseif params.server_name == 'git' and M.config.mcphub_git then
         auto_approve = is_project_path(params.arguments.repo_path)
+    elseif params.server_name == 'shell' and M.config.mcphub_shell then
+        if params.tool_name == 'shell_exec' then
+            auto_approve = is_cmd_allowed(params.arguments.command)
+        end
     end
 
     if auto_approve then
