@@ -3,6 +3,8 @@
 ---@field project_root? string Allow file operations in this directory and below.
 ---@field codecompanion? table<string,boolean> Code Companion tools to protect (when true).
 ---@field mcphub_neovim? boolean If true then protect @mcp Neovim tools.
+---@field mcphub_filesystem? boolean If true then protect @mcp filesystem tools.
+---@field mcphub_git? boolean If true then protect @mcp git tools.
 local defaults = {
     allowed_cmds = nil,
     project_root = nil,
@@ -13,6 +15,8 @@ local defaults = {
         read_file = true,
     },
     mcphub_neovim = true,
+    mcphub_filesystem = true,
+    mcphub_git = true,
 }
 
 local M = {
@@ -111,6 +115,7 @@ end
 -- Auto-approve file operations only in project dir (current git repo or cwd).
 -- Supported MCP servers:
 --  - Neovim
+---@module 'mcphub'
 ---@param params MCPHub.ParsedParams
 ---@return boolean | nil | string auto_approve Nil same as false, string to deny with error.
 function M.mcphub(params)
@@ -119,9 +124,9 @@ function M.mcphub(params)
         return true -- Auto approve when CodeCompanion auto-tool mode is on.
     end
 
-    if params.server_name == 'neovim' and M.config.mcphub_neovim then
-        local auto_approve = false
+    local auto_approve = false
 
+    if params.server_name == 'neovim' and M.config.mcphub_neovim then
         if params.tool_name == 'execute_command' then
             auto_approve = is_project_path(params.arguments.cwd)
                 and is_cmd_allowed(params.arguments.command)
@@ -139,12 +144,33 @@ function M.mcphub(params)
                 auto_approve = auto_approve and is_project_path(params.arguments.new_path)
             end
         end
-
-        if auto_approve then
-            return true
+    elseif params.server_name == 'filesystem' and M.config.mcphub_filesystem then
+        if params.tool_name == 'move_file' then
+            auto_approve = is_project_path(params.arguments.source)
+                and is_project_path(params.arguments.destination)
+        elseif params.tool_name == 'read_multiple_files' then
+            auto_approve = vim.iter(params.arguments.paths):fold(true, function(acc, path)
+                return acc and is_project_path(path)
+            end)
+        elseif
+            params.tool_name == 'create_directory'
+            or params.tool_name == 'directory_tree'
+            or params.tool_name == 'edit_file'
+            or params.tool_name == 'get_file_info'
+            or params.tool_name == 'list_directory'
+            or params.tool_name == 'read_file'
+            or params.tool_name == 'search_files'
+            or params.tool_name == 'write_file'
+        then
+            auto_approve = is_project_path(params.arguments.path)
         end
+    elseif params.server_name == 'git' and M.config.mcphub_git then
+        auto_approve = is_project_path(params.arguments.repo_path)
     end
 
+    if auto_approve then
+        return true
+    end
     return params.is_auto_approved_in_server -- Respect servers.json configuration.
 end
 

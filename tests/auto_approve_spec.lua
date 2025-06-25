@@ -21,6 +21,8 @@ describe('auto_approve', function()
                     read_file = true,
                 },
                 mcphub_neovim = true,
+                mcphub_filesystem = true,
+                mcphub_git = true,
             }, auto_approve.config)
         end)
 
@@ -42,6 +44,8 @@ describe('auto_approve', function()
                     read_file = true,
                 },
                 mcphub_neovim = true,
+                mcphub_filesystem = true,
+                mcphub_git = true,
             }, auto_approve.config)
         end)
     end)
@@ -200,6 +204,149 @@ describe('auto_approve', function()
                 local approved = auto_approve.mcphub(args)
                 assert.equal(tc.expected, approved)
             end
+        end)
+
+        describe('filesystem server', function()
+            it('auto-approves when enabled', function()
+                local params = {
+                    server_name = 'filesystem',
+                    tool_name = 'read_file',
+                    arguments = { path = project_root .. '/file.txt' },
+                }
+
+                auto_approve.setup { mcphub_filesystem = true, project_root = project_root }
+                local approved = auto_approve.mcphub(params)
+                assert.is_true(approved)
+
+                auto_approve.setup { mcphub_filesystem = false, project_root = project_root }
+                approved = auto_approve.mcphub(params)
+                assert.is_nil(approved)
+            end)
+
+            it('checks paths for read_multiple_files', function()
+                auto_approve.setup { mcphub_filesystem = true, project_root = project_root }
+
+                local params = {
+                    server_name = 'filesystem',
+                    tool_name = 'read_multiple_files',
+                    arguments = {
+                        paths = {
+                            project_root .. '/file1.txt',
+                            project_root .. '/file2.txt',
+                        },
+                    },
+                }
+                local approved = auto_approve.mcphub(params)
+                assert.is_true(approved)
+
+                params.arguments.paths[2] = '/tmp/file2.txt'
+                approved = auto_approve.mcphub(params)
+                assert.is_nil(approved)
+            end)
+
+            it('checks paths for move_file', function()
+                auto_approve.setup { mcphub_filesystem = true, project_root = project_root }
+
+                local test_cases = {
+                    {
+                        name = 'both paths in project root',
+                        source = project_root .. '/source.txt',
+                        destination = project_root .. '/dest.txt',
+                        expected = true,
+                    },
+                    {
+                        name = 'source outside project root',
+                        source = '/tmp/source.txt',
+                        destination = project_root .. '/dest.txt',
+                        expected = nil,
+                    },
+                    {
+                        name = 'destination outside project root',
+                        source = project_root .. '/source.txt',
+                        destination = '/tmp/dest.txt',
+                        expected = nil,
+                    },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local approved = auto_approve.mcphub {
+                        server_name = 'filesystem',
+                        tool_name = 'move_file',
+                        arguments = {
+                            source = tc.source,
+                            destination = tc.destination,
+                        },
+                    }
+                    assert.equal(tc.expected, approved, tc.name)
+                end
+            end)
+        end)
+
+        describe('git server', function()
+            it('auto-approves when enabled', function()
+                local params = {
+                    server_name = 'git',
+                    tool_name = 'git_status',
+                    arguments = { repo_path = project_root },
+                }
+
+                auto_approve.setup { mcphub_git = true, project_root = project_root }
+                local approved = auto_approve.mcphub(params)
+                assert.is_true(approved)
+
+                auto_approve.setup { mcphub_git = false, project_root = project_root }
+                approved = auto_approve.mcphub(params)
+                assert.is_nil(approved)
+            end)
+
+            it('checks repo_path for git operations', function()
+                auto_approve.setup { mcphub_git = true, project_root = project_root }
+
+                local test_cases = {
+                    {
+                        name = 'repo inside project root',
+                        repo_path = project_root,
+                        expected = true,
+                    },
+                    {
+                        name = 'repo outside project root',
+                        repo_path = '/tmp/repo',
+                        expected = nil,
+                    },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local approved = auto_approve.mcphub {
+                        server_name = 'git',
+                        tool_name = 'git_status',
+                        arguments = { repo_path = tc.repo_path },
+                    }
+                    assert.equal(tc.expected, approved, tc.name)
+                end
+            end)
+
+            it('checks repo_path for all git operations', function()
+                auto_approve.setup { mcphub_git = true, project_root = project_root }
+
+                local git_tools = {
+                    'git_status',
+                    'git_diff_unstaged',
+                    'git_diff_staged',
+                    'git_diff',
+                    'git_log',
+                    'git_show',
+                }
+
+                local params = {
+                    server_name = 'git',
+                    arguments = { repo_path = project_root },
+                }
+                for _, tool_name in ipairs(git_tools) do
+                    params.tool_name = tool_name
+                    local approved = auto_approve.mcphub(params)
+                    assert.is_true(approved, 'Failed for ' .. tool_name)
+                end
+            end)
         end)
     end)
 end)
