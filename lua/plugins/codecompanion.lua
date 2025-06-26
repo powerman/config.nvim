@@ -271,6 +271,9 @@ return {
                         goto_file_under_cursor = {
                             modes = { n = 'gf' },
                         },
+                        copilot_stats = {
+                            modes = { n = '<Leader>cS' },
+                        },
                     },
                 },
             },
