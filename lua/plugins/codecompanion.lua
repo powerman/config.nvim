@@ -146,7 +146,6 @@ return {
     {
         'olimorris/codecompanion.nvim',
         version = '*',
-        cond = vim.g.allow_remote_llm,
         cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionActions' },
         keys = {
             {
@@ -442,6 +441,9 @@ return {
                 ['Free Chat (GPT-4.1)'] = {
                     strategy = 'chat',
                     description = 'Create a new chat buffer to converse with an LLM for free',
+                    condition = function()
+                        return vim.g.allow_remote_llm
+                    end,
                     opts = {
                         index = 6,
                         stop_context_insertion = true,
@@ -485,6 +487,64 @@ return {
             require('auto_approve').setup_codecompanion()
 
             local config = require 'codecompanion.config'
+
+            if not vim.g.allow_remote_llm then
+                -- Forbid loading remote LLM adapters.
+                local orig_require = require
+                require = function(name)
+                    if
+                        name:match '^codecompanion.adapters.'
+                        and not name:match '^codecompanion.adapters.ollama'
+                        and name ~= 'codecompanion.adapters.jina' -- Non-LLM adapter.
+                        and name ~= 'codecompanion.adapters.tavily' -- Non-LLM adapter.
+                    then
+                        local info = debug.getinfo(2, 'S')
+                        if not (info and info.source:match 'ollama') then -- ollama loads openai.
+                            vim.print('Loading remote LLM adapters is forbidden: ' .. name)
+                            return nil
+                        end
+                    end
+                    return orig_require(name)
+                end
+
+                -- Remove all non-ollama adapters.
+                for key, adapter in pairs(config.config.adapters) do
+                    if key == 'opts' or key == 'jina' or key == 'tavily' then -- Skip non-LLMs.
+                        goto continue
+                    end
+
+                    if type(adapter) == 'function' then
+                        adapter = adapter()
+                    end
+                    if type(adapter) == 'table' then
+                        adapter = adapter.name
+                    end
+                    if type(adapter) ~= 'string' or adapter ~= 'ollama' then
+                        config.config.adapters[key] = nil
+                    end
+
+                    ::continue::
+                end
+
+                -- Use ollama as the default adapter for all strategies.
+                config.config.strategies.chat.adapter = 'ollama'
+                config.config.strategies.inline.adapter = 'ollama'
+                config.config.strategies.cmd.adapter = 'ollama'
+                config.config.extensions.history.opts.title_generation_opts.adapter = 'ollama'
+
+                -- Use ollama as the default adapter for all prompts.
+                for _, prompt in pairs(config.config.prompt_library) do
+                    if type(prompt) == 'table' and prompt.opts and prompt.opts.adapter then
+                        local adapter = prompt.opts.adapter
+                        if
+                            not (type(adapter) == 'string' and adapter:find 'ollama')
+                            and not (type(adapter) == 'table' and adapter.name:find 'ollama')
+                        then
+                            prompt.opts.adapter = 'ollama'
+                        end
+                    end
+                end
+            end
 
             -- Change this workflow to not touch vim.g.codecompanion_auto_tool_mode.
             local orig_mode = vim.g.codecompanion_auto_tool_mode
