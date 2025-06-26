@@ -507,6 +507,21 @@ return {
                     end
                 end,
             })
+
+            -- Use select_tab action in slash commands.
+            local Telescope = require 'codecompanion.providers.slash_commands.telescope'
+            local orig_display = Telescope.display
+            function Telescope:display()
+                local f = orig_display(self)
+                return function()
+                    local actions = require 'telescope.actions'
+                    local orig_select_default = actions.select_default
+                    actions.select_default = actions.select_tab
+                    local res = f()
+                    actions.select_default = orig_select_default
+                    return res
+                end
+            end
         end,
     },
 }
