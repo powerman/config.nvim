@@ -5,11 +5,12 @@
 This is my Neovim config.
 
 > [!NOTE]
+>
 > It was started as a fork of
-> [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim) and I
-> highly recommend it if you like to create your own config yourself (like I did). I do not
-> support this config on Windows, but it might work - check that kickstart repo for
-> Windows-specific install instructions.
+> [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim),
+> and I highly recommend it if you like to create your own config yourself (like I did).
+> I do not support this config on Windows, but it might work -
+> check the kickstart repo for Windows-specific installation instructions.
 
 ## Installation
 
@@ -50,12 +51,14 @@ so that you have your own copy that you can modify, then install by cloning the
 fork to your machine using one of the commands below, depending on your OS.
 
 > [!NOTE]
+>
 > Your fork's URL will be something like this:
 > `https://github.com/<your_github_username>/config.nvim.git`
 
 #### Clone config.nvim
 
 > [!NOTE]
+>
 > If following the recommended step above (i.e., forking the repo), replace
 > `powerman` with `<your_github_username>` in the commands below
 
