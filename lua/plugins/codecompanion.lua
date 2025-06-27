@@ -352,6 +352,29 @@ return {
                         },
                     })
                 end,
+                ollama_qwen_3_inline = function()
+                    return require('codecompanion.adapters').extend('ollama', {
+                        handlers = {
+                            inline_output = function(...)
+                                local openai = require 'codecompanion.adapters.openai'
+                                local res = openai.handlers.inline_output(...)
+                                if res and res.output then
+                                    res.output = res.output:gsub('<think>.-</think>', '', 1)
+                                end
+                                return res
+                            end,
+                        },
+                        schema = {
+                            model = {
+                                default = 'qwen3:8b',
+                                choices = {},
+                            },
+                            num_ctx = {
+                                default = 40960,
+                            },
+                        },
+                    })
+                end,
                 ollama_qwen_3 = function()
                     return require('codecompanion.adapters').extend('ollama', {
                         schema = {
@@ -498,17 +521,7 @@ return {
                     description = 'Improve grammar in the selected text',
                     opts = {
                         index = 100,
-                        adapter = {
-                            -- name = 'copilot',
-                            -- model = 'gpt-4.1', -- Multiplier = 0 (free).
-                            name = 'ollama',
-                            model = 'qwen3:8b',
-                            -- model = 'llama3.1:8b',
-                            -- model = 'qwen2.5-coder:14b',
-                            -- model = 'qwen2.5-coder:7b',
-                            -- model = 'gemma3n:e4b',
-                            -- model = 'llama2:7b',
-                        },
+                        adapter = 'ollama_qwen_3_inline',
                         modes = { 'v' },
                         short_name = 'grammar',
                         user_prompt = false,
@@ -522,7 +535,7 @@ return {
 <prompt>
 Your task is to take the text I have selected in the buffer
 and rewrite it into a clear, grammatically correct version
-while preserving the original language, meaning and the tone as closely as possible.
+while preserving the original language, meaning and tone as closely as possible.
 Correct any spelling mistakes, punctuation errors, verb tense issues, word choice problems,
 and other grammatical mistakes.
 
@@ -532,25 +545,23 @@ If the selected text contains both code and comments, do not change the code.
 Include code in your response as-is and make your changes only within comments.
 
 If the selected text is in Markdown format:
-- DO NOT add, change or delete the Markdown structure (headers, lists, tables, blockquotes).
+- Do NOT add, change or delete the Markdown structure (headers, lists, tables, blockquotes).
+- Do NOT change inline code blocks (e.g. `code`).
 - You may improve inline formatting (e.g. bold/italic) only if relevant to your corrections.
 
 **IMPORTANT CONSTRAINTS**:
 - You must preserve the original formatting, indentation, line breaks, block/line comment markers.
 - You must try hard to avoid too long (above 100 characters) lines:
-  break them into multiple lines if needed.
+  use more concise sentences or break them into multiple lines.
 - You must return only a raw JSON object, strictly following this schema:
 
-{
-  "code": "<corrected_text_here>",
-  "language": "<filetype_here>"
-}
+    {
+      "code": "<corrected_text_here>",
+      "language": "<filetype_here>"
+    }
 
-- Do NOT include any additional content outside this JSON object.
 - Do NOT include triple backticks or any Markdown formatting unless it is a part of selected text.
 - Do NOT include any explanations, justifications, or reasoning.
-- Do NOT use tags like <think>, <response>, or anything similar.
-- Do NOT write in natural language outside the JSON. Only JSON output is allowed.
 - If the selected text is already correct, return it **unchanged** in the "code" field.
 
 Violation of these constraints will be treated as incorrect output.
