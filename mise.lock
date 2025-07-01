@@ -6,11 +6,11 @@ backend = "aqua:rhysd/actionlint"
 "actionlint_1.7.7_linux_amd64.tar.gz" = "sha256:023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757"
 
 [tools.ast-grep]
-version = "0.38.5"
+version = "0.38.6"
 backend = "aqua:ast-grep/ast-grep"
 
 [tools.ast-grep.checksums]
-"app-x86_64-unknown-linux-gnu.zip" = "sha256:340a8dde2638648055100ea87442f42d5260d9dc24f06dbfba83bbe0c4932c5c"
+"app-x86_64-unknown-linux-gnu.zip" = "sha256:174e93eb29efef15091ecff34aaaf602c7c1c1f2a89a54f8dec6ecde31527d7a"
 
 [tools.neovim]
 version = "0.11.2"
