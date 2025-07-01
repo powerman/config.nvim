@@ -532,7 +532,9 @@ return {
                     description = 'Improve grammar in the selected text',
                     opts = {
                         index = 100,
-                        adapter = 'ollama_qwen_3_inline',
+                        adapter = {
+                            name = 'ollama_qwen_3_inline',
+                        },
                         modes = { 'v' },
                         short_name = 'grammar',
                         user_prompt = false,
