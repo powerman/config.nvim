@@ -330,7 +330,14 @@ return {
                         keymap = false, -- Use Action Palette to open.
                         save_chat_keymap = false, -- Use autosave.
                         expiration_days = 30,
-                        auto_generate_title = true,
+                        --- Title generation is troublesome with Ollama models:
+                        ---   - Ollama is slow, this will slow down the beginning of each chat.
+                        ---   - Using a concrete model will slow down things even more
+                        ---     because it will unload other model chosen by the user.
+                        ---   - Using default model will not work with qwen3 without hiding
+                        ---     thinking tags, but there is no way to ensure hiding.
+                        --- So, use it only with remote LLMs.
+                        auto_generate_title = vim.g.allow_remote_llm,
                         title_generation_opts = {
                             -- This one is free on my Copilot Pro plan.
                             adapter = 'copilot',
@@ -653,7 +660,6 @@ Violation of these constraints will be treated as incorrect output.
                 config.config.strategies.chat.adapter = 'ollama'
                 config.config.strategies.inline.adapter = 'ollama'
                 config.config.strategies.cmd.adapter = 'ollama'
-                config.config.extensions.history.opts.title_generation_opts.adapter = 'ollama'
 
                 -- Use ollama as the default adapter for all prompts.
                 for _, prompt in pairs(config.config.prompt_library) do
