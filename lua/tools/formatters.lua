@@ -38,7 +38,9 @@ return {
     -- markdown = { 'markdownlint', 'injected' },
     -- markdown = { 'markdownlint-cli2', 'injected' },
     -- markdown = { 'mdformat', 'injected' }, -- With plugins almost as good as dprint.
-    markdown = { 'prettierd', 'injected' }, -- Best support for Obsidian!
+    -- markdown = { 'prettierd', 'injected' }, -- Best support for Obsidian!
+    -- Avoid prettierd because of https://github.com/fsouza/prettierd/issues/872.
+    markdown = { 'prettier', 'injected' }, -- Best support for Obsidian!
     nginx = { 'prettierd_nginx' }, -- Require `npm i prettier-plugin-nginx` plus config.
     proto = { 'buf' },
     scss = { 'prettierd' },

@@ -76,7 +76,8 @@ return {
                         return
                     end
                 end
-                return { timeout_ms = 500, lsp_format = 'fallback' }
+                -- Have to use timeout greater than 500 because prettier is slow.
+                return { timeout_ms = 700, lsp_format = 'fallback' }
             end,
             -- INFO: After installing these 3rd-party tools do not forget to setup them!
             -- - Globally:
