@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
 describe('auto_approve', function()
-    local auto_approve = require 'auto_approve'
+    local auto_approve = require 'custom.codecompanion.auto_approve'
     local project_root = vim.fn.tempname()
     vim.fn.mkdir(project_root, 'p')
 

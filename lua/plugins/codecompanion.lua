@@ -63,9 +63,10 @@ end
 ---@type LazySpec
 return {
     {
-        'auto_approve',
-        dir = '~/.config/nvim/lua/custom',
+        'custom.codecompanion.auto_approve',
+        dir = '~/.config/nvim/lua',
         lazy = true, -- Will be loaded as a dependency of other plugins.
+        main = 'custom.codecompanion.auto_approve',
         opts = {
             project_root = vim.g.project_root,
             allowed_cmds = vim.g.llm_allowed_cmds or {},
@@ -150,13 +151,13 @@ return {
         cmd = 'MCPHub',
         dependencies = {
             'nvim-lua/plenary.nvim',
-            'auto_approve',
+            'custom.codecompanion.auto_approve',
         },
         -- build = 'npm install -g mcp-hub@latest', -- Binary `mcp-hub` is installed by Mise.
         config = function()
             ---@diagnostic disable-next-line: missing-fields
             require('mcphub').setup {
-                auto_approve = require('auto_approve').mcphub,
+                auto_approve = require('custom.codecompanion.auto_approve').mcphub,
             }
         end,
     },
@@ -182,7 +183,7 @@ return {
             'nvim-lua/plenary.nvim',
             'nvim-treesitter/nvim-treesitter',
             -- Optional:
-            'auto_approve',
+            'custom.codecompanion.auto_approve',
             'ravitemer/codecompanion-history.nvim', -- Save and load conversation history.
             'ravitemer/mcphub.nvim', -- Manage MCP servers.
             'j-hui/fidget.nvim', -- Display status.
@@ -679,7 +680,7 @@ Respond with the translated text only, without any additional explanations or co
         },
         config = function(_, opts)
             require('codecompanion').setup(opts)
-            require('auto_approve').setup_codecompanion()
+            require('custom.codecompanion.auto_approve').setup_codecompanion()
 
             local config = require 'codecompanion.config'
 
