@@ -358,6 +358,7 @@ return {
                 },
             },
             adapters = {
+                -- Set default model for Ollama.
                 ollama = function()
                     return require('codecompanion.adapters').extend('ollama', {
                         schema = {
@@ -370,18 +371,12 @@ return {
                         },
                     })
                 end,
-                ollama_qwen_3_inline = function()
+                -- Strip thinking tags from qwen3 responses.
+                ollama_qwen_3_hide_thinking = function()
+                    ---@alias thinkState ''|'thinking'|'done' Thinking state of streamed response.
+                    ---@type thinkState
+                    local think = ''
                     return require('codecompanion.adapters').extend('ollama', {
-                        handlers = {
-                            inline_output = function(...)
-                                local openai = require 'codecompanion.adapters.openai'
-                                local res = openai.handlers.inline_output(...)
-                                if res and res.output then
-                                    res.output = res.output:gsub('<think>.-</think>', '', 1)
-                                end
-                                return res
-                            end,
-                        },
                         schema = {
                             model = {
                                 default = 'qwen3:8b',
@@ -390,6 +385,37 @@ return {
                             num_ctx = {
                                 default = 40960,
                             },
+                        },
+                        handlers = {
+                            inline_output = function(self, data, context)
+                                local openai = require 'codecompanion.adapters.openai'
+                                local res = openai.handlers.inline_output(self, data, context)
+                                if res and res.output then
+                                    res.output = res.output:gsub('<think>.-</think>', '', 1)
+                                end
+                                return res
+                            end,
+                            chat_output = function(self, data, tools)
+                                local openai = require 'codecompanion.adapters.openai'
+                                local res = openai.handlers.chat_output(self, data, tools)
+                                if res and res.output then
+                                    if res.output.content:match '<think>' then
+                                        think = 'thinking'
+                                    end
+                                    if res.output.content:match '</think>' then
+                                        think = 'done'
+                                        res.output.content =
+                                            res.output.content:gsub('^.-</think>%s*', '', 1)
+                                    end
+                                    if think == 'done' and res.output.content:match '%S' then
+                                        think = ''
+                                    end
+                                    if think ~= '' then
+                                        return nil
+                                    end
+                                end
+                                return res
+                            end,
                         },
                     })
                 end,
@@ -540,7 +566,7 @@ return {
                     opts = {
                         index = 100,
                         adapter = {
-                            name = 'ollama_qwen_3_inline',
+                            name = 'ollama_qwen_3_hide_thinking',
                         },
                         modes = { 'v' },
                         short_name = 'grammar',
@@ -606,6 +632,45 @@ Violation of these constraints will be treated as incorrect output.
                         },
                     },
                 },
+                ['Translate [екфты]'] = {
+                    strategy = 'chat',
+                    description = 'Translate text into another language',
+                    opts = {
+                        index = 200,
+                        adapter = {
+                            name = 'ollama_qwen_3_hide_thinking',
+                        },
+                        is_slash_cmd = false,
+                        modes = { 'i', 'n', 'v' },
+                        short_name = 'translate',
+                        auto_submit = false,
+                        ignore_system_prompt = true,
+                        stop_context_insertion = false,
+                        -- user_prompt = false,
+                    },
+                    prompts = {
+                        {
+                            role = const.SYSTEM_ROLE,
+                            content = [[
+You are a highly skilled translator with expertise in many languages.
+Your task is to identify the language of the text I provide and accurately translate it into
+the specified target language while preserving the meaning, tone, and nuance of the original text.
+Please maintain proper grammar, spelling, and punctuation in the translated version.
+
+If text language is English, then translate it into Russian, otherwise translate it into English.
+
+The text I provide may contain code snippets, Markdown formatting, or other special elements -
+do not translate them but preserve them as-is in the translated text.
+
+Respond with the translated text only, without any additional explanations or comments.
+                            ]],
+                        },
+                        {
+                            role = const.USER_ROLE,
+                            content = '',
+                        },
+                    },
+                },
             },
             opts = {
                 language = 'Russian', -- The language used for LLM responses.
@@ -629,7 +694,13 @@ Violation of these constraints will be treated as incorrect output.
                         and name ~= 'codecompanion.adapters.tavily' -- Non-LLM adapter.
                     then
                         local info = debug.getinfo(2, 'S')
-                        if not (info and info.source:match 'ollama') then -- ollama loads openai.
+                        if
+                            not info
+                            or not (
+                                info.source:match 'ollama' -- ollama adapter loads openai.
+                                or info.source:match 'plugins/codecompanion' -- this file.
+                            )
+                        then
                             vim.print('Loading remote LLM adapters is forbidden: ' .. name)
                             return nil
                         end
