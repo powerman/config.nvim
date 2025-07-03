@@ -28,7 +28,7 @@ local const = {
 }
 
 local function chat_filter(chat_data)
-    return chat_data.project_root == vim.g.project_root
+    return vim.g.project_root == chat_data.project_root or vim.g.project_root == chat_data.cwd
 end
 
 local function send_code(context)
