@@ -1,5 +1,6 @@
 ---@class AutoApproveConfig
 ---@field allowed_cmds? string[] Allowed commands for cmd_runner and mcp execute_command.
+---@field secret_files? string[] List of files (in glob format) that should not be sent to LLM.
 ---@field project_root? string Allow file operations in this directory and below.
 ---@field codecompanion? table<string,boolean> Code Companion tools to protect (when true).
 ---@field mcphub_neovim? boolean If true then protect @mcp Neovim tools.
@@ -8,6 +9,10 @@
 ---@field mcphub_shell? boolean If true then protect @mcp shell tools.
 local defaults = {
     allowed_cmds = nil,
+    secret_files = {
+        '.env*',
+        'env*.sh',
+    },
     project_root = nil,
     codecompanion = {
         cmd_runner = true,
@@ -106,11 +111,23 @@ local function is_project_path(filepath)
     return abs_path == project_dir or vim.startswith(abs_path, project_dir .. '/')
 end
 
--- Auto-approve file operations only in project dir (current git repo or cwd).
+local function is_secret_file(filepath)
+    local filename = vim.fn.fnamemodify(filepath, ':t')
+    for _, glob in ipairs(M.config.secret_files or {}) do
+        local regex = vim.fn.glob2regpat(glob)
+        if vim.fn.match(filename, regex) ~= -1 then
+            return true
+        end
+    end
+    return false
+end
+
+-- Auto-approve file operations only in project dir (current git repo or cwd)
+-- excluding secret files.
 ---@param tool CodeCompanion.Agent.Tool
 ---@return boolean requires_approval
 function M.filepath(tool, _)
-    return not is_project_path(tool.args.filepath)
+    return not is_project_path(tool.args.filepath) or is_secret_file(tool.args.filepath)
 end
 
 -- Auto-approve command execution using whitelist.

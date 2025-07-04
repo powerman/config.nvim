@@ -68,8 +68,9 @@ return {
         lazy = true, -- Will be loaded as a dependency of other plugins.
         main = 'custom.codecompanion.auto_approve',
         opts = {
-            project_root = vim.g.project_root,
             allowed_cmds = vim.g.llm_allowed_cmds or {},
+            secret_files = vim.g.llm_secret_files,
+            project_root = vim.g.project_root,
         },
     },
     -- Use mini.diff for a cleaner diff when using the inline assistant or

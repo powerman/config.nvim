@@ -66,6 +66,13 @@ vim.g.allow_remote_llm = (function()
     return false
 end)()
 
+-- List of files (in glob format) that should not be sent to LLM.
+vim.g.llm_secret_files = {
+    '.env*',
+    'env*.sh',
+    '.secret.sh',
+}
+
 -- List of shell commands allowed to LLM without manual approve.
 vim.g.llm_allowed_cmds = {
     'make test',

@@ -13,6 +13,10 @@ describe('auto_approve', function()
         it('uses default config when no options provided', function()
             assert.same({
                 allowed_cmds = nil,
+                secret_files = {
+                    '.env*',
+                    'env*.sh',
+                },
                 project_root = nil,
                 codecompanion = {
                     cmd_runner = true,
@@ -37,6 +41,10 @@ describe('auto_approve', function()
             }
             assert.same({
                 allowed_cmds = { 'ls' },
+                secret_files = {
+                    '.env*',
+                    'env*.sh',
+                },
                 project_root = '/tmp',
                 codecompanion = {
                     cmd_runner = false,
@@ -67,25 +75,104 @@ describe('auto_approve', function()
     end)
 
     describe('filepath', function()
-        it('requires approval for paths outside project root', function()
-            auto_approve.setup { project_root = project_root }
-            local requires_approval =
-                auto_approve.filepath { args = { filepath = '/tmp/other/file.txt' } }
-            assert.is_true(requires_approval)
+        describe('project root checks', function()
+            it('requires approval for paths outside project root', function()
+                auto_approve.setup { project_root = project_root }
+                local requires_approval =
+                    auto_approve.filepath { args = { filepath = '/tmp/other/file.txt' } }
+                assert.is_true(requires_approval)
+            end)
+
+            it('auto-approves paths inside project root', function()
+                auto_approve.setup { project_root = project_root }
+                local requires_approval =
+                    auto_approve.filepath { args = { filepath = project_root .. '/file.txt' } }
+                assert.is_false(requires_approval)
+            end)
+
+            it('requires approval when project_root is not set', function()
+                auto_approve.setup { project_root = nil }
+                local requires_approval =
+                    auto_approve.filepath { args = { filepath = '/any/path' } }
+                assert.is_true(requires_approval)
+            end)
         end)
 
-        it('auto-approves paths inside project root', function()
-            auto_approve.setup { project_root = project_root }
-            local requires_approval =
-                auto_approve.filepath { args = { filepath = project_root .. '/file.txt' } }
-            assert.is_false(requires_approval)
-        end)
+        describe('secret files checks', function()
+            it('requires approval for secret files with default patterns', function()
+                auto_approve.setup { project_root = project_root }
+                local test_cases = {
+                    { filepath = project_root .. '/.env', expected = true },
+                    { filepath = project_root .. '/.env.local', expected = true },
+                    { filepath = project_root .. '/env.sh', expected = true },
+                    { filepath = project_root .. '/env-prod.sh', expected = true },
+                    { filepath = project_root .. '/regular-file.txt', expected = false },
+                }
 
-        it('requires approval when project_root is not set', function()
-            auto_approve.setup { project_root = nil }
-            local requires_approval =
-                auto_approve.filepath { args = { filepath = '/any/path' } }
-            assert.is_true(requires_approval)
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.filepath { args = { filepath = tc.filepath } }
+                    assert.equal(
+                        tc.expected,
+                        requires_approval,
+                        'Failed for file: ' .. tc.filepath
+                    )
+                end
+            end)
+
+            it('respects custom secret_files patterns', function()
+                auto_approve.setup {
+                    project_root = project_root,
+                    secret_files = {
+                        '*.key',
+                        'credentials.json',
+                    },
+                }
+
+                local test_cases = {
+                    { filepath = project_root .. '/config.key', expected = true },
+                    { filepath = project_root .. '/credentials.json', expected = true },
+                    { filepath = project_root .. '/.env', expected = false },
+                    { filepath = project_root .. '/regular-file.txt', expected = false },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.filepath { args = { filepath = tc.filepath } }
+                    assert.equal(
+                        tc.expected,
+                        requires_approval,
+                        'Failed for file: ' .. tc.filepath
+                    )
+                end
+            end)
+
+            it('works with empty secret_files list', function()
+                auto_approve.setup {
+                    project_root = project_root,
+                    secret_files = {},
+                }
+
+                local requires_approval = auto_approve.filepath {
+                    args = { filepath = project_root .. '/.env' },
+                }
+                assert.is_false(requires_approval)
+            end)
+
+            it('uses default secret_files when nil', function()
+                auto_approve.setup {
+                    project_root = project_root,
+                    secret_files = nil,
+                }
+
+                local requires_approval = auto_approve.filepath {
+                    args = { filepath = project_root .. '/.env' },
+                }
+                assert.is_true(
+                    requires_approval,
+                    'Should block .env file using default patterns'
+                )
+            end)
         end)
     end)
 
