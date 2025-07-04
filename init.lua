@@ -47,24 +47,8 @@ local project_bin_dirs = { '.buildcache/bin' }
 vim.env.PATH = require('custom.util').project_path(project_bin_dirs) .. vim.env.PATH
 
 -- Set to true if you agree to send your files to 3rd-party companies.
-vim.g.allow_remote_llm = (function()
-    -- Neovim is running under firejail in these dirs, so it's safe to use LLM.
-    local base_dirs = {
-        vim.env.HOME .. '/proj',
-        vim.env.HOME .. '/fork',
-        vim.env.HOME .. '/work',
-        vim.env.HOME .. '/.config/nvim',
-        vim.env.HOME .. '/.local/share/nvim/lazy',
-        vim.env.HOME .. '/.zsh',
-    }
-    local cwd = vim.fn.getcwd()
-    for _, base in ipairs(base_dirs) do
-        if cwd == base or cwd:sub(1, #base + 1) == base .. '/' then
-            return true
-        end
-    end
-    return false
-end)()
+vim.g.allow_remote_llm = vim.fn.filereadable '/proc/1/comm' == 1
+    and vim.fn.readfile('/proc/1/comm')[1] == 'firejail'
 
 -- List of files (in glob format) that should not be sent to LLM.
 vim.g.llm_secret_files = {
