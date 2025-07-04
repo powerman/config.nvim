@@ -30,7 +30,7 @@ External Requirements:
 - You might need some extra tool (e.g. `npm`) used by Mason to auto-install formatter/LSP tools.
 - A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons.
   - If you have it set `vim.g.have_nerd_font` in `init.lua` to true.
-  - If you chose "Mono" font kind set `vim.g.mono_nerd_font` in `init.lua` to true.
+  - If you chose "Propo" font kind set `vim.g.nerd_font_propo` in `init.lua` to true.
 
 ### Install Config
 

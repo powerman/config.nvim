@@ -19,8 +19,8 @@ vim.g.auto_open_diagnostic = false
 -- Set to true if you have a Nerd Font installed and selected in the terminal.
 vim.g.have_nerd_font = true
 
--- Set to true if you use a Nerd Font with "Mono" suffix in font name (small icons).
-vim.g.mono_nerd_font = false
+-- Set to true if you use a Nerd Font with "Propo" suffix in font name (wide icons).
+vim.g.nerd_font_propo = true
 
 -- Border for floating windows.
 -- See allowed values in `:h nvim_open_win()`.

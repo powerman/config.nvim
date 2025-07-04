@@ -47,6 +47,8 @@ return {
         opts = {
             signs = false,
             -- Removed space after doublewidth icons to fix "Vim:E239: Invalid sign text".
+            -- XXX: Unable to use util.adapt_nerd_font_propo() because of no access to defaults.
+            --
             -- Replaced TEST icon because original one is missing from my fonts.
             keywords = {
                 FIX = { icon = '' },

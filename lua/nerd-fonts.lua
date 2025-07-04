@@ -2,8 +2,8 @@
 --
 --  See https://www.nerdfonts.com/.
 
--- Fix icon width for Nerd Fonts v3 (non-Mono variant).
-if not vim.g.mono_nerd_font then
+-- Fix icon width for Nerd Fonts v3 (Propo variant).
+if vim.g.nerd_font_propo then
     -- Nerd Fonts v3.
     vim.fn.setcellwidths {
         { 0x23fb, 0x23fe, 2 },

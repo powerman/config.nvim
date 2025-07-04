@@ -308,10 +308,6 @@ return {
             },
             display = {
                 chat = {
-                    icons = {
-                        pinned_buffer = '',
-                        watched_buffer = '󰂥',
-                    },
                     window = {
                         width = 0.66,
                     },
@@ -319,10 +315,6 @@ return {
                 },
                 diff = {
                     provider = 'mini_diff',
-                },
-                icons = {
-                    loading = '',
-                    warning = '',
                 },
             },
             extensions = {
@@ -684,6 +676,9 @@ Respond with the translated text only, without any additional explanations or co
             require('custom.codecompanion.auto_approve').setup_codecompanion()
 
             local config = require 'codecompanion.config'
+
+            local util = require 'custom.util'
+            util.adapt_nerd_font_propo(config.config)
 
             if not vim.g.allow_remote_llm then
                 -- Forbid loading remote LLM adapters.
