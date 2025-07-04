@@ -28,8 +28,12 @@ return {
                 return false
             end
             -- Protect sensitive files which often contains secrets.
-            if string.match(bufname, '^%.env') or string.match(bufname, '^env.*%.sh') then
-                return false
+            local filename = vim.fn.fnamemodify(bufname, ':t')
+            for _, glob in ipairs(vim.g.llm_secret_files) do
+                local regex = vim.fn.glob2regpat(glob)
+                if vim.fn.match(filename, regex) ~= -1 then
+                    return false
+                end
             end
             return true
         end,
