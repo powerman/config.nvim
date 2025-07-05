@@ -15,6 +15,14 @@ stylua = 'latest'
 ast-grep = 'latest'
 
 
+[tasks.fmt]
+description = 'Format all code'
+depends = ['fmt:*']
+
+[tasks.'fmt:stylua']
+description = 'Format Lua code'
+run = 'stylua .'
+
 [tasks.test]
 alias = 'default'
 description = 'Run all linters and tests'

@@ -62,6 +62,7 @@ vim.g.llm_allowed_cmds = {
     'make test',
     'go test',
     'go test ./...',
+    'mise run fmt',
     'mise run test',
     'mise run lint',
     'mise tasks',
