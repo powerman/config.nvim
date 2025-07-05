@@ -72,6 +72,9 @@ vim.g.llm_allowed_cmds = {
     'git diff',
 }
 
+-- Sound file to play on LLM response.
+vim.g.llm_message_sound = '/usr/share/sounds/freedesktop/stereo/message.oga'
+
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
 
