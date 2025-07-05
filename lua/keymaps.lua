@@ -12,6 +12,9 @@
 -- NOTE:  ]d [d        LSP: Next/prev diagnostic.
 -- NOTE:  <Leader>e    LSP: Show diagnostic under cursor.
 -- NOTE:  <Leader>q    LSP: Open diagnostics in quickfix list.
+-- NOTE:  :-)          Smiley: 󰱱.
+-- NOTE:  :-(          Smiley: 󰱶.
+-- NOTE:  :-/          Smiley: 󱃞.
 
 -- Add hotkey to save current buffer: <F2>.
 vim.keymap.set('n', '<F2>', ':w<CR>', { desc = 'Save current buffer' })
@@ -66,3 +69,8 @@ vim.keymap.set(
     vim.diagnostic.setloclist,
     { desc = 'Open diagnostic in quickfix list' }
 )
+
+-- Smiley keymaps. Type fast enough (within `timeoutlen`) to replace text with emojis.
+vim.api.nvim_set_keymap('i', ':-)', '󰱱', { noremap = true })
+vim.api.nvim_set_keymap('i', ':-(', '󰱶', { noremap = true })
+vim.api.nvim_set_keymap('i', ':-/', '󱃞', { noremap = true })
