@@ -165,7 +165,7 @@ return {
             documentFormatting = true,
             documentRangeFormatting = true,
             hover = true,
-            documentSymbol = true,
+            documentSymbol = false, -- Duplicates all symbols for markdown.
             codeAction = true,
             completion = true,
         },
