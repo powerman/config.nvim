@@ -141,7 +141,7 @@ return {
     },
     {
         'ravitemer/codecompanion-history.nvim', -- Save and load conversation history.
-        cmd = { 'CodeCompanionHistory' },
+        cmd = { 'CodeCompanionHistory', 'CodeCompanionSummaries' },
         config = true,
     },
     -- A centralized manager for Model Context Protocol (MCP) servers with dynamic server
@@ -292,10 +292,10 @@ return {
                             modes = { n = '<Leader>cd' },
                         },
                         system_prompt = {
-                            modes = { n = '<Leader>cs' },
+                            modes = { n = '<Leader>cts' },
                         },
                         auto_tool_mode = {
-                            modes = { n = '<Leader>ct' },
+                            modes = { n = '<Leader>cta' },
                         },
                         goto_file_under_cursor = {
                             modes = { n = 'gf' },
@@ -321,25 +321,28 @@ return {
                 history = {
                     enabled = true,
                     opts = {
-                        keymap = false, -- Use Action Palette to open.
-                        save_chat_keymap = false, -- Use autosave.
+                        keymap = {}, -- Use Action Palette to open.
+                        save_chat_keymap = {}, -- Use autosave.
                         expiration_days = 30,
-                        --- Title generation is troublesome with Ollama models:
-                        ---   - Ollama is slow, this will slow down the beginning of each chat.
-                        ---   - Using a concrete model will slow down things even more
-                        ---     because it will unload other model chosen by the user.
-                        ---   - Using default model will not work with qwen3 without hiding
-                        ---     thinking tags, but there is no way to ensure hiding.
-                        --- So, use it only with remote LLMs.
-                        auto_generate_title = vim.g.allow_remote_llm,
-                        title_generation_opts = {
+                        auto_generate_title = true,
+                        title_generation_opts = vim.tbl_extend('force', {
+                            refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
+                            format_title = function(title)
+                                return vim.trim(string.gsub(title, '<think>.-</think>', ''))
+                            end,
+                        }, (vim.g.allow_remote_llm and {
                             -- This one is free on my Copilot Pro plan.
                             adapter = 'copilot',
                             model = 'gpt-4.1',
-                            refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
-                        },
+                        } or {
+                            -- Use current model for Ollama.
+                        })),
                         -- Show chats only from the current project.
                         chat_filter = chat_filter,
+                        summary = {
+                            create_summary_keymap = '<Leader>csc',
+                            browse_summaries_keymap = '<Leader>csb',
+                        },
                     },
                 },
                 mcphub = {
