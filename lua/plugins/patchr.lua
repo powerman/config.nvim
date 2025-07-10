@@ -1,8 +1,7 @@
-local patch_dir = vim.fn.stdpath 'config' .. '/patch'
+local patches_dir = vim.fn.stdpath 'config' .. '/patches'
 
 local function collect_patches(patch_root)
     local plugins = {}
-    -- TODO: If vim.fs.dir does not order entries then we need to sort them.
     local ok, entries = pcall(vim.fs.dir, patch_root, { depth = 2 })
 
     if not ok then
@@ -24,11 +23,11 @@ end
 ---@type LazySpec
 return {
     {
-        'nhu/patchr.nvim',
+        'powerman/patchr.nvim',
         ---@module 'patchr'
         ---@type patchr.config
         opts = {
-            plugins = collect_patches(patch_dir),
+            plugins = collect_patches(patches_dir),
         },
     },
 }
