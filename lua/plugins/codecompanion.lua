@@ -373,8 +373,7 @@ return {
                                 end
                             end
 
-                            local args = vim.inspect(args):gsub('%s+', ' ')
-                            return name .. ' ' .. args
+                            return name .. ' ' .. vim.inspect(args):gsub('%s+', ' ')
                         end,
                     },
                 },
