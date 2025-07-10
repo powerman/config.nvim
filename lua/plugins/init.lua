@@ -24,6 +24,7 @@ return {
         version = '*',
         opts = {
             notification = {
+                filter = vim.log.levels.INFO, -- Minimum notifications level.
                 override_vim_notify = true,
                 window = {
                     border = 'rounded',
