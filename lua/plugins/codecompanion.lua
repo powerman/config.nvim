@@ -159,6 +159,7 @@ return {
             ---@diagnostic disable-next-line: missing-fields
             require('mcphub').setup {
                 auto_approve = require('custom.codecompanion.auto_approve').mcphub,
+                auto_toggle_mcp_servers = false, -- I consider it a security risk.
             }
         end,
     },
