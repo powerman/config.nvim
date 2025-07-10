@@ -148,7 +148,8 @@ return {
     -- management and monitoring.
     {
         'ravitemer/mcphub.nvim',
-        version = '*',
+        -- version = '*',
+        branch = 'make-tools',
         cmd = 'MCPHub',
         dependencies = {
             'nvim-lua/plenary.nvim',
@@ -349,9 +350,32 @@ return {
                 mcphub = {
                     callback = 'mcphub.extensions.codecompanion',
                     opts = {
+                        make_tools = true, -- Make individual tools (@server__tool) and server groups (@server) from MCP servers.
+                        show_server_tools_in_chat = false, -- Show individual tools in chat completion (when make_tools=true).
+                        add_mcp_prefix_to_tool_names = false, -- Add mcp__ prefix (e.g `@mcp__github`, `@mcp__neovim__list_issues`).
                         show_result_in_chat = false, -- Show mcp tool results in chat.
                         make_vars = true, -- Convert resources to #variables.
                         make_slash_commands = true, -- Add prompts as /slash commands.
+                        format_tool = function(name, tool)
+                            local args = vim.deepcopy(tool.args)
+                            if name == 'use_mcp_tool' then
+                                name = string.format('%s__%s', args.server_name, args.tool_name)
+                                args = args.tool_input
+                            end
+
+                            if name == 'filesystem__edit_file' then
+                                if type(args.edits) == 'table' then
+                                    args.edits = '󰩫'
+                                end
+                            elseif name == 'filesystem__write_file' then
+                                if type(args.content) == 'string' then
+                                    args.content = '󰩫'
+                                end
+                            end
+
+                            local args = vim.inspect(args):gsub('%s+', ' ')
+                            return name .. ' ' .. args
+                        end,
                     },
                 },
             },
