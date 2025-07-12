@@ -42,6 +42,10 @@ vim.g.debug_lsp = vim.g.debug_lsp or false
 -- Used to setup PATH and some plugins. Configure your markers for vim.fs.root as needed.
 vim.g.project_root = vim.fs.root(0, '.git') or vim.fn.getcwd()
 
+-- Change working directory to project root.
+-- This is needed for some plugins that use the current working directory - e.g. MCP servers.
+vim.cmd('cd ' .. vim.g.project_root)
+
 -- Setup project-specific PATH.
 local project_bin_dirs = { '.buildcache/bin' }
 vim.env.PATH = require('custom.util').project_path(project_bin_dirs) .. vim.env.PATH
