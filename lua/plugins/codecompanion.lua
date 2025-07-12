@@ -590,6 +590,7 @@ return {
             opts = {
                 language = 'Russian', -- The language used for LLM responses.
                 log_level = 'ERROR', -- TRACE|DEBUG|ERROR|INFO
+                system_prompt = prompt.chat.copilot_instructions,
             },
         },
         config = function(_, opts)
