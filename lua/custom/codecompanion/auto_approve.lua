@@ -80,6 +80,14 @@ function M.setup_codecompanion()
 end
 
 local function is_cmd_allowed(cmd)
+    -- Strip "cd {project_root} && " prefix if present
+    if M.config.project_root and M.config.project_root ~= '' then
+        local prefix = 'cd ' .. M.config.project_root .. ' && '
+        if vim.startswith(cmd, prefix) then
+            cmd = cmd:sub(#prefix + 1)
+        end
+    end
+
     for _, allowed_cmd in ipairs(M.config.allowed_cmds or {}) do
         if cmd == allowed_cmd then
             return true

@@ -72,6 +72,105 @@ describe('auto_approve', function()
             local requires_approval = auto_approve.cmd_runner { args = { cmd = 'ls' } }
             assert.is_false(requires_approval)
         end)
+
+        describe('cd prefix handling', function()
+            it('auto-approves allowed commands with cd prefix', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'npm test' },
+                    project_root = project_root,
+                }
+                local cmd = 'cd ' .. project_root .. ' && npm test'
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_false(requires_approval)
+            end)
+
+            it('requires approval for non-allowed commands with cd prefix', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'npm test' },
+                    project_root = project_root,
+                }
+                local cmd = 'cd ' .. project_root .. ' && npm build'
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_true(requires_approval)
+            end)
+
+            it('ignores cd prefix when project_root is not set', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'npm test' },
+                    project_root = nil,
+                }
+                local cmd = 'cd /some/path && npm test'
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_true(requires_approval)
+            end)
+
+            it('ignores cd prefix when project_root is empty', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'npm test' },
+                    project_root = '',
+                }
+                local cmd = 'cd /some/path && npm test'
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_true(requires_approval)
+            end)
+
+            it('handles multiple commands with different prefixes', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'ls', 'pwd' },
+                    project_root = project_root,
+                }
+
+                local test_cases = {
+                    { cmd = 'cd ' .. project_root .. ' && ls', expected = false },
+                    { cmd = 'cd ' .. project_root .. ' && pwd', expected = false },
+                    { cmd = 'cd ' .. project_root .. ' && rm', expected = true },
+                    { cmd = 'cd /other/path && ls', expected = true },
+                    { cmd = 'ls', expected = false },
+                    { cmd = 'rm', expected = true },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('handles complex allowed commands with cd prefix', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'npm run test:unit', 'docker compose up' },
+                    project_root = project_root,
+                }
+
+                local test_cases = {
+                    {
+                        cmd = 'cd ' .. project_root .. ' && npm run test:unit',
+                        expected = false,
+                    },
+                    {
+                        cmd = 'cd ' .. project_root .. ' && docker compose up',
+                        expected = false,
+                    },
+                    { cmd = 'cd ' .. project_root .. ' && npm run build', expected = true },
+                    { cmd = 'npm run test:unit', expected = false },
+                    { cmd = 'docker compose up', expected = false },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+        end)
     end)
 
     describe('filepath', function()
@@ -249,6 +348,30 @@ describe('auto_approve', function()
                 arguments = { cwd = project_root, command = 'pwd' },
             }
             assert.is_nil(approved)
+        end)
+
+        it('checks allowed commands for execute_command with cd prefix', function()
+            auto_approve.setup {
+                project_root = project_root,
+                allowed_cmds = { 'npm test' },
+                mcphub_neovim = true,
+            }
+
+            local test_cases = {
+                { command = 'cd ' .. project_root .. ' && npm test', expected = true },
+                { command = 'cd ' .. project_root .. ' && npm build', expected = nil },
+                { command = 'cd /other/path && npm test', expected = nil },
+                { command = 'npm test', expected = true },
+            }
+
+            for _, tc in ipairs(test_cases) do
+                local approved = auto_approve.mcphub {
+                    server_name = 'neovim',
+                    tool_name = 'execute_command',
+                    arguments = { cwd = project_root, command = tc.command },
+                }
+                assert.equal(tc.expected, approved, 'Failed for command: ' .. tc.command)
+            end
         end)
 
         it('checks both paths for move_item operations', function()
@@ -479,6 +602,70 @@ describe('auto_approve', function()
                     }
                     assert.equal(tc.expected, approved, tc.name)
                 end
+            end)
+
+            describe('cd prefix handling', function()
+                it('auto-approves allowed commands with cd prefix', function()
+                    auto_approve.setup {
+                        mcphub_shell = true,
+                        allowed_cmds = { 'npm test' },
+                        project_root = project_root,
+                    }
+
+                    local cmd = 'cd ' .. project_root .. ' && npm test'
+                    local approved = auto_approve.mcphub {
+                        server_name = 'shell',
+                        tool_name = 'shell_exec',
+                        arguments = { command = cmd },
+                    }
+                    assert.is_true(approved)
+                end)
+
+                it('requires approval for non-allowed commands with cd prefix', function()
+                    auto_approve.setup {
+                        mcphub_shell = true,
+                        allowed_cmds = { 'npm test' },
+                        project_root = project_root,
+                    }
+
+                    local cmd = 'cd ' .. project_root .. ' && npm build'
+                    local approved = auto_approve.mcphub {
+                        server_name = 'shell',
+                        tool_name = 'shell_exec',
+                        arguments = { command = cmd },
+                    }
+                    assert.is_nil(approved)
+                end)
+
+                it('handles mixed commands with and without cd prefix', function()
+                    auto_approve.setup {
+                        mcphub_shell = true,
+                        allowed_cmds = { 'ls', 'pwd' },
+                        project_root = project_root,
+                    }
+
+                    local test_cases = {
+                        { command = 'cd ' .. project_root .. ' && ls', expected = true },
+                        { command = 'cd ' .. project_root .. ' && pwd', expected = true },
+                        { command = 'cd ' .. project_root .. ' && rm', expected = nil },
+                        { command = 'cd /other/path && ls', expected = nil },
+                        { command = 'ls', expected = true },
+                        { command = 'rm', expected = nil },
+                    }
+
+                    for _, tc in ipairs(test_cases) do
+                        local approved = auto_approve.mcphub {
+                            server_name = 'shell',
+                            tool_name = 'shell_exec',
+                            arguments = { command = tc.command },
+                        }
+                        assert.equal(
+                            tc.expected,
+                            approved,
+                            'Failed for command: ' .. tc.command
+                        )
+                    end
+                end)
             end)
         end)
     end)
