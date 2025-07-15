@@ -117,8 +117,7 @@ return {
     -- management and monitoring.
     {
         'ravitemer/mcphub.nvim',
-        -- version = '*',
-        branch = 'make-tools',
+        version = '*',
         cmd = 'MCPHub',
         dependencies = {
             'nvim-lua/plenary.nvim',
