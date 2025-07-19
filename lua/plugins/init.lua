@@ -12,6 +12,8 @@ return {
     --
     -- See `:help sleuth`.
     'tpope/vim-sleuth',
+    -- nftables configuration file support.
+    'greglook/vim-nftables',
     -- Not a plugin but a library used by other plugins.
     -- Useful for getting pretty icons, but requires a Nerd Font.
     -- Setup it here for lazy loading and DO NOT include in other plugin's dependencies.
