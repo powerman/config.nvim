@@ -18,6 +18,7 @@ vim.o.showmode = false
 -- Schedule the setting after `UiEnter` because it can increase startup-time.
 vim.schedule(function()
     vim.o.clipboard = 'unnamedplus'
+    vim.g.clipboard = 'xclip' -- `xsel` conflicts with KDE Plasma Klipper syncronization.
 end)
 
 -- Set highlight on search.
