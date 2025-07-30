@@ -185,8 +185,8 @@ return {
                 inline = {
                     adapter = {
                         name = 'copilot',
-                        -- model = 'gpt-4.1', -- Multiplier = 0 (free).
-                        model = 'claude-3.5-sonnet', -- Multiplier = 1.
+                        model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        -- model = 'claude-3.5-sonnet', -- Multiplier = 1.
                     },
                     keymaps = {
                         accept_change = {
