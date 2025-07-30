@@ -5,7 +5,8 @@
 return {
     'zbirenbaum/copilot.lua',
     cond = vim.g.allow_remote_llm,
-    lazy = false, -- Needs to setup autocommands for LSP before creating buffers.
+    cmd = 'Copilot',
+    event = 'InsertEnter',
     opts = {
         panel = {
             enabled = false,
@@ -22,7 +23,7 @@ return {
                 dismiss = '<M-\\>',
             },
         },
-        should_attach = function(bufid, bufname)
+        should_attach = function(_, bufname)
             -- Default behavior.
             if not vim.bo.buflisted then
                 return false
