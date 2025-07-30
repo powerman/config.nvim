@@ -82,3 +82,6 @@ vim.opt.tabclose:append 'left'
 vim.opt.tabclose:append 'uselast'
 
 vim.opt.diffopt:append 'algorithm:histogram'
+
+-- Border for floating windows.
+vim.opt.winborder = 'rounded'
