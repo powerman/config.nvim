@@ -57,6 +57,11 @@ return {
                 cancelled = todo_item('-', '󰜺'),
             },
         },
+        html = {
+            comment = {
+                conceal = false,
+            },
+        },
         overrides = {
             filetype = {
                 codecompanion = {
