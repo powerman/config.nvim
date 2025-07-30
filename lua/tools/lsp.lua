@@ -237,6 +237,8 @@ return {
 
     taplo = {},
 
+    ts_ls = {},
+
     yamlls = {
         filetypes = {
             'yaml',
