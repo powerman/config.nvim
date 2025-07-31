@@ -129,6 +129,13 @@ return {
             local cwd_hash = string.sub(vim.fn.sha256(vim.fn.getcwd()), 1, 4)
             ---@diagnostic disable-next-line: missing-fields
             require('mcphub').setup {
+                global_env = {
+                    'XDG_CACHE_HOME',
+                },
+                workspace = {
+                    enabled = false,
+                    port_range = { min = 13000, max = 13999 },
+                },
                 port = 13000 + tonumber(cwd_hash, 16) % 1000, -- Use ports 13000-13999.
                 auto_approve = require('custom.codecompanion.auto_approve').mcphub,
                 auto_toggle_mcp_servers = false, -- I consider it a security risk.
