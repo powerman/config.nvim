@@ -1,4 +1,5 @@
 -- Source: https://github.com/olimorris/codecompanion.nvim/discussions/813#discussioncomment-12031954
+-- Modified to process only inline requests.
 
 local progress = require 'fidget.progress'
 
@@ -11,6 +12,9 @@ function M:init()
         pattern = 'CodeCompanionRequestStarted',
         group = group,
         callback = function(request)
+            if request.data.strategy ~= 'inline' then
+                return
+            end
             local handle = M:create_progress_handle(request)
             M:store_progress_handle(request.data.id, handle)
         end,
@@ -20,6 +24,9 @@ function M:init()
         pattern = 'CodeCompanionRequestFinished',
         group = group,
         callback = function(request)
+            if request.data.strategy ~= 'inline' then
+                return
+            end
             local handle = M:pop_progress_handle(request.data.id)
             if handle then
                 M:report_exit_status(handle, request)

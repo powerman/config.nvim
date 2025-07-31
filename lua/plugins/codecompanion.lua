@@ -168,6 +168,7 @@ return {
             'ravitemer/codecompanion-history.nvim', -- Save and load conversation history.
             'ravitemer/mcphub.nvim', -- Manage MCP servers.
             'j-hui/fidget.nvim', -- Display status.
+            'franco-ruggeri/codecompanion-spinner.nvim',
         },
         init = function()
             require('custom.codecompanion.fidget-spinner'):init()
@@ -209,15 +210,14 @@ return {
                         name = 'copilot',
                         -- https://docs.github.com/en/copilot/managing-copilot/understanding-and-managing-copilot-usage/understanding-and-managing-requests-in-copilot
                         -- model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        -- model = 'gpt-4o', -- Multiplier = 0 (free).
                         -- model = 'gemini-2.0-flash-001', -- Multiplier = 0.25.
-                        -- model = 'o3-mini', -- Multiplier = 0.33.
                         -- model = 'o4-mini', -- Multiplier = 0.33.
                         -- model = 'gemini-2.5-pro', -- Multiplier = 1.
                         model = 'claude-3.5-sonnet', -- Multiplier = 1.
                         -- model = 'claude-3.7-sonnet', -- Multiplier = 1.
                         -- model = 'claude-sonnet-4', -- Multiplier = 1.
                         -- model = 'claude-3.7-sonnet-thought', -- Multiplier = 1.25.
-                        -- model = 'o1', -- Multiplier = 10.
                     },
                     roles = {
                         ---@type string|fun(adapter: CodeCompanion.Adapter): string
@@ -298,6 +298,7 @@ return {
                 },
             },
             extensions = {
+                spinner = {},
                 history = {
                     enabled = true,
                     opts = {
@@ -307,9 +308,6 @@ return {
                         auto_generate_title = true,
                         title_generation_opts = vim.tbl_extend('force', {
                             refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
-                            format_title = function(title)
-                                return vim.trim(string.gsub(title, '<think>.-</think>', ''))
-                            end,
                         }, (vim.g.allow_remote_llm and {
                             -- This one is free on my Copilot Pro plan.
                             adapter = 'copilot',
@@ -367,54 +365,6 @@ return {
                             num_ctx = {
                                 default = 20000, -- Used by CodeCompanion author, no idea why.
                             },
-                        },
-                    })
-                end,
-                -- Strip thinking tags from qwen3 responses.
-                ollama_qwen_3_hide_thinking = function()
-                    ---@alias thinkState ''|'thinking'|'done' Thinking state of streamed response.
-                    ---@type thinkState
-                    local think = ''
-                    return require('codecompanion.adapters').extend('ollama', {
-                        schema = {
-                            model = {
-                                default = 'qwen3:8b',
-                                choices = {},
-                            },
-                            num_ctx = {
-                                default = 40960,
-                            },
-                        },
-                        handlers = {
-                            inline_output = function(self, data, context)
-                                local openai = require 'codecompanion.adapters.openai'
-                                local res = openai.handlers.inline_output(self, data, context)
-                                if res and res.output then
-                                    res.output = res.output:gsub('<think>.-</think>', '', 1)
-                                end
-                                return res
-                            end,
-                            chat_output = function(self, data, tools)
-                                local openai = require 'codecompanion.adapters.openai'
-                                local res = openai.handlers.chat_output(self, data, tools)
-                                if res and res.output then
-                                    if res.output.content:match '<think>' then
-                                        think = 'thinking'
-                                    end
-                                    if res.output.content:match '</think>' then
-                                        think = 'done'
-                                        res.output.content =
-                                            res.output.content:gsub('^.-</think>%s*', '', 1)
-                                    end
-                                    if think == 'done' and res.output.content:match '%S' then
-                                        think = ''
-                                    end
-                                    if think ~= '' then
-                                        return nil
-                                    end
-                                end
-                                return res
-                            end,
                         },
                     })
                 end,
@@ -543,7 +493,7 @@ return {
                     opts = {
                         index = 100,
                         adapter = {
-                            name = 'ollama_qwen_3_hide_thinking',
+                            name = 'ollama_qwen_3',
                         },
                         modes = { 'v' },
                         short_name = 'grammar',
@@ -571,7 +521,7 @@ return {
                     opts = {
                         index = 200,
                         adapter = {
-                            name = 'ollama_qwen_3_hide_thinking',
+                            name = 'ollama_qwen_3',
                         },
                         is_slash_cmd = false,
                         modes = { 'i', 'n', 'v' },

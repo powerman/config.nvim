@@ -113,7 +113,6 @@ If the selected text is in Markdown format:
 
 Violation of these constraints will be treated as incorrect output.
 </prompt>
-/no_think
 ]]
 
 -- Designed for weak (8B) local Ollama models.
