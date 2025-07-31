@@ -244,7 +244,10 @@ return {
                 }, {
                     {
                         name = 'buffer',
-                        option = { get_bufnrs = get_bufnrs_all_visible },
+                        option = {
+                            get_bufnrs = get_bufnrs_all_visible,
+                            keyword_pattern = [[\%(-\?\d\+\%(\.\d\+\)\?\|\<\k\+\%(-\k*\)*\)]],
+                        },
                     },
                 }),
             }
@@ -253,7 +256,10 @@ return {
                 sources = {
                     {
                         name = 'buffer',
-                        option = { get_bufnrs = get_bufnrs_current },
+                        option = {
+                            get_bufnrs = get_bufnrs_current,
+                            keyword_pattern = [[\%(-\?\d\+\%(\.\d\+\)\?\|\<\k\+\%(-\k*\)*\)]],
+                        },
                     },
                 },
             })
