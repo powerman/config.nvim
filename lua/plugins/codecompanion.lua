@@ -193,7 +193,7 @@ return {
                 inline = {
                     adapter = {
                         name = 'copilot',
-                        model = 'gpt-4.1', -- Multiplier = 0 (free).
+                        model = 'gpt-4o', -- Multiplier = 0 (free).
                         -- model = 'claude-3.5-sonnet', -- Multiplier = 1.
                     },
                     keymaps = {
@@ -227,6 +227,42 @@ return {
                         end,
                     },
                     tools = {
+                        groups = {
+                            ['agent'] = {
+                                description = 'Agent tools',
+                                tools = {
+                                    'context7__get-library-docs',
+                                    'context7__resolve-library-id',
+                                    'filesystem__create_directory',
+                                    'filesystem__edit_file',
+                                    'filesystem__get_file_info',
+                                    'filesystem__list_allowed_directories',
+                                    'filesystem__list_directory',
+                                    'filesystem__list_directory_with_sizes',
+                                    'filesystem__move_file',
+                                    'filesystem__read_file',
+                                    'filesystem__read_multiple_files',
+                                    'filesystem__search_files',
+                                    'filesystem__write_file',
+                                    'git__git_branch',
+                                    'git__git_diff',
+                                    'git__git_diff_staged',
+                                    'git__git_diff_unstaged',
+                                    'git__git_init',
+                                    'git__git_log',
+                                    'git__git_show',
+                                    'git__git_status',
+                                    'shell__shell_exec',
+                                    'tavily-mcp__tavily-crawl',
+                                    'tavily-mcp__tavily-extract',
+                                    'tavily-mcp__tavily-map',
+                                    'tavily-mcp__tavily-search',
+                                },
+                                opts = {
+                                    collapse_tools = true,
+                                },
+                            },
+                        },
                         opts = {
                             --- This is needed when using CodeCompanion's internal tools
                             --- (e.g., when @cmd_runner runs tests and they fail),
@@ -311,7 +347,7 @@ return {
                         }, (vim.g.allow_remote_llm and {
                             -- This one is free on my Copilot Pro plan.
                             adapter = 'copilot',
-                            model = 'gpt-4.1',
+                            model = 'gpt-4o',
                         } or {
                             -- Use current model for Ollama.
                         })),
@@ -414,12 +450,12 @@ return {
                 ---     - 100-199   User Inline Prompts
                 ---     - 200-299   User Chat Prompts
                 ---     - 300-399   User Workflows
-                ['Unit Tests'] = { opts = { index = 50 } },
-                ['Fix code'] = { opts = { index = 150 } },
-                ['Explain LSP Diagnostics'] = { opts = { index = 151 } },
-                ['Explain'] = { opts = { index = 152 } },
-                ['Generate a Commit Message'] = { opts = { index = 153 } },
-                ['Workspace File'] = { opts = { index = 250 } },
+                ['Unit Tests'] = { opts = { index = 150 } },
+                ['Fix code'] = { opts = { index = 250 } },
+                ['Explain LSP Diagnostics'] = { opts = { index = 251 } },
+                ['Explain'] = { opts = { index = 252 } },
+                ['Generate a Commit Message'] = { opts = { index = 253 } },
+                ['Workspace File'] = { opts = { index = 254 } },
                 ['Code workflow'] = { opts = { index = 350 } },
                 ['Edit<->Test workflow'] = { opts = { index = 351 } },
 
@@ -471,9 +507,9 @@ return {
                         end,
                     },
                 },
-                ['Free Chat (GPT-4.1)'] = {
+                ['Agent'] = {
                     strategy = 'chat',
-                    description = 'Create a new chat buffer to converse with an LLM for free',
+                    description = 'Create a new chat buffer in Agent mode',
                     condition = function()
                         return vim.g.allow_remote_llm
                     end,
@@ -482,10 +518,44 @@ return {
                         stop_context_insertion = true,
                         adapter = {
                             name = 'copilot',
-                            model = 'gpt-4.1', -- Multiplier = 0 (free).
+                            model = 'claude-sonnet-4', -- Multiplier = 1.
                         },
                     },
-                    prompts = prompt.chat.std,
+                    prompts = {
+                        {
+                            role = prompt.USER_ROLE,
+                            content = '#{mcp:neovim://workspace} @{agent}',
+                        },
+                        {
+                            role = prompt.USER_ROLE,
+                            content = '',
+                        },
+                    },
+                },
+                ['Free Agent (GPT-4o)'] = {
+                    strategy = 'chat',
+                    description = 'Create a new chat buffer in Agent mode with GPT-4o',
+                    condition = function()
+                        return vim.g.allow_remote_llm
+                    end,
+                    opts = {
+                        index = 7,
+                        stop_context_insertion = true,
+                        adapter = {
+                            name = 'copilot',
+                            model = 'gpt-4o', -- Multiplier = 0 (free).
+                        },
+                    },
+                    prompts = {
+                        {
+                            role = prompt.USER_ROLE,
+                            content = '#{mcp:neovim://workspace} @{agent}',
+                        },
+                        {
+                            role = prompt.USER_ROLE,
+                            content = '',
+                        },
+                    },
                 },
                 ['Improve grammar'] = {
                     strategy = 'inline',
