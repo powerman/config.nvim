@@ -1,0 +1,59 @@
+https://github.com/hrsh7th/nvim-cmp/pull/2183
+
+diff --git a/lua/cmp/utils/str.lua b/lua/cmp/utils/str.lua
+index 84b0177..3b72198 100644
+--- a/lua/cmp/utils/str.lua
++++ b/lua/cmp/utils/str.lua
+@@ -47,6 +47,19 @@ str.get_common_string = function(text1, text2)
+   local min = math.min(#text1, #text2)
+   for i = 1, min do
+     if not char.match(string.byte(text1, i), string.byte(text2, i)) then
++      if string.byte(text1, i) > 127 then
++        -- Differing byte is non-ASCII, use Unicode-safe path
++        local char_min_len = math.min(vim.fn.strchars(text1), vim.fn.strchars(text2))
++        for j = 0, char_min_len - 1 do
++          local char1 = vim.fn.strcharpart(text1, j, 1)
++          local char2 = vim.fn.strcharpart(text2, j, 1)
++          -- Use case-insensitive comparison for Unicode like char.match does for ASCII
++          if vim.fn.tolower(char1) ~= vim.fn.tolower(char2) then
++            return vim.fn.strcharpart(text1, 0, j)
++          end
++        end
++        return vim.fn.strcharpart(text1, 0, char_min_len)
++      end
+       return string.sub(text1, 1, i - 1)
+     end
+   end
+diff --git a/lua/cmp/utils/str_spec.lua b/lua/cmp/utils/str_spec.lua
+index 1a21855..c4a80aa 100644
+--- a/lua/cmp/utils/str_spec.lua
++++ b/lua/cmp/utils/str_spec.lua
+@@ -26,4 +26,28 @@ describe('utils.str', function()
+     assert.are.equal(str.escape('pla"in', { '"' }), 'pla\\"in')
+     assert.are.equal(str.escape('call("")', { '"' }), 'call(\\"\\")')
+   end)
++
++  it('get_common_string', function()
++    -- ASCII tests
++    assert.are.equal(str.get_common_string('hello', 'help'), 'hel')
++    assert.are.equal(str.get_common_string('abc', 'xyz'), '')
++    assert.are.equal(str.get_common_string('test', 'Testing'), 'test')
++
++    -- Unicode tests
++    assert.are.equal(str.get_common_string('получаем', 'получив'), 'получ')
++    assert.are.equal(str.get_common_string('тест', 'тестинг'), 'тест')
++    assert.are.equal(str.get_common_string('тест', 'Тестинг'), 'тест')
++    assert.are.equal(str.get_common_string('Тест', 'тестинг'), 'Тест')
++    assert.are.equal(str.get_common_string('тЕст', 'тестинг'), 'тЕст')
++    assert.are.equal(str.get_common_string('тест', 'тЕстинг'), 'тест')
++    assert.are.equal(str.get_common_string('тесТ', 'тЕстинг'), 'тесТ')
++    assert.are.equal(str.get_common_string('тест', 'тесТинг'), 'тест')
++    assert.are.equal(str.get_common_string('а', 'я'), '') -- 0xD0 0xB0 - 0xD1 0x8F
++    assert.are.equal(str.get_common_string('а', 'б'), '') -- 0xD0 0xB0 - 0xD0 0xB1
++    assert.are.equal(str.get_common_string('Я', 'я'), 'Я') -- 0xD0 0xAF - 0xD1 0x8F
++    assert.are.equal(str.get_common_string('А', 'а'), 'А') -- 0xD0 0x90 - 0xD0 0xB0
++    -- Normalization is not supported yet
++    assert.are.equal(str.get_common_string('й', 'и'), '') -- 0xD0 0xB9 - 0xD0 0xB8
++    assert.are.equal(str.get_common_string('й', 'и'), 'и') -- 0xD0 0xB8 0xD1 0x8E - 0xD0 0xB8
++  end)
+ end)
