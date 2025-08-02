@@ -731,13 +731,8 @@ return {
             local notifier = require('custom.sound_notifier').new(vim.g.llm_message_sound)
             vim.api.nvim_create_autocmd('User', {
                 group = notifier.augroup,
-                pattern = 'CodeCompanionRequestStarted',
-                callback = notifier:task_started_callback(),
-            })
-            vim.api.nvim_create_autocmd('User', {
-                group = notifier.augroup,
-                pattern = 'CodeCompanionRequestFinished',
-                callback = notifier:task_finished_callback(),
+                pattern = { 'CodeCompanionChatDone', 'CodeCompanionInlineFinished' },
+                callback = notifier:notify_callback(),
             })
         end,
     },

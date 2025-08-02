@@ -47,6 +47,13 @@ function M.new(sound_path, delay_ms)
     return self
 end
 
+---Plays sound immediately if window is not focused
+function M:notify()
+    if not self._is_focused then
+        self._play_sound()
+    end
+end
+
 ---Mark task as started, preventing notifications until task_finished is called
 function M:task_started()
     self._is_active = true
@@ -59,10 +66,18 @@ function M:task_finished()
 
     vim.defer_fn(function()
         local elapsed = vim.uv.now() - self._last_finished
-        if not self._is_focused and not self._is_active and elapsed >= self._delay_ms then
-            self:_play_sound()
+        if not self._is_active and elapsed >= self._delay_ms then
+            self:notify()
         end
     end, self._delay_ms)
+end
+
+---Returns callback function that plays sound immediately
+---@return function
+function M:notify_callback()
+    return function()
+        self:notify()
+    end
 end
 
 ---Returns callback function that marks task as started

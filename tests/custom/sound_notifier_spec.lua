@@ -46,4 +46,23 @@ describe('SoundNotifier', function()
         end)
         assert.is_false(play_called)
     end)
+
+    it('should play sound immediately when not focused', function()
+        notifier._is_focused = false
+        notifier:notify()
+        assert.is_true(play_called)
+    end)
+
+    it('should not play sound immediately when focused', function()
+        assert.is_true(notifier._is_focused)
+        notifier:notify()
+        assert.is_false(play_called)
+    end)
+
+    it('should have callback for immediate notification', function()
+        notifier._is_focused = false
+        local callback = notifier:notify_callback()
+        callback()
+        assert.is_true(play_called)
+    end)
 end)
