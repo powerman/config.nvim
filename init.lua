@@ -60,6 +60,7 @@ vim.g.llm_secret_files = {
 -- List of shell commands allowed to LLM without manual approve.
 vim.g.llm_allowed_cmds = {
     './scripts/test',
+    'make lint',
     'make test',
     'go test',
     'go test ./...',
