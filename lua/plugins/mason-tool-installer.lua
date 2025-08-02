@@ -42,6 +42,11 @@ return {
         },
     },
     config = function(_, opts)
+        -- HACK: Fix Mason registry for Prettierd to use fork with fixed Unicode issue.
+        require('mason-registry').get_all_packages() -- Force Mason to load registry.
+        require('mason-registry').sources.list[1].instance.buffer.prettierd.spec.source.id =
+            'pkg:npm/%40powerman-asdf/prettierd@0.26.3'
+
         opts = opts or {}
         local ensure_installed = {
             'copilot-language-server', -- For copilot-lsp plugin.
