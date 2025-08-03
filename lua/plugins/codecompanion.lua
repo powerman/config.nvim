@@ -231,19 +231,32 @@ return {
                             ['agent'] = {
                                 description = 'Agent tools',
                                 tools = {
+                                    --- Web search and browsing tools.
+                                    'search_web',
+                                    'fetch_webpage',
                                     'context7__get-library-docs',
                                     'context7__resolve-library-id',
-                                    'filesystem__create_directory',
-                                    'filesystem__edit_file',
+                                    'tavily-mcp__tavily-crawl',
+                                    'tavily-mcp__tavily-extract',
+                                    'tavily-mcp__tavily-map',
+                                    'tavily-mcp__tavily-search',
+                                    --- File analysis tools.
+                                    'list_code_usages',
                                     'filesystem__get_file_info',
                                     'filesystem__list_allowed_directories',
                                     'filesystem__list_directory',
                                     'filesystem__list_directory_with_sizes',
-                                    'filesystem__move_file',
                                     'filesystem__read_file',
                                     'filesystem__read_multiple_files',
                                     'filesystem__search_files',
+                                    --- File modification tools.
+                                    'filesystem__create_directory',
+                                    'filesystem__edit_file',
+                                    'filesystem__move_file',
                                     'filesystem__write_file',
+                                    --- Shell tools.
+                                    'shell__shell_exec',
+                                    --- Git tools.
                                     'git__git_branch',
                                     'git__git_diff',
                                     'git__git_diff_staged',
@@ -252,11 +265,6 @@ return {
                                     'git__git_log',
                                     'git__git_show',
                                     'git__git_status',
-                                    'shell__shell_exec',
-                                    'tavily-mcp__tavily-crawl',
-                                    'tavily-mcp__tavily-extract',
-                                    'tavily-mcp__tavily-map',
-                                    'tavily-mcp__tavily-search',
                                 },
                                 opts = {
                                     collapse_tools = true,
@@ -524,11 +532,7 @@ return {
                     prompts = {
                         {
                             role = prompt.USER_ROLE,
-                            content = '#{mcp:neovim://workspace} @{agent}',
-                        },
-                        {
-                            role = prompt.USER_ROLE,
-                            content = '',
+                            content = '#{mcp:neovim://workspace} @{agent} ',
                         },
                     },
                 },
@@ -549,11 +553,7 @@ return {
                     prompts = {
                         {
                             role = prompt.USER_ROLE,
-                            content = '#{mcp:neovim://workspace} @{agent}',
-                        },
-                        {
-                            role = prompt.USER_ROLE,
-                            content = '',
+                            content = '#{mcp:neovim://workspace} @{agent} ',
                         },
                     },
                 },
