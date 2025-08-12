@@ -23,6 +23,7 @@ require('lazy').setup {
     },
     dev = {
         path = '~/proj/vim',
+        fallback = true, -- Fallback to git when local plugin doesn't exist
     },
     ui = {
         border = vim.o.winborder,
