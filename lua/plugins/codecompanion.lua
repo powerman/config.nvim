@@ -193,7 +193,7 @@ return {
                 inline = {
                     adapter = {
                         name = 'copilot',
-                        model = 'gpt-4o', -- Multiplier = 0 (free).
+                        model = 'gpt-4.1', -- Multiplier = 0 (free).
                         -- model = 'claude-3.5-sonnet', -- Multiplier = 1.
                     },
                     keymaps = {
@@ -214,6 +214,7 @@ return {
                         -- model = 'gemini-2.0-flash-001', -- Multiplier = 0.25.
                         -- model = 'o4-mini', -- Multiplier = 0.33.
                         -- model = 'gemini-2.5-pro', -- Multiplier = 1.
+                        -- model = 'gpt-5', -- Multiplier = 1.
                         model = 'claude-3.5-sonnet', -- Multiplier = 1.
                         -- model = 'claude-3.7-sonnet', -- Multiplier = 1.
                         -- model = 'claude-sonnet-4', -- Multiplier = 1.
@@ -355,7 +356,7 @@ return {
                         }, (vim.g.allow_remote_llm and {
                             -- This one is free on my Copilot Pro plan.
                             adapter = 'copilot',
-                            model = 'gpt-4o',
+                            model = 'gpt-4.1',
                         } or {
                             -- Use current model for Ollama.
                         })),
@@ -404,10 +405,12 @@ return {
                     return require('codecompanion.adapters').extend('ollama', {
                         schema = {
                             model = {
-                                default = 'qwen3:8b',
+                                default = 'qwen3:4b',
                             },
                             num_ctx = {
-                                default = 20000, -- Used by CodeCompanion author, no idea why.
+                                --- qwen3 uses extra 1GB per 4k context.
+                                --- It's default is 4k (qwen3:4b=4.1GB, qwen3:8b=6.5GB).
+                                -- default = 16384,
                             },
                         },
                     })
@@ -416,11 +419,8 @@ return {
                     return require('codecompanion.adapters').extend('ollama', {
                         schema = {
                             model = {
-                                default = 'qwen3:8b',
+                                default = 'qwen3:4b',
                                 choices = {},
-                            },
-                            num_ctx = {
-                                default = 40960,
                             },
                         },
                     })
@@ -432,9 +432,6 @@ return {
                                 default = 'qwen2.5-coder:7b',
                                 choices = { 'qwen2.5-coder:7b', 'qwen2.5-coder:14b' },
                             },
-                            num_ctx = {
-                                default = 32768,
-                            },
                         },
                     })
                 end,
@@ -444,9 +441,6 @@ return {
                             model = {
                                 default = 'llama3.1:8b',
                                 choices = {},
-                            },
-                            num_ctx = {
-                                default = 131072,
                             },
                         },
                     })
@@ -515,7 +509,7 @@ return {
                         end,
                     },
                 },
-                ['Agent'] = {
+                ['Agent (Sonnet 4)'] = {
                     strategy = 'chat',
                     description = 'Create a new chat buffer in Agent mode',
                     condition = function()
@@ -536,9 +530,9 @@ return {
                         },
                     },
                 },
-                ['Free Agent (GPT-4o)'] = {
+                ['Free Agent (GPT 4.1)'] = {
                     strategy = 'chat',
-                    description = 'Create a new chat buffer in Agent mode with GPT-4o',
+                    description = 'Create a new chat buffer in Agent mode with GPT-4.1',
                     condition = function()
                         return vim.g.allow_remote_llm
                     end,
@@ -547,7 +541,7 @@ return {
                         stop_context_insertion = true,
                         adapter = {
                             name = 'copilot',
-                            model = 'gpt-4o', -- Multiplier = 0 (free).
+                            model = 'gpt-4.1', -- Multiplier = 0 (free).
                         },
                     },
                     prompts = {
