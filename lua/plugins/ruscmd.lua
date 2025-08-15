@@ -3,7 +3,6 @@
 return {
     {
         'powerman/ruscmd.nvim',
-        dev = true,
         ---@module 'ruscmd'
         ---@type ruscmd.Options
         opts = {
