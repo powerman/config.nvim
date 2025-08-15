@@ -8,22 +8,22 @@ size = 2080472
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz"
 
 [tools.ast-grep]
-version = "0.38.6"
+version = "0.39.3"
 backend = "aqua:ast-grep/ast-grep"
 
 [tools.ast-grep.platforms.linux-x64]
-checksum = "blake3:7dc93d8540104939b6cbadd19da0e3e9d0f28305320387ab44acf0c65ea5ef65"
-size = 7280525
-url = "https://github.com/ast-grep/ast-grep/releases/download/0.38.6/app-x86_64-unknown-linux-gnu.zip"
+checksum = "blake3:e0ec88575111a8eb8af98e5fa639a15aeebed1fc4274513f1673aadd3db1d598"
+size = 7426438
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.3/app-x86_64-unknown-linux-gnu.zip"
 
 [tools.neovim]
-version = "0.11.2"
+version = "0.11.3"
 backend = "aqua:neovim/neovim"
 
 [tools.neovim.platforms.linux-x64]
-checksum = "sha256:a9b24157672eb218ff3e33ef3f8c08db26f8931c5c04bdb0e471371dd1dfe63e"
-size = 10928973
-url = "https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.tar.gz"
+checksum = "blake3:2028f31e20dd8e50399dc80da13b0ef626b7db83885f65098726626aa44d174b"
+size = 10941468
+url = "https://github.com/neovim/neovim/releases/download/v0.11.3/nvim-linux-x86_64.tar.gz"
 
 [tools.stylua]
 version = "2.1.0"
