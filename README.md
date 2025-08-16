@@ -1,5 +1,10 @@
 # ~/.config/nvim
 
+[![License MIT](https://img.shields.io/badge/license-MIT-royalblue.svg)](LICENSE)
+[![Neovim 0.11+](https://img.shields.io/badge/Neovim-0.11%2B-royalblue?logo=neovim&logoColor=white)](https://neovim.io/)
+[![Lua 5.1](https://img.shields.io/badge/Lua-5.1-blue)](https://www.lua.org/)
+[![Test](https://img.shields.io/github/actions/workflow/status/powerman/config.nvim/test.yml?label=test)](https://github.com/powerman/config.nvim/actions/workflows/test.yml)
+
 ## Introduction
 
 This is my Neovim config.
@@ -91,14 +96,12 @@ version from the lockfile.
 ### FAQ
 
 - What should I do if I already have a pre-existing Neovim configuration?
-
   - You should back it up and then delete all associated files.
 
   - This includes your existing init.lua and the Neovim files in `~/.local`
     which can be deleted with `rm -rf ~/.local/share/nvim/`
 
 - Can I keep my existing configuration in parallel?
-
   - Yes! You can use [NVIM_APPNAME](https://neovim.io/doc/user/starting.html#_nvim_appname)`=nvim-NAME`
     to maintain multiple configurations. For example, you can install the
     configuration in `~/.config/nvim-powerman` and create an alias:

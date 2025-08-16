@@ -2,7 +2,6 @@ name: Test
 
 on:
   workflow_dispatch:
-  workflow_call:
   push:
     branches: [main]
   pull_request:
@@ -22,9 +21,10 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: jdx/mise-action@v2
+      - run: git reset --hard # Work around https://github.com/jdx/mise/discussions/5910.
 
       - name: Cache Lazy plugins
         uses: actions/cache@v4
@@ -38,4 +38,4 @@ jobs:
           ln -snf "$PWD" ~/.config/nvim
           nvim --headless -c "Lazy restore" +qa
 
-      - run: mise run test
+      - run: mise run ci

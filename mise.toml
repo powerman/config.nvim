@@ -6,31 +6,41 @@ lockfile = true     # DO NOT FORGET TO `touch mise.lock` if mise.lock does not e
 [tools]
 neovim = 'latest'
 
-#--- Test & Lint
-# Static checker for GitHub Actions workflow files.
-actionlint = 'latest'
+#--- Format
 # An opinionated Lua code formatter
 stylua = 'latest'
+
+#--- Lint
+# Static checker for GitHub Actions workflow files.
+actionlint = 'latest'
 # A CLI tool for code structural search, lint and rewriting.
 ast-grep = 'latest'
 
 
 [tasks.fmt]
-description = 'Format all code'
+description = 'Format all files'
 depends = ['fmt:*']
-
-[tasks.'fmt:stylua']
-description = 'Format Lua code'
-run = 'stylua .'
-
-[tasks.test]
-alias = 'default'
-description = 'Run all linters and tests'
-depends = ['lint:*', 'test:*']
 
 [tasks.lint]
 description = 'Run all linters'
 depends = ['lint:*']
+
+[tasks.test]
+description = 'Run all tests'
+depends = ['test:*']
+
+[tasks.default]
+description = 'Run all linters and tests'
+depends = ['lint', 'test']
+
+[tasks.ci]
+description = 'Run all CI tasks'
+depends = ['fmt', 'lint', 'test']
+run = '! git status --porcelain | tee /dev/stderr | grep -q .' # Is working tree clean after fmt?
+
+[tasks.'fmt:stylua']
+description = 'Format Lua code'
+run = 'stylua .'
 
 [tasks.'lint:workflows']
 description = 'Lint GitHub Action workflows'
@@ -51,3 +61,7 @@ arg "[test]"
 complete "test" run="cd tests && fd -tf -td -E minimal_init.lua"
 '''
 run = 'nvim --headless -u run_plenary.vim +qa -- tests/${usage_test}'
+
+[tasks.cachedir]
+hide = true
+run = 'mkdir -p .cache'
