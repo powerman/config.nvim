@@ -44,8 +44,27 @@ return {
     config = function(_, opts)
         -- HACK: Fix Mason registry for Prettierd to use fork with fixed Unicode issue.
         require('mason-registry').get_all_packages() -- Force Mason to load registry.
-        require('mason-registry').sources.list[1].instance.buffer.prettierd.spec.source.id =
-            'pkg:npm/%40powerman-asdf/prettierd@0.26.4'
+        local prettierd_source_id = 'pkg:npm/%40powerman-asdf/prettierd@0.26.4'
+        local registry_source = require('mason-registry').sources.list[1].instance
+        local original_get_package = registry_source.get_package
+        registry_source.get_package = function(self, pkg_name)
+            local pkg = original_get_package(self, pkg_name)
+            if pkg and pkg_name == 'prettierd' then
+                pkg.spec.source.id = prettierd_source_id
+            end
+            return pkg
+        end
+        local original_get_all_specs = registry_source.get_all_package_specs
+        registry_source.get_all_package_specs = function(self)
+            local specs = original_get_all_specs(self)
+            for _, spec in ipairs(specs) do
+                if spec.name == 'prettierd' then
+                    spec.source.id = prettierd_source_id
+                    break
+                end
+            end
+            return specs
+        end
 
         opts = opts or {}
         local ensure_installed = {
