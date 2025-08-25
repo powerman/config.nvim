@@ -7,7 +7,7 @@ lockfile = true     # DO NOT FORGET TO `touch mise.lock` if mise.lock does not e
 neovim = 'latest'
 
 #--- Format
-# An opinionated Lua code formatter
+# An opinionated Lua code formatter.
 stylua = 'latest'
 
 #--- Lint
@@ -47,7 +47,7 @@ description = 'Lint GitHub Action workflows'
 run = 'actionlint'
 
 [tasks.'lint:stylua']
-description = 'Lint Lua code'
+description = 'Check Lua code formatting'
 run = 'stylua --check .'
 
 [tasks.'lint:ast-grep']
