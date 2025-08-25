@@ -8,11 +8,9 @@ describe('util', function()
         local notify_called
 
         before_each(function()
-            -- Создаем временную директорию для тестов
             test_dir = vim.fn.getcwd() .. '/test_dir'
             vim.fn.mkdir(test_dir .. '/.buildcache/bin', 'p')
             notify_called = false
-            -- Перехватываем вызовы vim.notify
             ---@diagnostic disable-next-line: duplicate-set-field
             vim.notify = function(msg, level)
                 notify_called = true
