@@ -15,7 +15,7 @@ return {
     -- TODO: Some basic formatter is already provided by LSP, but there are new tools not
     -- added to Mason yet which might work better (e.g. https://github.com/reteps/dockerfmt).
     -- dockerfile = { 'dprint' }, -- Require `dprint config add dockerfile`.
-    go = { 'goimports', 'gci', 'gofumpt' }, -- Also: 'gofmt', 'goimports-reviser'.
+    go = { 'golangci-lint' }, -- Also: 'goimports', 'gci', 'gofumpt', 'gofmt', 'goimports-reviser'.
     graphql = { 'prettierd' },
     -- html = { 'djlint' }, -- Already provided by LSP (by efmls djlint).
     -- html = { 'prettierd' }, -- Fail on invalid HTML without error message.
