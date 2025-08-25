@@ -205,6 +205,9 @@ function M.mcphub(params)
     if auto_approve then
         return true
     end
+    if not params.is_auto_approved_in_server then
+        vim.api.nvim_exec_autocmds('User', { pattern = 'MCPHubApprovalWindowOpened' })
+    end
     return params.is_auto_approved_in_server -- Respect servers.json configuration.
 end
 
