@@ -211,6 +211,7 @@ return {
                         -- https://docs.github.com/en/copilot/managing-copilot/understanding-and-managing-copilot-usage/understanding-and-managing-requests-in-copilot
                         -- model = 'gpt-4.1', -- Multiplier = 0 (free).
                         -- model = 'gpt-4o', -- Multiplier = 0 (free).
+                        -- model = 'gpt-5-mini', -- Multiplier = 0 (free).
                         -- model = 'gemini-2.0-flash-001', -- Multiplier = 0.25.
                         -- model = 'o4-mini', -- Multiplier = 0.33.
                         -- model = 'gemini-2.5-pro', -- Multiplier = 1.
@@ -509,6 +510,48 @@ return {
                         end,
                     },
                 },
+                ['Agent (Sonnet 3.5)'] = {
+                    strategy = 'chat',
+                    description = 'Create a new chat buffer in Agent mode',
+                    condition = function()
+                        return vim.g.allow_remote_llm
+                    end,
+                    opts = {
+                        index = 9,
+                        stop_context_insertion = true,
+                        adapter = {
+                            name = 'copilot',
+                            model = 'claude-3.5-sonnet', -- Multiplier = 1.
+                        },
+                    },
+                    prompts = {
+                        {
+                            role = prompt.USER_ROLE,
+                            content = '#{mcp:neovim://workspace} @{agent} ',
+                        },
+                    },
+                },
+                ['Agent (Sonnet 3.7)'] = {
+                    strategy = 'chat',
+                    description = 'Create a new chat buffer in Agent mode',
+                    condition = function()
+                        return vim.g.allow_remote_llm
+                    end,
+                    opts = {
+                        index = 8,
+                        stop_context_insertion = true,
+                        adapter = {
+                            name = 'copilot',
+                            model = 'claude-3.7-sonnet', -- Multiplier = 1.
+                        },
+                    },
+                    prompts = {
+                        {
+                            role = prompt.USER_ROLE,
+                            content = '#{mcp:neovim://workspace} @{agent} ',
+                        },
+                    },
+                },
                 ['Agent (Sonnet 4)'] = {
                     strategy = 'chat',
                     description = 'Create a new chat buffer in Agent mode',
@@ -516,7 +559,7 @@ return {
                         return vim.g.allow_remote_llm
                     end,
                     opts = {
-                        index = 6,
+                        index = 7,
                         stop_context_insertion = true,
                         adapter = {
                             name = 'copilot',
@@ -537,7 +580,7 @@ return {
                         return vim.g.allow_remote_llm
                     end,
                     opts = {
-                        index = 7,
+                        index = 6,
                         stop_context_insertion = true,
                         adapter = {
                             name = 'copilot',
