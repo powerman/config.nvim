@@ -768,7 +768,11 @@ return {
             local notifier = require('custom.sound_notifier').new(vim.g.llm_message_sound)
             vim.api.nvim_create_autocmd('User', {
                 group = notifier.augroup,
-                pattern = { 'CodeCompanionChatDone', 'CodeCompanionInlineFinished' },
+                pattern = {
+                    'CodeCompanionChatDone',
+                    'CodeCompanionInlineFinished',
+                    'MCPHubApprovalWindowOpened',
+                },
                 callback = notifier:notify_callback(),
             })
         end,
