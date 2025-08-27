@@ -7,17 +7,21 @@ describe('auto_approve', function()
 
     before_each(function()
         auto_approve.setup()
+        auto_approve.session_allowed_cmds = {} -- Reset session commands for each test
     end)
 
     describe('setup', function()
         it('uses default config when no options provided', function()
             assert.same({
-                allowed_cmds = nil,
+                allowed_cmds = {},
                 secret_files = {
                     '.env*',
                     'env*.sh',
                 },
                 project_root = nil,
+                cmd_env = true,
+                cmd_redir = true,
+                cmd_chain = true,
                 codecompanion = {
                     cmd_runner = true,
                     create_file = true,
@@ -35,6 +39,7 @@ describe('auto_approve', function()
             auto_approve.setup {
                 allowed_cmds = { 'ls' },
                 project_root = '/tmp',
+                cmd_env = false,
                 codecompanion = {
                     cmd_runner = false,
                 },
@@ -46,6 +51,9 @@ describe('auto_approve', function()
                     'env*.sh',
                 },
                 project_root = '/tmp',
+                cmd_env = false,
+                cmd_redir = true,
+                cmd_chain = true,
                 codecompanion = {
                     cmd_runner = false,
                     create_file = true,
@@ -82,6 +90,80 @@ describe('auto_approve', function()
                 local cmd = 'cd ' .. project_root .. ' && npm test'
                 local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
                 assert.is_false(requires_approval)
+            end)
+
+            it('supports advanced quote handling in prefix patterns', function()
+                auto_approve.setup {
+                    allowed_cmds = {
+                        'go test -run=*',
+                        'docker -*',
+                    },
+                }
+
+                local test_cases = {
+                    -- Advanced quote combinations for -run=*
+                    {
+                        cmd = [[go test -"r"u'n'=Test]],
+                        expected = true,
+                        desc = 'Quoted middle part',
+                    },
+                    {
+                        cmd = 'go test "-run"=Test',
+                        expected = true,
+                        desc = 'Quoted prefix part',
+                    },
+                    {
+                        cmd = 'go test -run="Test"',
+                        expected = true,
+                        desc = 'Quoted value part',
+                    },
+                    {
+                        cmd = 'go test -run=A "-run=B" -run=C',
+                        expected = true,
+                        desc = 'Multiple mixed arguments',
+                    },
+                    {
+                        cmd = 'go test -run=A -run="B C" -run=D',
+                        expected = true,
+                        desc = 'Multiple with quoted space',
+                    },
+                    {
+                        cmd = 'go test "-run=A" "-run=B" "-run=C"',
+                        expected = true,
+                        desc = 'Multiple all quoted',
+                    },
+                    { cmd = 'go test "-run="', expected = true, desc = 'Quoted empty value' },
+
+                    -- Tests for docker -*
+                    { cmd = 'docker -it', expected = true, desc = 'Simple flag' },
+                    { cmd = 'docker --rm', expected = true, desc = 'Double dash flag' },
+                    { cmd = 'docker "-it"', expected = true, desc = 'Quoted flag' },
+                    { cmd = 'docker "--rm"', expected = true, desc = 'Quoted double dash' },
+                    {
+                        cmd = 'docker "-it" "--rm"',
+                        expected = true,
+                        desc = 'Multiple quoted flags',
+                    },
+
+                    -- Negative cases
+                    { cmd = 'go test -debug=yes', expected = false, desc = 'Different prefix' },
+                    {
+                        cmd = 'go test "-debug=yes"',
+                        expected = false,
+                        desc = 'Different prefix quoted',
+                    },
+                    { cmd = 'docker run', expected = false, desc = 'No dash prefix' },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd .. ' (' .. tc.desc .. ')'
+                    )
+                end
             end)
 
             it('requires approval for non-allowed commands with cd prefix', function()
@@ -168,6 +250,509 @@ describe('auto_approve', function()
                         requires_approval,
                         'Failed for command: ' .. tc.cmd
                     )
+                end
+            end)
+        end)
+
+        describe('session commands', function()
+            it('adds valid session commands', function()
+                auto_approve.setup { allowed_cmds = { 'ls' } }
+
+                -- Add session command
+                vim.cmd 'AutoApproveAddAllowedCmd go test'
+
+                -- Should auto-approve session command
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_false(requires_approval)
+
+                -- Should still work with original commands
+                requires_approval = auto_approve.cmd_runner { args = { cmd = 'ls' } }
+                assert.is_false(requires_approval)
+
+                -- Should require approval for non-allowed commands
+                requires_approval = auto_approve.cmd_runner { args = { cmd = 'rm file' } }
+                assert.is_true(requires_approval)
+            end)
+
+            it('validates session commands', function()
+                -- Should reject empty command
+                local ok = pcall(vim.cmd, 'AutoApproveAddAllowedCmd')
+                assert.is_false(ok)
+
+                -- Should reject command starting with *
+                ok = pcall(vim.cmd, 'AutoApproveAddAllowedCmd *')
+                assert.is_false(ok) -- Will error due to validation
+            end)
+
+            it('session commands have higher priority', function()
+                auto_approve.setup { allowed_cmds = { 'go build' } }
+                vim.cmd 'AutoApproveAddAllowedCmd go test'
+
+                -- Session command should work
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_false(requires_approval)
+
+                -- Config command should also work
+                requires_approval = auto_approve.cmd_runner { args = { cmd = 'go build' } }
+                assert.is_false(requires_approval)
+            end)
+
+            it('resets session commands', function()
+                vim.cmd 'AutoApproveAddAllowedCmd go test'
+                vim.cmd 'AutoApproveAddAllowedCmd npm install'
+
+                -- Both should work
+                local requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_false(requires_approval)
+
+                requires_approval = auto_approve.cmd_runner { args = { cmd = 'npm install' } }
+                assert.is_false(requires_approval)
+
+                -- Reset
+                vim.cmd 'AutoApproveResetAllowedCmds'
+
+                -- Both should now require approval
+                requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_true(requires_approval)
+
+                requires_approval = auto_approve.cmd_runner { args = { cmd = 'npm install' } }
+                assert.is_true(requires_approval)
+            end)
+
+            it('lists session commands', function()
+                -- Empty list
+                vim.cmd 'AutoApproveListAddedAllowedCmds' -- Should not error
+
+                -- Add commands and list
+                vim.cmd 'AutoApproveAddAllowedCmd go test'
+                vim.cmd 'AutoApproveAddAllowedCmd npm build'
+                vim.cmd 'AutoApproveListAddedAllowedCmds' -- Should not error
+            end)
+        end)
+
+        describe('pattern support', function()
+            it('supports wildcard patterns with *', function()
+                auto_approve.setup {
+                    allowed_cmds = {
+                        'go test *',
+                        'echo *',
+                        'ls *',
+                    },
+                }
+
+                local test_cases = {
+                    { cmd = 'go test', expected = true },
+                    { cmd = 'go test -v', expected = true },
+                    { cmd = 'go test -v -run TestName', expected = true },
+                    { cmd = 'echo hello world', expected = true },
+                    { cmd = 'echo "hello world"', expected = true },
+                    { cmd = 'ls -la', expected = true },
+                    { cmd = 'ls', expected = true },
+                    { cmd = 'go build', expected = false },
+                    { cmd = 'rm file', expected = false },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('supports prefix patterns like -* and --*', function()
+                auto_approve.setup {
+                    allowed_cmds = {
+                        'go -* test *',
+                        'docker -* run *',
+                        'git -* diff *',
+                    },
+                }
+
+                local test_cases = {
+                    { cmd = 'go test', expected = true },
+                    { cmd = 'go -mod=vendor test', expected = true },
+                    { cmd = 'go -mod=vendor -v test', expected = true },
+                    { cmd = 'docker run nginx', expected = true },
+                    { cmd = 'docker --rm run nginx', expected = true },
+                    { cmd = 'git diff HEAD~1', expected = true },
+                    { cmd = 'git --no-pager diff HEAD~1', expected = true },
+                    { cmd = 'go build test', expected = false },
+                    { cmd = 'docker build .', expected = false },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('supports specific prefix patterns like -run=*', function()
+                auto_approve.setup {
+                    allowed_cmds = {
+                        'go test -run=*',
+                        'sed -n *',
+                        'grep -E *',
+                    },
+                }
+
+                local test_cases = {
+                    { cmd = 'go test -run=', expected = true },
+                    { cmd = 'go test "-run="', expected = true },
+                    { cmd = "go test '-run='", expected = true },
+                    { cmd = 'go test -run=TestName', expected = true },
+                    { cmd = 'go test -run="Test 1"', expected = true },
+                    { cmd = "go test -run='Test 1'", expected = true },
+                    { cmd = 'go test "-run=Test 1"', expected = true },
+                    { cmd = "go test '-run=Test 1'", expected = true },
+                    { cmd = 'sed -n 1p file.txt', expected = true },
+                    { cmd = 'sed -n "1,5p" file.txt', expected = true },
+                    { cmd = 'grep -E "some pattern" file.txt', expected = true },
+                    { cmd = 'go test -v', expected = false },
+                    { cmd = 'sed -i s/old/new/ file.txt', expected = false },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+        end)
+
+        describe('environment variables support', function()
+            it('auto-approves safe environment variables', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'go test' },
+                }
+
+                local test_cases = {
+                    { cmd = 'go test', expected = true },
+                    { cmd = 'GOOS=linux go test', expected = true },
+                    { cmd = 'GOOS=linux GOARCH=amd64 go test', expected = true },
+                    { cmd = 'CGO_ENABLED=0 go test', expected = true },
+                    { cmd = 'DEBUG= go test', expected = true },
+                    { cmd = 'MY_VAR="hello world" go test', expected = true },
+                    { cmd = "MY_VAR='hello world' go test", expected = true },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('blocks unsafe environment variables', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'ls' },
+                }
+
+                local test_cases = {
+                    { cmd = 'PATH=/malicious ls', expected = false },
+                    { cmd = 'LD_PRELOAD=./bad.so ls', expected = false },
+                    { cmd = 'LD_LIBRARY_PATH=/bad ls', expected = false },
+                    { cmd = 'LIBRARY_PATH=/bad ls', expected = false },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('can disable environment variables support', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'go test' },
+                    cmd_env = false,
+                }
+
+                local requires_approval =
+                    auto_approve.cmd_runner { args = { cmd = 'GOOS=linux go test' } }
+                assert.is_true(
+                    requires_approval,
+                    'Should require approval when env vars disabled'
+                )
+            end)
+        end)
+
+        describe('redirections support', function()
+            it('auto-approves safe redirections', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'go test', 'ls' },
+                }
+
+                local test_cases = {
+                    { cmd = 'go test > output.txt', expected = true },
+                    { cmd = 'go test 2>&1', expected = true },
+                    { cmd = 'go test > /dev/null', expected = true },
+                    { cmd = 'go test 2> /dev/null', expected = true },
+                    { cmd = 'ls > result.txt 2>&1', expected = true },
+                    { cmd = 'go test > logs/test.log', expected = true },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('can disable redirections support', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'go test' },
+                    cmd_redir = false,
+                }
+
+                local requires_approval =
+                    auto_approve.cmd_runner { args = { cmd = 'go test > output.txt' } }
+                assert.is_true(
+                    requires_approval,
+                    'Should require approval when redirections disabled'
+                )
+            end)
+        end)
+
+        describe('command chains support', function()
+            it('auto-approves safe command chains', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'go test', 'echo *', 'ls' },
+                }
+
+                local test_cases = {
+                    { cmd = 'go test && echo "success"', expected = true },
+                    { cmd = 'go test || echo "failed"', expected = true },
+                    { cmd = 'ls; echo "done"', expected = true },
+                    { cmd = 'go test | grep PASS', expected = false }, -- grep not allowed
+                    { cmd = 'go test && rm file', expected = false }, -- rm not allowed
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+
+            it('can disable command chains support', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'go test', 'echo *' },
+                    cmd_chain = false,
+                }
+
+                local requires_approval =
+                    auto_approve.cmd_runner { args = { cmd = 'go test && echo success' } }
+                assert.is_true(
+                    requires_approval,
+                    'Should require approval when command chains disabled'
+                )
+            end)
+        end)
+
+        describe('security checks', function()
+            it('blocks unsafe substrings', function()
+                auto_approve.setup {
+                    allowed_cmds = { 'echo *' },
+                }
+
+                local test_cases = {
+                    { cmd = 'echo ../../../etc/passwd', expected = false },
+                    { cmd = 'echo `whoami`', expected = false },
+                    { cmd = 'echo $(malicious)', expected = false },
+                    { cmd = 'echo "../../../etc/passwd"', expected = false }, -- quoted but still unsafe
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+        end)
+
+        describe('configuration validation', function()
+            it('validates allowed_cmds configuration', function()
+                -- Test will pass if no errors are thrown
+                auto_approve.setup {
+                    allowed_cmds = {
+                        'go test',
+                        'go test *',
+                        'go -* test *',
+                    },
+                }
+
+                -- Invalid configurations should log errors but not crash
+                auto_approve.setup {
+                    allowed_cmds = {
+                        '', -- empty command
+                        '*', -- starts with *
+                        123, -- not a string
+                        'valid command',
+                    },
+                }
+            end)
+        end)
+
+        describe('complex scenarios', function()
+            it('handles complex real-world commands', function()
+                auto_approve.setup {
+                    allowed_cmds = {
+                        'go test *',
+                        'go -* test *',
+                        'npm *',
+                        'docker *',
+                        'echo *',
+                        'grep *',
+                    },
+                }
+
+                local test_cases = {
+                    {
+                        cmd = 'GOOS=linux go -mod=vendor test -v -run=TestIntegration > test.log 2>&1',
+                        expected = true,
+                    },
+                    {
+                        cmd = 'CGO_ENABLED=0 go test ./... && echo "Tests passed"',
+                        expected = true,
+                    },
+                    {
+                        cmd = 'npm run test:unit > output.txt || echo "Tests failed"',
+                        expected = true,
+                    },
+                    { cmd = 'docker --rm --name test run nginx:latest', expected = true },
+                    { cmd = 'DEBUG=1 npm install && npm test', expected = true }, -- both npm commands are allowed
+                    {
+                        cmd = 'go test | grep PASS',
+                        expected = true,
+                    },
+                }
+
+                for _, tc in ipairs(test_cases) do
+                    local requires_approval =
+                        auto_approve.cmd_runner { args = { cmd = tc.cmd } }
+                    assert.equal(
+                        tc.expected,
+                        not requires_approval,
+                        'Failed for command: ' .. tc.cmd
+                    )
+                end
+            end)
+        end)
+
+        describe('performance', function()
+            it('handles complex command checking efficiently', function()
+                -- 100 allowed commands
+                local many_commands = {}
+                for i = 1, 100 do
+                    table.insert(many_commands, 'cmd' .. i .. ' *')
+                end
+
+                auto_approve.setup { allowed_cmds = many_commands }
+
+                -- Complex command (200+ characters), checks command near end of list
+                local complex_cmd = 'ENV1=value1 ENV2="quoted value" cmd99 --flag1 --flag2=value '
+                    .. 'arg1 arg2 > output.log 2>&1 && echo "success" || echo "failed" ; '
+                    .. 'cmd100 -v --verbose | grep pattern > final.txt'
+
+                local start = vim.loop.hrtime()
+                auto_approve.cmd_runner { args = { cmd = complex_cmd } }
+                local elapsed = (vim.loop.hrtime() - start) / 1e6 -- in milliseconds
+
+                print(
+                    'auto_approve: BENCHMARK: Complex command parsing took '
+                        .. string.format('%.2f', elapsed)
+                        .. 'ms'
+                )
+            end)
+        end)
+
+        describe('edge cases and special characters', function()
+            it('handles special characters safely', function()
+                auto_approve.setup { allowed_cmds = { 'echo *' } }
+
+                local evil_inputs = {
+                    'echo \0null',
+                    'echo \n\r\t',
+                    'echo "quote\\"escape"',
+                    "echo 'single\\'quote'",
+                    'echo $((1+1))',
+                    'echo ${HOME}',
+                    'echo ~user',
+                    'echo file\\ with\\ spaces',
+                    string.rep('a', 1000), -- very long command
+                }
+
+                for _, input in ipairs(evil_inputs) do
+                    local ok, result =
+                        pcall(auto_approve.cmd_runner, { args = { cmd = input } })
+                    assert.is_true(ok, 'Should not crash on: ' .. input)
+                    assert.is_boolean(result, 'Should return boolean for: ' .. input)
+                end
+            end)
+
+            it('handles malformed patterns gracefully', function()
+                auto_approve.setup {
+                    allowed_cmds = {
+                        '', -- empty command
+                        '   ', -- only spaces
+                        '*', -- only asterisk (should be blocked)
+                        'cmd **', -- double asterisk
+                        'cmd * * *', -- multiple asterisks
+                    },
+                }
+
+                -- Should not crash during initialization
+                assert.is_table(auto_approve.config)
+            end)
+
+            it('handles empty and whitespace commands', function()
+                auto_approve.setup { allowed_cmds = { 'test' } }
+
+                local edge_cases = {
+                    '',
+                    ' ',
+                    '\t',
+                    '\n',
+                    '   \t  \n  ',
+                }
+
+                for _, cmd in ipairs(edge_cases) do
+                    local ok, result = pcall(auto_approve.cmd_runner, { args = { cmd = cmd } })
+                    assert.is_true(ok, 'Should not crash on empty/whitespace: "' .. cmd .. '"')
+                    assert.is_boolean(result, 'Should return boolean for: "' .. cmd .. '"')
                 end
             end)
         end)

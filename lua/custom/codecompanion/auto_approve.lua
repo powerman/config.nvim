@@ -1,5 +1,8 @@
 ---@class AutoApproveConfig
----@field allowed_cmds? string[] Allowed commands for cmd_runner and mcp execute_command.
+---@field allowed_cmds? string[] Allowed commands for cmd_runner, neovim__execute_command, shell__shell_exec. Supports patterns (e.g., 'go test *').
+---@field cmd_env? boolean Allow safe environment variables in commands (default: true).
+---@field cmd_redir? boolean Allow safe output redirections in commands (default: true).
+---@field cmd_chain? boolean Allow command chaining with &&, ||, ;, | (default: true).
 ---@field secret_files? string[] List of files (in glob format) that should not be sent to LLM.
 ---@field project_root? string Allow file operations in this directory and below.
 ---@field codecompanion? table<string,boolean> Code Companion tools to protect (when true).
@@ -8,7 +11,10 @@
 ---@field mcphub_git? boolean If true then protect @mcp git tools.
 ---@field mcphub_shell? boolean If true then protect @mcp shell tools.
 local defaults = {
-    allowed_cmds = nil,
+    allowed_cmds = {},
+    cmd_env = true,
+    cmd_redir = true,
+    cmd_chain = true,
     secret_files = {
         '.env*',
         'env*.sh',
@@ -26,8 +32,40 @@ local defaults = {
     mcphub_shell = true,
 }
 
+local UNSAFE_CMD_SUBSTRINGS = {
+    '../',
+    '`', -- Isn't included in "safe quoted chars", so this is just an extra precaution.
+    '$(', -- Isn't included in "safe quoted chars", so this is just an extra precaution.
+}
+
+local UNSAFE_ENV_NAME_PREFIXES = {
+    'LD_',
+    'DYLD_',
+    'CLASSPATH=',
+    'GIO_EXTRA_MODULES=',
+    'GTK_PATH=',
+    'LIBGL_DRIVERS_PATH=',
+    'LIBRARY_PATH=',
+    'NODE_PATH=',
+    'PATH=',
+    'PERL5LIB=',
+    'PKG_CONFIG_PATH=',
+    'PYTHONPATH=',
+    'QT_PLUGIN_PATH=',
+    'RUBYLIB=',
+}
+
+local SAFE_REDIR_PATTERNS = {
+    '[0-9]>&[0-9]%s*',
+    '[12]?>%s*/dev/null%s*', -- to /dev/null
+    '[12]?>%s*[A-Za-z0-9_.%-][/A-Za-z0-9_.%-]*%s*', -- to file
+}
+
+local SAFE_CONTROL_OPERATORS = { '&&', '||', '|&', '|', ';' }
+
 local M = {
     config = vim.deepcopy(defaults),
+    session_allowed_cmds = {}, -- Commands added via :AutoApproveAddAllowedCmd.
 }
 
 local function notify(message, level)
@@ -39,10 +77,36 @@ local function notify(message, level)
     vim.notify(message, level or vim.log.levels.INFO)
 end
 
+--- Validate a single command pattern.
+---@param cmd string Command to validate.
+---@return boolean valid Whether command is valid.
+local function validate_command(cmd)
+    local msg = 'skip allowed cmd '
+    if type(cmd) ~= 'string' then
+        notify(msg .. vim.inspect(cmd) .. ': must be a string', vim.log.levels.ERROR)
+        return false
+    elseif vim.trim(cmd) == '' then
+        notify(msg .. vim.inspect(cmd) .. ': empty string', vim.log.levels.ERROR)
+        return false
+    elseif vim.startswith(vim.trim(cmd), '*') then
+        notify(msg .. vim.inspect(cmd) .. ': cannot start with *', vim.log.levels.ERROR)
+        return false
+    end
+    return true
+end
+
 ---@param opts? AutoApproveConfig
 function M.setup(opts)
     opts = opts or {}
     M.config = vim.tbl_deep_extend('force', vim.deepcopy(defaults), opts)
+
+    for i = #M.config.allowed_cmds, 1, -1 do
+        if validate_command(M.config.allowed_cmds[i]) then
+            M.config.allowed_cmds[i] = vim.trim(M.config.allowed_cmds[i])
+        else
+            table.remove(M.config.allowed_cmds, i)
+        end
+    end
 end
 
 -- Updates CodeCompanion config to protect tools based on user-defined settings.
@@ -79,7 +143,209 @@ function M.setup_codecompanion()
     end
 end
 
+-- Command parsing with simple pattern matching.
+-- Supports patterns with * wildcards and automatic approval for environment variables,
+-- redirections, and command chains.
+
+--- Check if command is not safe.
+---@param cmd string
+---@return boolean
+local function is_cmd_unsafe(cmd)
+    -- Remove quotes to prevent bypassing security checks (e.g., `."."/` is a `../`).
+    local cleaned_cmd = cmd:gsub('["\']', '')
+
+    for _, substring in ipairs(UNSAFE_CMD_SUBSTRINGS) do
+        if cleaned_cmd:find(substring, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+--- Check if environment variable is not safe.
+---@param name string
+---@return boolean
+local function is_env_unsafe(name)
+    for _, prefix in ipairs(UNSAFE_ENV_NAME_PREFIXES) do
+        if vim.startswith(name .. '=', prefix) then
+            return true
+        end
+    end
+    return false
+end
+
+--- Trim safe environment variables from the beginning of command.
+---@param cmd string Full command which may start with env vars.
+---@return string cmd Rest of command without prefix containing safe env vars.
+local function trim_safe_env_vars(cmd)
+    if not M.config.cmd_env then
+        return cmd
+    end
+
+    while true do
+        local s, e, k = cmd:find '^([A-Z0-9_]+)='
+        if not s then
+            return cmd
+        end
+
+        local value_pos = e + 1
+        s, e = cmd:find('^[A-Za-z0-9_:.-]*%s+', value_pos)
+        if not s then
+            s, e = cmd:find("^'[ A-Za-z0-9_:.-]*'%s+", value_pos)
+        end
+        if not s then
+            s, e = cmd:find('^"[ A-Za-z0-9_:.-]*"%s+', value_pos)
+        end
+        if not s then
+            return cmd
+        end
+
+        if is_env_unsafe(k) then
+            return cmd
+        end
+        cmd = cmd:sub(e + 1)
+    end
+end
+
+--- Split allowed_cmd pattern into space-separated tokens.
+---@param allowed_cmd string
+---@return string[] tokens
+local function split_allowed_cmd(allowed_cmd)
+    local tokens = {}
+    local i = 1
+    local len = #allowed_cmd
+    while i <= len do
+        local _, e = allowed_cmd:find('^%s*', i)
+        i = e + 1
+
+        local from = i
+        while i <= len do
+            _, e = allowed_cmd:find([[^[^%s'"]+]], i)
+            if not e then
+                _, e = allowed_cmd:find("^%b''", i)
+            end
+            if not e then
+                _, e = allowed_cmd:find('^%b""', i)
+            end
+            if not e then
+                break
+            end
+            i = e + 1
+        end
+
+        if from >= i then -- No match: either end of string or unbalanced quote.
+            if i <= len then -- Unbalanced quote, take the rest of the string.
+                if #tokens == 0 or allowed_cmd:match('^%s', i - 1) ~= nil then -- Separate token.
+                    table.insert(tokens, allowed_cmd:sub(i))
+                else -- Part of previous token.
+                    tokens[#tokens] = tokens[#tokens] .. allowed_cmd:sub(i)
+                end
+            end
+            break
+        end
+
+        table.insert(tokens, allowed_cmd:sub(from, i - 1))
+    end
+    return tokens
+end
+
+--- Try to get safe argument from the beginning of a command.
+---@param cmd string Command to check
+---@return string arg Argument if found.
+---@return boolean space_after Whether there was a space after the argument.
+---@return string remaining_cmd Unmodified command if no safe arg found.
+local function try_get_safe_arg(cmd)
+    local i = 1
+    while i <= #cmd do
+        local _, e = cmd:find('^[A-Za-z0-9+,/:=@^_.~%%-]+', i)
+        if not e then
+            _, e = cmd:find("^'[%sA-Za-z0-9+,/:=@^_.~%%-]+'", i)
+        end
+        if not e then
+            _, e = cmd:find('^"[%sA-Za-z0-9+,/:=@^_.~%%-]+"', i)
+        end
+        if not e then
+            break
+        end
+        i = e + 1
+    end
+    local remaining_cmd, n = cmd:sub(i):gsub('^%s+', '')
+    return cmd:sub(1, i), n > 0, remaining_cmd
+end
+
+--- Check if a command part matches a pattern.
+---@param pattern string Pattern to match against
+---@param cmd string Command to check
+---@return string | nil remaining_cmd if matches, otherwise nil
+local function match_allowed_cmd(pattern, cmd)
+    local pattern_tokens = split_allowed_cmd(pattern)
+
+    for i, p_token in ipairs(pattern_tokens) do
+        if vim.endswith(p_token, '*') then
+            local prefix = p_token:sub(1, -2)
+            prefix = prefix:gsub('["\']', '')
+            while true do
+                local arg, space_after, remaining_cmd = try_get_safe_arg(cmd)
+                arg = arg:gsub('["\']', '')
+                if not vim.startswith(arg, prefix) then
+                    break
+                end
+
+                cmd = remaining_cmd
+                if not space_after then
+                    break
+                end
+            end
+        elseif vim.startswith(cmd, p_token) then
+            cmd = cmd:sub(#p_token + 1)
+            local n
+            cmd, n = cmd:gsub('^%s+', '')
+            if n == 0 and i < #pattern_tokens then
+                -- Special case: if next token is the last and is '*' then everything is fine.
+                if i + 1 == #pattern_tokens and pattern_tokens[i + 1] == '*' then
+                    break
+                end
+                return nil -- No space after token and not the last token.
+            end
+        else
+            return nil -- Token does not match.
+        end
+    end
+
+    return cmd
+end
+
+--- Strip redirections from command.
+---@param cmd string Command part to process
+---@return string cleaned_cmd Command with redirections removed
+local function strip_redirections(cmd)
+    if not M.config.cmd_redir then
+        return cmd
+    end
+
+    for _, pattern in ipairs(SAFE_REDIR_PATTERNS) do
+        cmd = cmd:gsub(pattern, '')
+    end
+
+    return cmd
+end
+
+-- TODO: Implement blacklist for commands with non-obvious execution capabilities:
+-- find -exec, find -execdir - these are the most dangerous as users often forget
+-- they can execute arbitrary commands.
+-- Other similar commands to research: rsync --rsh, awk -f, sed -e with system(),
+-- sort --compress-program, tar --use-compress-program.
+
+-- TODO: Implement command wrapper parsing for commands whose main purpose is
+-- executing other commands: xargs, timeout, nohup, watch, parallel.
+-- These should skip the wrapper and validate the actual command being executed.
+
+--- Check if command is allowed based on patterns.
+---@param cmd string Full command to check
+---@return boolean allowed Whether command is allowed
 local function is_cmd_allowed(cmd)
+    cmd = vim.trim(cmd)
+
     -- Strip "cd {project_root} && " prefix if present
     if M.config.project_root and M.config.project_root ~= '' then
         local prefix = 'cd ' .. M.config.project_root .. ' && '
@@ -88,16 +354,59 @@ local function is_cmd_allowed(cmd)
         end
     end
 
-    for _, allowed_cmd in ipairs(M.config.allowed_cmds or {}) do
-        if cmd == allowed_cmd then
-            return true
+    if is_cmd_unsafe(cmd) then
+        return false
+    end
+
+    local allowed_cmds = {}
+    for _, allowed_cmd in ipairs(M.session_allowed_cmds) do
+        table.insert(allowed_cmds, allowed_cmd)
+    end
+    for _, allowed_cmd in ipairs(M.config.allowed_cmds) do
+        table.insert(allowed_cmds, allowed_cmd)
+    end
+
+    while true do
+        cmd = trim_safe_env_vars(cmd)
+
+        if cmd == '' then
+            return false
+        end
+
+        local operator_found = false
+
+        for _, allowed_cmd in ipairs(allowed_cmds) do
+            local after_cmd = match_allowed_cmd(allowed_cmd, cmd)
+            if after_cmd ~= nil then
+                after_cmd = strip_redirections(after_cmd)
+
+                if after_cmd == '' or after_cmd == ';' then
+                    return true
+                end
+
+                if M.config.cmd_chain then
+                    for _, op in ipairs(SAFE_CONTROL_OPERATORS) do
+                        if vim.startswith(after_cmd, op) then
+                            cmd = vim.trim(after_cmd:sub(#op + 1))
+                            operator_found = true
+                            break
+                        end
+                    end
+                    if operator_found then
+                        break
+                    end
+                end
+            end
+        end
+
+        if not operator_found then
+            return false
         end
     end
-    return false
 end
 
 -- Auto-approve command execution using whitelist.
----@param tool CodeCompanion.Agent.Tool
+---@param tool CodeCompanion.Tools.Tool
 ---@return boolean requires_approval
 function M.cmd_runner(tool, _)
     return not is_cmd_allowed(tool.args.cmd)
@@ -132,7 +441,7 @@ end
 
 -- Auto-approve file operations only in project dir (current git repo or cwd)
 -- excluding secret files.
----@param tool CodeCompanion.Agent.Tool
+---@param tool CodeCompanion.Tools.Tool
 ---@return boolean requires_approval
 function M.filepath(tool, _)
     return not is_project_path(tool.args.filepath) or is_secret_file(tool.args.filepath)
@@ -210,5 +519,23 @@ function M.mcphub(params)
     end
     return params.is_auto_approved_in_server -- Respect servers.json configuration.
 end
+
+vim.api.nvim_create_user_command('AutoApproveAddAllowedCmd', function(opts)
+    local cmd = opts.args
+    if validate_command(cmd) then
+        table.insert(M.session_allowed_cmds, vim.trim(cmd))
+    end
+end, { nargs = '+', desc = 'Add command to session approval list' })
+
+vim.api.nvim_create_user_command('AutoApproveResetAllowedCmds', function()
+    M.session_allowed_cmds = {}
+end, { desc = 'Clear all session approval commands' })
+
+vim.api.nvim_create_user_command('AutoApproveListAddedAllowedCmds', function()
+    vim.print('There are ' .. #M.session_allowed_cmds .. ' added allowed_cmds.')
+    for _, cmd in ipairs(M.session_allowed_cmds) do
+        vim.print(cmd)
+    end
+end, { desc = 'List current session approval commands' })
 
 return M
