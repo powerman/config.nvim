@@ -1,8 +1,9 @@
 ---@class AutoApproveConfig
 ---@field allowed_cmds? string[] Allowed commands for cmd_runner, neovim__execute_command, shell__shell_exec. Supports patterns (e.g., 'go test *').
 ---@field cmd_env? boolean Allow safe environment variables in commands (default: true).
+---@field cmd_glob? boolean Allow * ? in command args (default: false).
 ---@field cmd_redir? boolean Allow safe output redirections in commands (default: true).
----@field cmd_chain? boolean Allow command chaining with &&, ||, ;, | (default: true).
+---@field cmd_control? boolean Allow command control operators: &&, ||, |&, |, ; (default: true).
 ---@field secret_files? string[] List of files (in glob format) that should not be sent to LLM.
 ---@field project_root? string Allow file operations in this directory and below.
 ---@field codecompanion? table<string,boolean> Code Companion tools to protect (when true).
@@ -13,8 +14,9 @@
 local defaults = {
     allowed_cmds = {},
     cmd_env = true,
+    cmd_glob = false,
     cmd_redir = true,
-    cmd_chain = true,
+    cmd_control = true,
     secret_files = {
         '.env*',
         'env*.sh',
@@ -55,13 +57,36 @@ local UNSAFE_ENV_NAME_PREFIXES = {
     'RUBYLIB=',
 }
 
+-- Not included in these 3 sets: ' " ~ and ASCII control except \t\r\n
+local SAFE_UNQUOTED = '%%+,%-./0-9:@A-Z^_a-z\128-\255'
+local SAFE_DQ = '%s!#&()*;<=>?[%]{|}' -- Escaped $ \ ` are allowed by safe_dq function.
+local SAFE_SQ = '$\\`' .. SAFE_DQ
+
+local SAFE_ENV_NAME_SET = 'A-Za-z0-9_'
+local SAFE_ENV_VAL_SET = '~' .. SAFE_UNQUOTED
+local SAFE_ENV_VAL_SQ_SET = '"' .. SAFE_SQ .. SAFE_ENV_VAL_SET
+local SAFE_ENV_VAL_DQ_SET = "'" .. SAFE_DQ .. SAFE_ENV_VAL_SET
+
+local SAFE_ARG_SET = '=~' .. SAFE_UNQUOTED
+local SAFE_ARG_SQ_SET = '"' .. SAFE_SQ .. SAFE_ARG_SET
+local SAFE_ARG_DQ_SET = "'" .. SAFE_DQ .. SAFE_ARG_SET
+
+local SAFE_ARG_GLOB = '*?' -- Support for [] will also require ! and ^ so postpone it for now.
+
 local SAFE_REDIR_PATTERNS = {
-    '[0-9]>&[0-9]%s*',
-    '[12]?>%s*/dev/null%s*', -- to /dev/null
-    '[12]?>%s*[A-Za-z0-9_.%-][/A-Za-z0-9_.%-]*%s*', -- to file
+    '[0-9]>&[0-9]',
+    '[12]?>%s*/dev/null', -- to /dev/null
+    '[12]?>%s*[A-Za-z0-9_.%-][/A-Za-z0-9_.%-]*', -- to relative file
 }
 
-local SAFE_CONTROL_OPERATORS = { '&&', '||', '|&', '|', ';' }
+local CONTROL_OPERATORS = { '&&', '||', '|&', '|', ';' }
+
+local function safe_dq(s, set)
+    -- Do not allow escaped " just in case, to prevent bypassing checks.
+    -- Escaping for shell needs only $, \, and ` - the rest are for grep regexp etc.
+    local escaped = SAFE_SQ .. SAFE_UNQUOTED
+    return s:gsub('\\[' .. escaped .. ']', ''):match('^"[' .. set .. ']*"$')
+end
 
 local M = {
     config = vim.deepcopy(defaults),
@@ -183,20 +208,26 @@ local function trim_safe_env_vars(cmd)
     end
 
     while true do
-        local s, e, k = cmd:find '^([A-Z0-9_]+)='
-        if not s then
+        local _, e, k = cmd:find('^([' .. SAFE_ENV_NAME_SET .. ']+)=')
+        if not e then
             return cmd
         end
 
         local value_pos = e + 1
-        s, e = cmd:find('^[A-Za-z0-9_:.-]*%s+', value_pos)
-        if not s then
-            s, e = cmd:find("^'[ A-Za-z0-9_:.-]*'%s+", value_pos)
+        _, e = cmd:find('^[' .. SAFE_ENV_VAL_SET .. ']*%s+', value_pos)
+        if not e then
+            _, e = cmd:find("^'[" .. SAFE_ENV_VAL_SQ_SET .. "]*'%s+", value_pos)
         end
-        if not s then
-            s, e = cmd:find('^"[ A-Za-z0-9_:.-]*"%s+', value_pos)
+        if not e then
+            _, e = cmd:find('^"[^"]*"', value_pos)
+            if e and not safe_dq(cmd:sub(value_pos, e), SAFE_ENV_VAL_DQ_SET) then
+                e = nil
+            end
+            if e then
+                _, e = cmd:find('^%s+', e + 1)
+            end
         end
-        if not s then
+        if not e then
             return cmd
         end
 
@@ -255,14 +286,22 @@ end
 ---@return boolean space_after Whether there was a space after the argument.
 ---@return string remaining_cmd Unmodified command if no safe arg found.
 local function try_get_safe_arg(cmd)
+    local safe_arg_set = SAFE_ARG_SET
+    if M.config.cmd_glob then
+        safe_arg_set = safe_arg_set .. SAFE_ARG_GLOB
+    end
+
     local i = 1
     while i <= #cmd do
-        local _, e = cmd:find('^[A-Za-z0-9+,/:=@^_.~%%-]+', i)
+        local _, e = cmd:find('^[' .. safe_arg_set .. ']+', i)
         if not e then
-            _, e = cmd:find("^'[%sA-Za-z0-9+,/:=@^_.~%%-]+'", i)
+            _, e = cmd:find("^'[" .. SAFE_ARG_SQ_SET .. "]*'", i)
         end
         if not e then
-            _, e = cmd:find('^"[%sA-Za-z0-9+,/:=@^_.~%%-]+"', i)
+            _, e = cmd:find('^"[^"]*"', i)
+            if e and not safe_dq(cmd:sub(i, e), SAFE_ARG_DQ_SET) then
+                e = nil
+            end
         end
         if not e then
             break
@@ -270,7 +309,10 @@ local function try_get_safe_arg(cmd)
         i = e + 1
     end
     local remaining_cmd, n = cmd:sub(i):gsub('^%s+', '')
-    return cmd:sub(1, i), n > 0, remaining_cmd
+    if i <= #cmd and n == 0 then -- No space or end of string after arg.
+        return '', false, cmd
+    end
+    return cmd:sub(1, i - 1), n > 0, remaining_cmd
 end
 
 --- Check if a command part matches a pattern.
@@ -323,22 +365,27 @@ local function strip_redirections(cmd)
         return cmd
     end
 
-    for _, pattern in ipairs(SAFE_REDIR_PATTERNS) do
-        cmd = cmd:gsub(pattern, '')
-    end
+    repeat
+        local prev_cmd = cmd
+        for _, pattern in ipairs(SAFE_REDIR_PATTERNS) do
+            cmd = cmd:gsub('^' .. pattern .. '%s*', '')
+        end
+    until cmd == prev_cmd
 
     return cmd
 end
 
 -- TODO: Implement blacklist for commands with non-obvious execution capabilities:
--- find -exec, find -execdir - these are the most dangerous as users often forget
--- they can execute arbitrary commands.
--- Other similar commands to research: rsync --rsh, awk -f, sed -e with system(),
--- sort --compress-program, tar --use-compress-program.
+-- find -exec, find -execdir, find -ok, find -okdir, fd -exec - these are the most dangerous
+-- as users often forget they can execute arbitrary commands.
+-- Another example is ack --pager and envs like EDITOR, GIT_PAGER, PAGER, MANPAGER, etc.
+-- Other similar commands to research: rsync --rsh, awk -f and sed -e with system(),
+-- sort --compress-program, tar --use-compress-program (it actually have a lot of ways to run
+-- a command from it args).
 
 -- TODO: Implement command wrapper parsing for commands whose main purpose is
--- executing other commands: xargs, timeout, nohup, watch, parallel.
--- These should skip the wrapper and validate the actual command being executed.
+-- executing other commands: xargs, timeout, nohup, watch, parallel, mise exec, mise x, env.
+-- These should skip the (allowed) wrapper and validate the actual command being executed.
 
 --- Check if command is allowed based on patterns.
 ---@param cmd string Full command to check
@@ -384,8 +431,8 @@ local function is_cmd_allowed(cmd)
                     return true
                 end
 
-                if M.config.cmd_chain then
-                    for _, op in ipairs(SAFE_CONTROL_OPERATORS) do
+                if M.config.cmd_control then
+                    for _, op in ipairs(CONTROL_OPERATORS) do
                         if vim.startswith(after_cmd, op) then
                             cmd = vim.trim(after_cmd:sub(#op + 1))
                             operator_found = true

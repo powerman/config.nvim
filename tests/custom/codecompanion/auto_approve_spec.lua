@@ -20,8 +20,9 @@ describe('auto_approve', function()
                 },
                 project_root = nil,
                 cmd_env = true,
+                cmd_glob = false,
                 cmd_redir = true,
-                cmd_chain = true,
+                cmd_control = true,
                 codecompanion = {
                     cmd_runner = true,
                     create_file = true,
@@ -52,8 +53,9 @@ describe('auto_approve', function()
                 },
                 project_root = '/tmp',
                 cmd_env = false,
+                cmd_glob = false,
                 cmd_redir = true,
-                cmd_chain = true,
+                cmd_control = true,
                 codecompanion = {
                     cmd_runner = false,
                     create_file = true,
@@ -500,7 +502,7 @@ describe('auto_approve', function()
         describe('redirections support', function()
             it('auto-approves safe redirections', function()
                 auto_approve.setup {
-                    allowed_cmds = { 'go test', 'ls' },
+                    allowed_cmds = { 'go test', 'ls', 'nvim *' },
                 }
 
                 local test_cases = {
@@ -510,6 +512,7 @@ describe('auto_approve', function()
                     { cmd = 'go test 2> /dev/null', expected = true },
                     { cmd = 'ls > result.txt 2>&1', expected = true },
                     { cmd = 'go test > logs/test.log', expected = true },
+                    { cmd = 'nvim -l tests/run.lua --minitest 2>&1', expected = true },
                 }
 
                 for _, tc in ipairs(test_cases) do
@@ -566,7 +569,7 @@ describe('auto_approve', function()
             it('can disable command chains support', function()
                 auto_approve.setup {
                     allowed_cmds = { 'go test', 'echo *' },
-                    cmd_chain = false,
+                    cmd_control = false,
                 }
 
                 local requires_approval =
