@@ -59,50 +59,84 @@ vim.g.llm_secret_files = {
 
 -- List of shell commands allowed to LLM without manual approve.
 vim.g.llm_allowed_cmds = {
+    -- Common development commands.
     './scripts/test',
+    'actionlint',
+    'go build *',
+    'go clean *',
+    'go doc *',
+    'go env -changed',
+    'go env GOROOT',
+    'go env', -- WARN: Unwanted if used with -w.
+    'go fmt *',
+    'go get *',
+    'go run *',
+    'go test *',
+    'golangci-lint run --fix',
+    'golangci-lint run',
     'make lint',
     'make test',
-    'mise tasks',
+    'mise doctor',
+    -- 'mise exec *', XXX: Dangerous, allows any command.
+    -- 'mise x *', XXX: Dangerous, allows any command.
     'mise lint',
-    'mise test',
     'mise run *',
-    'golangci-lint run',
-    'golangci-lint run --fix',
-    'actionlint',
-    'go test *',
+    'mise tasks',
+    'mise test',
+    'npm test *',
+    'npx jest *',
+    'nvim *', -- WARN: Dangerous if use Lua or plugins to run shell commands.
+    'stylua .',
+    'vusted *',
+    'xmllint *',
+    -- General commands.
+    'cut *',
+    'false',
+    'ps *',
+    'sort -u',
+    'sort', -- WARN: Dangerous if used with --compress-program.
+    -- 'timeout *', XXX: Dangerous, allows any command.
+    'true',
+    'wc *',
+    'which *',
     -- Search files.
-    'ack *',
-    'ag *',
-    'fd *',
-    -- 'find *',
+    'diff *',
+    'find *', -- WARN: Dangerous if used with -exec.
     'grep *',
     'ls *',
-    'rg *',
     'tree *',
     -- File management.
+    'cp *',
     'mkdir *',
+    'mv *',
+    'rm -* .cache/*',
     'rmdir *',
     'touch *',
-    -- 'rm *',
-    'cp *',
-    'mv *',
+    'unzip *',
     -- File editing (usually with redirects).
+    'awk *', -- WARN: Dangerous if used with system().
     'cat *',
     'echo *',
     'head *',
     'sed *',
     'tail *',
+    'xargs cat',
     -- Git commands.
-    'git branch *',
-    'git checkout *',
+    'git checkout -- *',
+    'git checkout HEAD -- *',
     'git diff *',
     'git grep *',
     'git log *',
+    'git reset --hard HEAD',
+    'git restore *',
+    'git show *',
+    'git stash *',
+    'git status --porcelain',
     'git status',
     --- Docker commands.
-    'docker build *',
-    'docker compose *',
-    'docker run *',
+    -- 'docker build *',
+    -- 'docker compose *',
+    -- 'docker run *',
 }
 
 -- Sound file to play on LLM response.
