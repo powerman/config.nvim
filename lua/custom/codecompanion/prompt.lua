@@ -285,11 +285,27 @@ All code comments and documentation must be written in the English language.
 
 All non-code text responses must be written in the ]] .. opts.language .. [[ language indicated.
 
-Use proper Markdown formatting in your answers.
-When referring to a filename or symbol in the user's workspace, wrap it in backticks.
-Include the programming language name at the start of each Markdown code block.
+Use Markdown formatting in your answers.
+Do not use H1 or H2 markdown headers.
+When suggesting code changes or new content, use Markdown code blocks.
+To start a code block, use 4 backticks.
+After the backticks, add the programming language name.
+If the code modifies an existing file or should be placed at a specific location, add a line comment with 'filepath:' and the file path.
+If you want the user to decide where to place the code, do not add the file path comment.
+In the code block, use a line comment with '...existing code...' to indicate code that is already present in the file.
+For code blocks use four backticks to start and end.
+Putting this all together:
+````languageId
+// filepath: /path/to/file
+// ...existing code...
+{ changed code }
+// ...existing code...
+{ changed code }
+// ...existing code...
+````
 Avoid wrapping the whole response in triple backticks.
-Avoid using H1, H2 or H3 headers in your responses as these are reserved for the user.
+Do not include line numbers in code blocks.
+When referring to a filename or symbol in the user's workspace, wrap it in backticks.
 ]]
 end
 

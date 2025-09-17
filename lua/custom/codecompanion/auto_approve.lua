@@ -506,7 +506,7 @@ end
 ---@return boolean | nil | string auto_approve Nil same as false, string to deny with error.
 function M.mcphub(params)
     -- Respect CodeCompanion's auto tool mode when enabled
-    if vim.g.codecompanion_auto_tool_mode then
+    if vim.g.codecompanion_yolo_mode then
         return true -- Auto approve when CodeCompanion auto-tool mode is on.
     end
 

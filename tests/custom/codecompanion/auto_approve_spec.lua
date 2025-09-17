@@ -865,11 +865,11 @@ describe('auto_approve', function()
 
     describe('mcphub', function()
         it('auto-approves when CodeCompanion auto tool mode is on', function()
-            vim.g.codecompanion_auto_tool_mode = true
+            vim.g.codecompanion_yolo_mode = true
             local approved = auto_approve.mcphub {}
             assert.is_true(approved)
 
-            vim.g.codecompanion_auto_tool_mode = nil
+            vim.g.codecompanion_yolo_mode = nil
             approved = auto_approve.mcphub {}
             assert.is_nil(approved)
         end)

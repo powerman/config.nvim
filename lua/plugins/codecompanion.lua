@@ -206,6 +206,9 @@ return {
                     },
                 },
                 chat = {
+                    opts = {
+                        completion_provider = 'cmp',
+                    },
                     adapter = {
                         name = 'copilot',
                         -- https://docs.github.com/en/copilot/managing-copilot/understanding-and-managing-copilot-usage/understanding-and-managing-requests-in-copilot
@@ -320,7 +323,7 @@ return {
                         system_prompt = {
                             modes = { n = '<Leader>cts' },
                         },
-                        auto_tool_mode = {
+                        yolo_mode = {
                             modes = { n = '<Leader>cta' },
                         },
                         goto_file_under_cursor = {
@@ -401,51 +404,53 @@ return {
                 },
             },
             adapters = {
-                -- Set default model for Ollama.
-                ollama = function()
-                    return require('codecompanion.adapters').extend('ollama', {
-                        schema = {
-                            model = {
-                                default = 'qwen3:4b',
+                http = {
+                    -- Set default model for Ollama.
+                    ollama = function()
+                        return require('codecompanion.adapters').extend('ollama', {
+                            schema = {
+                                model = {
+                                    default = 'qwen3:4b',
+                                },
+                                num_ctx = {
+                                    --- qwen3 uses extra 1GB per 4k context.
+                                    --- It's default is 4k (qwen3:4b=4.1GB, qwen3:8b=6.5GB).
+                                    -- default = 16384,
+                                },
                             },
-                            num_ctx = {
-                                --- qwen3 uses extra 1GB per 4k context.
-                                --- It's default is 4k (qwen3:4b=4.1GB, qwen3:8b=6.5GB).
-                                -- default = 16384,
+                        })
+                    end,
+                    ollama_qwen_3 = function()
+                        return require('codecompanion.adapters').extend('ollama', {
+                            schema = {
+                                model = {
+                                    default = 'qwen3:4b',
+                                    choices = {},
+                                },
                             },
-                        },
-                    })
-                end,
-                ollama_qwen_3 = function()
-                    return require('codecompanion.adapters').extend('ollama', {
-                        schema = {
-                            model = {
-                                default = 'qwen3:4b',
-                                choices = {},
+                        })
+                    end,
+                    ollama_qwen_2_5_coder = function()
+                        return require('codecompanion.adapters').extend('ollama', {
+                            schema = {
+                                model = {
+                                    default = 'qwen2.5-coder:7b',
+                                    choices = { 'qwen2.5-coder:7b', 'qwen2.5-coder:14b' },
+                                },
                             },
-                        },
-                    })
-                end,
-                ollama_qwen_2_5_coder = function()
-                    return require('codecompanion.adapters').extend('ollama', {
-                        schema = {
-                            model = {
-                                default = 'qwen2.5-coder:7b',
-                                choices = { 'qwen2.5-coder:7b', 'qwen2.5-coder:14b' },
+                        })
+                    end,
+                    ollama_llama_3_1 = function()
+                        return require('codecompanion.adapters').extend('ollama', {
+                            schema = {
+                                model = {
+                                    default = 'llama3.1:8b',
+                                    choices = {},
+                                },
                             },
-                        },
-                    })
-                end,
-                ollama_llama_3_1 = function()
-                    return require('codecompanion.adapters').extend('ollama', {
-                        schema = {
-                            model = {
-                                default = 'llama3.1:8b',
-                                choices = {},
-                            },
-                        },
-                    })
-                end,
+                        })
+                    end,
+                },
             },
             prompt_library = {
                 --- Reserve index intervals:
@@ -670,10 +675,10 @@ return {
                 local orig_require = require
                 require = function(name)
                     if
-                        name:match '^codecompanion.adapters.'
-                        and not name:match '^codecompanion.adapters.ollama'
-                        and name ~= 'codecompanion.adapters.jina' -- Non-LLM adapter.
-                        and name ~= 'codecompanion.adapters.tavily' -- Non-LLM adapter.
+                        name:match '^codecompanion.adapters.http.'
+                        and not name:match '^codecompanion.adapters.http.ollama'
+                        and name ~= 'codecompanion.adapters.http.jina' -- Non-LLM adapter.
+                        and name ~= 'codecompanion.adapters.http.tavily' -- Non-LLM adapter.
                     then
                         local info = debug.getinfo(2, 'S')
                         if
@@ -691,7 +696,7 @@ return {
                 end
 
                 -- Remove all non-ollama adapters.
-                for key, adapter in pairs(config.config.adapters) do
+                for key, adapter in pairs(config.config.adapters.http) do
                     if key == 'opts' or key == 'jina' or key == 'tavily' then -- Skip non-LLMs.
                         goto continue
                     end
@@ -703,7 +708,7 @@ return {
                         adapter = adapter.name
                     end
                     if type(adapter) ~= 'string' or adapter ~= 'ollama' then
-                        config.config.adapters[key] = nil
+                        config.config.adapters.http[key] = nil
                     end
 
                     ::continue::
@@ -728,12 +733,12 @@ return {
                 end
             end
 
-            -- Change this workflow to not touch vim.g.codecompanion_auto_tool_mode.
-            local orig_mode = vim.g.codecompanion_auto_tool_mode
+            -- Change this workflow to not touch vim.g.codecompanion_yolo_mode.
+            local orig_mode = vim.g.codecompanion_yolo_mode
             ---@type function|string
             config.config.prompt_library['Edit<->Test workflow'].prompts[1][1].content =
                 config.config.prompt_library['Edit<->Test workflow'].prompts[1][1].content()
-            vim.g.codecompanion_auto_tool_mode = orig_mode
+            vim.g.codecompanion_yolo_mode = orig_mode
 
             -- Fix default chat when opened from INSERT mode.
             local static_actions = require 'codecompanion.actions.static'
