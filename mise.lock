@@ -1,4 +1,4 @@
-[tools.actionlint]
+[[tools.actionlint]]
 version = "1.7.7"
 backend = "aqua:rhysd/actionlint"
 
@@ -7,29 +7,29 @@ checksum = "sha256:023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0
 size = 2080472
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz"
 
-[tools.ast-grep]
-version = "0.39.4"
+[[tools.ast-grep]]
+version = "0.39.5"
 backend = "aqua:ast-grep/ast-grep"
 
 [tools.ast-grep.platforms.linux-x64]
-checksum = "blake3:d0acf0297eeefba7dd24817a65dd5faef20efd5df55d1fbb4639d2a256ec1d95"
-size = 7413321
-url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.4/app-x86_64-unknown-linux-gnu.zip"
+checksum = "blake3:880ec426ee90feab50ffc6b5f6ab31f337e1d7d94de543e993c0a092297c13bc"
+size = 7440877
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.5/app-x86_64-unknown-linux-gnu.zip"
 
-[tools.neovim]
-version = "0.11.3"
+[[tools.neovim]]
+version = "0.11.4"
 backend = "aqua:neovim/neovim"
 
 [tools.neovim.platforms.linux-x64]
-checksum = "blake3:2028f31e20dd8e50399dc80da13b0ef626b7db83885f65098726626aa44d174b"
-size = 10941468
-url = "https://github.com/neovim/neovim/releases/download/v0.11.3/nvim-linux-x86_64.tar.gz"
+checksum = "blake3:cd67ee2229bbf5b8e2612998f3a247a17d3a48960f375357a41f17ba98b9cc45"
+size = 10952396
+url = "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz"
 
-[tools.stylua]
-version = "2.1.0"
+[[tools.stylua]]
+version = "2.2.0"
 backend = "aqua:JohnnyMorganz/StyLua"
 
 [tools.stylua.platforms.linux-x64]
-checksum = "blake3:54b7956ba032f1db1315795b642dab09b8b93b846ede0eee638a84e0be823ffa"
-size = 3139437
-url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.1.0/stylua-linux-x86_64-musl.zip"
+checksum = "blake3:6e60dea187cbb93c4213123fa1c3821c17fbf7e81a74558ae7e26b3a6821840e"
+size = 3289679
+url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.2.0/stylua-linux-x86_64-musl.zip"
