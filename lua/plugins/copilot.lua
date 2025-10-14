@@ -7,13 +7,19 @@ return {
     cond = vim.g.allow_remote_llm,
     cmd = 'Copilot',
     event = 'InsertEnter',
+    dependencies = {
+        'copilotlsp-nvim/copilot-lsp', -- for NES functionality
+    },
     opts = {
         panel = {
             enabled = false,
+            keymap = {
+                open = false, -- '<M-CR>' by default
+            },
         },
         suggestion = {
             enabled = true,
-            auto_trigger = true, -- Disabled while evaluating copilot-lsp.
+            auto_trigger = true,
             keymap = {
                 accept = '<M-CR>',
                 accept_word = '<M-Right>',
