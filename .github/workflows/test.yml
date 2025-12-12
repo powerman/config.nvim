@@ -27,7 +27,7 @@ jobs:
       - run: git reset --hard # Work around https://github.com/jdx/mise/discussions/5910.
 
       - name: Cache Lazy plugins
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.local/share/nvim/lazy*
           key: v1-lazy-${{ runner.os }}-${{ hashFiles('lazy-lock.json') }}
