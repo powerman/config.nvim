@@ -7,6 +7,15 @@ backend = "aqua:rhysd/actionlint"
 "platforms.macos-x64" = { checksum = "sha256:17ffc17fed8f0258ef6ad4aed932d3272464c7ef7d64e1cb0d65aa97c9752107", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_1.7.11_darwin_amd64.tar.gz"}
 "platforms.windows-x64" = { checksum = "sha256:5414b7124a91f4b5abee62e5c9d84802237734f8d15b9b7032732a32c3ebffa3", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_1.7.11_windows_amd64.zip"}
 
+[[tools."aqua:neovim/neovim"]]
+version = "0.11.6"
+backend = "aqua:neovim/neovim"
+"platforms.linux-arm64" = { checksum = "sha256:8ddc0c101846145e830b17bbca50782ca9307eee4fab539d9e2ddaf8793c06f1", url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-linux-arm64.tar.gz"}
+"platforms.linux-x64" = { checksum = "sha256:2fc90b962327f73a78afbfb8203fd19db8db9cdf4ee5e2bef84704339add89cc", url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-linux-x86_64.tar.gz"}
+"platforms.macos-arm64" = { checksum = "sha256:d5ee93b67630d5a87f3d336d0f7e8b2fe6973aa653d3cc93b82b820e6538c1dd", url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-macos-arm64.tar.gz"}
+"platforms.macos-x64" = { checksum = "sha256:6e665bb0a711cf974050e0f7183dbb696b1e7425814eb87df7cb094a49054a06", url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-macos-x86_64.tar.gz"}
+"platforms.windows-x64" = { checksum = "sha256:90fc6d7cdf3d3388737caab1e2c554aa24b468f3a5cc38ef63857ddf1103513c", url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-win64.zip"}
+
 [[tools.ast-grep]]
 version = "0.40.5"
 backend = "aqua:ast-grep/ast-grep"
@@ -15,15 +24,6 @@ backend = "aqua:ast-grep/ast-grep"
 "platforms.macos-arm64" = { checksum = "sha256:55c3a471a483daab49b6413972c3655087f2ce47335ab019067ed1fbf6672107", url = "https://github.com/ast-grep/ast-grep/releases/download/0.40.5/app-aarch64-apple-darwin.zip"}
 "platforms.macos-x64" = { checksum = "sha256:4e1e6ae14aefb36a1a846bb6f1f951ca3f24895896161661c6cb589e0841fbd9", url = "https://github.com/ast-grep/ast-grep/releases/download/0.40.5/app-x86_64-apple-darwin.zip"}
 "platforms.windows-x64" = { checksum = "sha256:50a596ef5231883ddae69f1960d27312bb2fe81254d67ef50e1794fc9820e863", url = "https://github.com/ast-grep/ast-grep/releases/download/0.40.5/app-x86_64-pc-windows-msvc.zip"}
-
-[[tools.neovim]]
-version = "0.11.6"
-backend = "vfox:mise-plugins/vfox-neovim"
-"platforms.linux-arm64" = { url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-linux-arm64.tar.gz"}
-"platforms.linux-x64" = { url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-linux-x86_64.tar.gz"}
-"platforms.macos-arm64" = { url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-macos-arm64.tar.gz"}
-"platforms.macos-x64" = { url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-macos-x86_64.tar.gz"}
-"platforms.windows-x64" = { url = "https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-win64.zip"}
 
 [[tools.stylua]]
 version = "2.3.1"

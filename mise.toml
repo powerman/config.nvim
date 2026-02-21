@@ -3,7 +3,8 @@ lockfile = true # DO NOT FORGET TO `touch mise.lock` if mise.lock does not exist
 
 
 [tools]
-neovim = 'latest'
+# Use aqua because of https://github.com/mise-plugins/vfox-neovim/issues/1.
+'aqua:neovim/neovim' = 'latest'
 
 #--- Format
 # An opinionated Lua code formatter.
