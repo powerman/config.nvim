@@ -1,40 +1,15 @@
 [[tools.actionlint]]
-version = "1.7.7"
+version = "1.7.11"
 backend = "aqua:rhysd/actionlint"
-"platforms.linux-arm64" = { checksum = "sha256:401942f9c24ed71e4fe71b76c7d638f66d8633575c4016efd2977ce7c28317d0", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_arm64.tar.gz"}
-"platforms.linux-x64" = { checksum = "sha256:023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz"}
-"platforms.macos-arm64" = { checksum = "sha256:2693315b9093aeacb4ebd91a993fea54fc215057bf0da2659056b4bc033873db", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_darwin_arm64.tar.gz"}
-"platforms.macos-x64" = { checksum = "sha256:28e5de5a05fc558474f638323d736d822fff183d2d492f0aecb2b73cc44584f5", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_darwin_amd64.tar.gz"}
-"platforms.windows-x64" = { checksum = "sha256:7f12f1801bca3d480d67aaf7774f4c2a6359a3ca8eebe382c95c10c9704aa731", url = "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_windows_amd64.zip"}
 
 [[tools.ast-grep]]
-version = "0.39.5"
+version = "0.40.5"
 backend = "aqua:ast-grep/ast-grep"
-"platforms.linux-arm64" = { checksum = "sha256:4b20d2032fec27d0863e9f58e2848861fd5b99bf71f56f271d636dc821056bbb", url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.5/app-aarch64-unknown-linux-gnu.zip"}
-"platforms.linux-x64" = { checksum = "sha256:9a1cab3e7916c98c6fe0079cc2c3b44d98832ba3bdb9db492d04a4e60e41fd0f", url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.5/app-x86_64-unknown-linux-gnu.zip"}
-"platforms.macos-arm64" = { checksum = "sha256:d672ef833d478423a54a57da6b937784e2fe9b768c89affa58d8ff6db3174d3d", url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.5/app-aarch64-apple-darwin.zip"}
-"platforms.macos-x64" = { checksum = "sha256:569d1fe851c137f1edb29e83ce51fdea0845abfb6746b19d94c982904b0e5dac", url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.5/app-x86_64-apple-darwin.zip"}
-"platforms.windows-x64" = { checksum = "sha256:7e56dcb5d4b843d90d58a97c1328eaee60695b6a62e1c8d266b48d4ab349d7ef", url = "https://github.com/ast-grep/ast-grep/releases/download/0.39.5/app-x86_64-pc-windows-msvc.zip"}
 
 [[tools.neovim]]
-version = "0.11.4"
-backend = "aqua:neovim/neovim"
-"platforms.linux-arm64" = { checksum = "sha256:684e4262d2296e469cb43f0d05edbbb52b960b7f117bed6b22936fc768993cd9", url = "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-arm64.tar.gz"}
-"platforms.linux-x64" = { checksum = "sha256:a74740047e73b2b380d63a474282814063d10650cd6cc95efa16d1713c7e616c", url = "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz"}
-"platforms.macos-arm64" = { checksum = "sha256:2de9623a4aa8cedf85c51e33bf8e85e05f6f291b923cd666c04704ccf164e8b7", url = "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-macos-arm64.tar.gz"}
-"platforms.macos-x64" = { checksum = "sha256:567b89138c29386f67a00fc8e26c6469c8bf0e5707dfea5e3fbaf4e21294d9eb", url = "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-macos-x86_64.tar.gz"}
-"platforms.windows-x64" = { checksum = "sha256:77eee5936724b82e45b448e0370abe0911d75fad551c0a25415f4e51719faf34", url = "https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-win64.zip"}
-
-[[tools.rg]]
-version = "15.0.0"
-backend = "aqua:BurntSushi/ripgrep"
-"platforms.linux-x64" = { checksum = "sha256:253ad0fd5fef0d64cba56c70dccdacc1916d4ed70ad057cc525fcdb0c3bbd2a7", url = "https://github.com/BurntSushi/ripgrep/releases/download/15.0.0/ripgrep-15.0.0-x86_64-unknown-linux-musl.tar.gz"}
+version = "0.11.6"
+backend = "vfox:mise-plugins/vfox-neovim"
 
 [[tools.stylua]]
-version = "2.2.0"
+version = "2.3.1"
 backend = "aqua:JohnnyMorganz/StyLua"
-"platforms.linux-arm64" = { checksum = "sha256:e3b6078ad47071e40056a976be78c9b3bcf661759eeeb96ea2e47edaf3060293", url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.2.0/stylua-linux-aarch64.zip"}
-"platforms.linux-x64" = { checksum = "sha256:d07ba799023e2790ad4dbe3e51c17491f2087f0e47c0294cfe69ac3273f29e39", url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.2.0/stylua-linux-x86_64-musl.zip"}
-"platforms.macos-arm64" = { checksum = "sha256:addbaed63cef8fd95aae474885d4929b1ef42dbe3376cbe57235aa46ea62ecf7", url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.2.0/stylua-macos-aarch64.zip"}
-"platforms.macos-x64" = { checksum = "sha256:b631414953f9701434e9fcc7ce0e999ced604bdda8a644c14a043c41b07ab769", url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.2.0/stylua-macos-x86_64.zip"}
-"platforms.windows-x64" = { checksum = "sha256:c88fdba114242601d7c9a3ed9f0a7ddfb5ca0b4c85146405daa38d459d0dfa29", url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.2.0/stylua-windows-x86_64.zip"}
