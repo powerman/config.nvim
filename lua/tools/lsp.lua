@@ -235,7 +235,9 @@ return {
     -- Configure: https://github.com/sqls-server/sqls?tab=readme-ov-file#db-configuration
     -- sqls = {},
 
-    taplo = {},
+    -- BUG: taplo 0.10.0 adds 1 second delay on exit from Neovim.
+    -- taplo = {}, -- TOML.
+    tombi = {}, -- TOML.
 
     ts_ls = {},
 

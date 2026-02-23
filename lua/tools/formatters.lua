@@ -50,6 +50,7 @@ return {
     -- toml = { 'dprint' }, -- Require `dprint config add toml`.
     -- toml = { 'prettierd' }, -- Require prettier plugin.
     toml = { 'taplo' },
+    -- toml = { 'tombi' }, -- Doesn't support extra newlines between keys.
     tsv = { 'yq_tsv' },
     -- typescript = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
     typescript = { 'prettierd' },
