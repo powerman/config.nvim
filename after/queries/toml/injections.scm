@@ -1,4 +1,5 @@
-; Source: https://github.com/okuuva/mise/blob/main/docs/mise-cookbook/neovim.md
+; Source: https://mise.jdx.dev/mise-cookbook/neovim.html
+
 ; extends
 
 (pair
