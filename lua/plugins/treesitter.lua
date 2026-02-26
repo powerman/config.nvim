@@ -9,7 +9,7 @@
 -- There are additional nvim-treesitter modules that you can use to interact
 -- with nvim-treesitter. You should go explore a few and see what interests you:
 --
---    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
+--    - Incremental selection: sustech-data/wildfire.nvim
 --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
 --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 --
@@ -29,103 +29,123 @@
 -- NOTE:  :TSModuleInfo   Show supported language/module matrix.
 -- NOTE:  <M-v> <BS>      Increment/decrement selection by syntax tree.
 
+-- Map of treesitter parser name -> Neovim filetype.
+-- Use false as filetype for embedded/injected parsers that have no standalone filetype
+-- (they are activated automatically via treesitter injections, not via FileType autocmd).
+local languages = {
+    bash = 'sh',
+    c = 'c',
+    css = 'css',
+    diff = 'diff',
+    dockerfile = 'dockerfile',
+    editorconfig = 'editorconfig',
+    git_config = 'gitconfig',
+    git_rebase = 'gitrebase',
+    gitattributes = 'gitattributes',
+    gitcommit = 'gitcommit',
+    gitignore = 'gitignore',
+    go = 'go',
+    gomod = 'gomod',
+    gotmpl = 'gotmpl',
+    gowork = 'gowork',
+    html = 'html',
+    http = 'http',
+    ini = 'ini',
+    javascript = 'javascript',
+    jsdoc = false, -- embedded in javascript/typescript, no filetype
+    kdl = 'kdl', -- embedded in bash via #USAGE comments (usage-cli tool)
+    json = 'json',
+    json5 = 'json5',
+    jsonc = 'jsonc',
+    jsonnet = 'jsonnet',
+    lua = 'lua',
+    luadoc = false, -- embedded in lua, no filetype
+    make = 'make',
+    markdown = 'markdown',
+    markdown_inline = false, -- embedded in markdown, no filetype
+    mermaid = 'mermaid',
+    muttrc = 'muttrc',
+    nginx = 'nginx',
+    printf = false, -- embedded in c/bash/etc., no filetype
+    promql = 'promql',
+    proto = 'proto',
+    query = 'query',
+    sql = 'sql',
+    ssh_config = 'sshconfig',
+    strace = 'strace',
+    tmux = 'tmux',
+    toml = 'toml',
+    udev = 'udevrules',
+    vim = 'vim',
+    vimdoc = 'help',
+    xcompose = 'xcompose',
+    yaml = 'yaml',
+}
+
+local function parsers()
+    return vim.tbl_keys(languages)
+end
+
+local function filetypes()
+    local ft = {}
+    for _, filetype in pairs(languages) do
+        if filetype then
+            ft[#ft + 1] = filetype
+        end
+    end
+    return ft
+end
+
 ---@module 'lazy'
 ---@type LazySpec
 return {
     {
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
-        -- TODO: Update to 'main' branch after
-        -- https://github.com/nvim-treesitter/nvim-treesitter-textobjects/issues/772
-        -- Also check for telescope errors on <F3> after upgrade.
-        branch = 'master',
         build = ':TSUpdate',
-        main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-        opts = {
-            ensure_installed = {
-                'bash',
-                'c',
-                'css',
-                'diff',
-                'dockerfile',
-                'editorconfig',
-                'git_config',
-                'git_rebase',
-                'gitattributes',
-                'gitcommit',
-                'gitignore',
-                'go',
-                'gomod',
-                'gotmpl',
-                'gowork',
-                'html',
-                'http',
-                'ini',
-                'javascript',
-                'jsdoc',
-                'json',
-                'json5',
-                'jsonc',
-                'jsonnet',
-                'lua',
-                'luadoc',
-                'make',
-                'markdown',
-                'markdown_inline',
-                'mermaid',
-                'muttrc',
-                'nginx',
-                'printf',
-                'promql',
-                'proto',
-                'query',
-                'sql',
-                'ssh_config',
-                'strace',
-                'tmux',
-                'toml',
-                'udev',
-                'vim',
-                'vimdoc',
-                'xcompose',
-                'yaml',
-            },
-            -- Autoinstall languages that are not installed. Require `tree-sitter` CLI tool.
-            auto_install = true,
-            highlight = {
-                enable = true,
-                -- Setting this to a list of languages will run `:h syntax` and tree-sitter at
-                -- the same time for these languages.
-                -- This may be useful for some languages which depend on vim's regex
-                -- highlighting system (such as Ruby) for indent rules.
-                -- If you are experiencing weird indenting issues, add the language to the
-                -- list of additional_vim_regex_highlighting and disabled languages for indent.
-                additional_vim_regex_highlighting = { 'ruby' },
-            },
-            indent = {
-                enable = true,
-                disable = { 'ruby' },
-            },
-            incremental_selection = {
-                enable = true,
-                keymaps = {
-                    init_selection = '<M-v>',
-                    node_incremental = '<M-v>',
-                    scope_incremental = false,
-                    node_decremental = '<BS>',
-                },
-            },
-        },
-        init = function() -- Source: https://mise.jdx.dev/mise-cookbook/neovim.html
+        init = function()
+            -- Source: https://mise.jdx.dev/mise-cookbook/neovim.html
             require('vim.treesitter.query').add_predicate('is-mise?', function(_, _, bufnr, _)
                 local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
                 local filename = vim.fn.fnamemodify(filepath, ':t')
                 return string.match(filename, '.*mise.*%.toml$') ~= nil
             end, { force = true, all = false })
+
+            vim.api.nvim_create_autocmd('FileType', {
+                pattern = filetypes(),
+                callback = function()
+                    -- syntax highlighting, provided by Neovim
+                    vim.treesitter.start()
+                    -- folds, provided by Neovim
+                    vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+                    vim.wo.foldmethod = 'expr'
+                    -- indentation, provided by nvim-treesitter
+                    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end,
+            })
+        end,
+        config = function(_, _)
+            require('nvim-treesitter').install(parsers())
         end,
     },
     {
         'nvim-treesitter/nvim-treesitter-textobjects',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    },
+    {
+        -- Incremental selection by treesitter nodes (replacement for removed incremental_selection module).
+        -- <M-v> in normal mode: start visual selection at current node.
+        -- <M-v> in visual mode: expand selection to parent node.
+        -- <BS> in visual mode: shrink selection to child node.
+        'sustech-data/wildfire.nvim',
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        keys = { { '<M-v>', mode = { 'n', 'x' } }, { '<BS>', mode = 'x' } },
+        opts = {
+            keymaps = {
+                init_selection = '<M-v>',
+                node_incremental = '<M-v>',
+                node_decremental = '<BS>',
+            },
+        },
     },
 }

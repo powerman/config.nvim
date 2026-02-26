@@ -1,5 +1,3 @@
-; Source: https://mise.jdx.dev/mise-cookbook/neovim.html
-
 ; extends
 
 (pair

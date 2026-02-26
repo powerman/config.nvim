@@ -116,6 +116,12 @@ local function handle_LspAttach(ev)
     --
     --  if client.name == 'some' then client.server_capabilities.XXX = nil end
 
+    -- BUG: tombi semantic tokens (priority 125) override treesitter injection highlights
+    -- (priority 100) inside `run=` strings (e.g. bash syntax in mise.toml).
+    if client.name == 'tombi' then
+        client.server_capabilities.semanticTokensProvider = nil
+    end
+
     local builtin = require 'telescope.builtin'
     local map = function(keys, func, desc, mode)
         keys = type(keys) == 'table' and keys or { keys }
