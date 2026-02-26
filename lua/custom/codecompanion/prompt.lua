@@ -79,13 +79,16 @@ end
 
 -- Copilot instructions are based on the official VSCode Copilot chat instructions,
 -- but modified to fit CodeCompanion's context and tools.
--- Source: https://github.com/microsoft/vscode-copilot-chat/blob/main/src/extension/prompts/node/agent/agentInstructions.tsx
+-- Source: https://github.com/microsoft/vscode-copilot-chat/blob/main/src/extension/prompts/node/agent/defaultAgentInstructions.tsx
+-- Source version: v0.38.2026022603.
 -- Source license: MIT License. Copyright (c) Microsoft Corporation. All rights reserved.
 
----@param adapter CodeCompanion.Adapter
-M.copilot_keep_going_reminder = function(adapter)
-    if adapter.model and adapter.model.name == 'gpt-4.1' then
-        return [[
+---@param model string
+M.copilot_keep_going_reminder = function(model)
+    if not model:find '^gpt%-' then
+        return ''
+    end
+    return [[
 
 You are an agent - you must keep going until the user's query is completely resolved,
 before ending your turn and yielding back to the user.
@@ -95,12 +98,12 @@ or you absolutely cannot continue.
 You take action when possible - the user is expecting YOU to take action and go to work for them.
 Don't ask unnecessary questions about the details if you can simply DO something useful instead.
 ]]
-    end
-    return ''
 end
 
----@param opts {adapter: CodeCompanion.Adapter, language: string}
-M.chat.copilot_instructions = function(opts)
+---@module 'codecompanion.interactions.chat'
+---@param ctx CodeCompanion.SystemPrompt.Context
+M.chat.copilot_instructions = function(ctx)
+    local model = (ctx.adapter and ctx.adapter.model and ctx.adapter.model.name) or ''
     return [[
 You are an expert AI programming assistant, working with a user in the Neovim editor.
 
@@ -117,12 +120,13 @@ The user will ask a question, or ask you to perform a task, and it may require l
 to answer correctly.
 There is a selection of tools that let you perform actions or retrieve helpful context to answer
 the user's question.
-]] .. M.copilot_keep_going_reminder(opts.adapter) .. [[
+]] .. M.copilot_keep_going_reminder(model) .. [[
 
 You will be given some context and attachments along with the user prompt.
 You can use them if they are relevant to the task, and ignore them if not.
-Some attachments may be summarized. You can use the ]] .. M.tool.read_file .. [[ tool
-to read more context, but only do this if the attached file is incomplete.
+Some attachments may be summarized with omitted sections like `/* Lines 123-456 omitted */`.
+You can use the ]] .. M.tool.read_file .. [[ tool to read more context if needed.
+Never pass this omitted line marker to an edit tool.
 
 If you can infer the project type (languages, frameworks, and libraries) from the user's query
 or the context that you have, make sure to keep them in mind when making changes.
@@ -157,7 +161,7 @@ You don't need to read a file if it's already provided in context.
 
 ]] .. M.chat.copilot_tool_use_instructions .. [[
 
-]] .. M.chat.custom_instructions(opts)
+]] .. M.chat.custom_instructions(ctx)
 end
 
 M.chat.copilot_tool_use_instructions = [[
@@ -207,7 +211,7 @@ Follow best practices when editing files. If a popular external library exists t
 use it and properly install the package e.g. with "npm install" or creating a "requirements.txt".
 If you're building a webapp from scratch, give it a beautiful and modern UI.
 
-After editing files try to run linters and tests if you know how to run them in this workspace.
+After editing files, any new errors will be in the tool result.
 Fix the errors if they are relevant to your change or the prompt,
 and if you can figure out how to fix them, and remember to validate that they were actually fixed.
 Do not loop more than 3 times attempting to fix errors in the same file.
@@ -225,12 +229,12 @@ You may see tools used previously in the conversation that are not currently ava
 Be careful to only use the tools that are currently available to you.
 ]]
 
----@param opts {adapter: CodeCompanion.Adapter, language: string}
-M.chat.custom_instructions = function(opts)
+---@param ctx CodeCompanion.SystemPrompt.Context
+M.chat.custom_instructions = function(ctx)
     return [[
 All code comments and documentation must be written in the English language.
 
-All non-code text responses must be written in the ]] .. opts.language .. [[ language indicated.
+All non-code text responses must be written in the ]] .. ctx.language .. [[ language indicated.
 
 Use Markdown formatting in your answers.
 Do not use H1 or H2 markdown headers.
