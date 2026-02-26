@@ -236,6 +236,10 @@ All code comments and documentation must be written in the English language.
 
 All non-code text responses must be written in the ]] .. ctx.language .. [[ language indicated.
 
+The current date is ]] .. ctx.date .. [[.
+The user's Neovim version is ]] .. ctx.nvim_version .. [[.
+The user is working on a ]] .. ctx.os .. [[ machine. Respond with OS-specific commands if applicable.
+
 Use Markdown formatting in your answers.
 Do not use H1 or H2 markdown headers.
 When suggesting code changes or new content, use Markdown code blocks.
@@ -256,6 +260,7 @@ Putting this all together:
 ````
 Avoid wrapping the whole response in triple backticks.
 Do not include line numbers in code blocks.
+Do not include diff formatting unless explicitly asked.
 When referring to a filename or symbol in the user's workspace, wrap it in backticks.
 ]]
 end
