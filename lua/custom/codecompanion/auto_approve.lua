@@ -17,7 +17,7 @@ local defaults = {
     cmd_glob = false,
     cmd_redir = true,
     cmd_control = true,
-    secret_files = {
+    secret_files = { -- WARN: Not protected against file search tools or command `env` etc.
         '.env*',
         'env*.sh',
     },
@@ -25,6 +25,7 @@ local defaults = {
     codecompanion = {
         cmd_runner = true,
         create_file = true,
+        delete_file = true,
         insert_edit_into_file = true,
         read_file = true,
     },
@@ -135,10 +136,10 @@ function M.setup(opts)
 end
 
 -- Updates CodeCompanion config to protect tools based on user-defined settings.
--- Tools with already set requires_approval to a function won't be modified.
+-- Tools with already set require_approval_before to a function won't be modified.
 function M.setup_codecompanion()
     local config = require 'codecompanion.config'
-    local tools = config.config.strategies.chat.tools
+    local tools = config.config.interactions.chat.tools
 
     for tool_name, protect in pairs(M.config.codecompanion) do
         if not protect then
@@ -146,20 +147,21 @@ function M.setup_codecompanion()
         end
 
         tools[tool_name].opts = tools[tool_name].opts or {}
-        if type(tools[tool_name].opts.requires_approval) == 'function' then
+        if type(tools[tool_name].opts.require_approval_before) == 'function' then
             goto continue
         end
 
         if tool_name == 'cmd_runner' then
             ---@type boolean|function(CodeCompanion.Agent.Tool, CodeCompanion.Agent)
-            tools[tool_name].opts.requires_approval = M.cmd_runner
+            tools[tool_name].opts.require_approval_before = M.cmd_runner
         elseif
             tool_name == 'create_file'
-            or tool_name == 'read_file'
+            or tool_name == 'delete_file'
             or tool_name == 'insert_edit_into_file'
+            or tool_name == 'read_file'
         then
             ---@type boolean|function(CodeCompanion.Agent.Tool, CodeCompanion.Agent)
-            tools[tool_name].opts.requires_approval = M.filepath
+            tools[tool_name].opts.require_approval_before = M.filepath
         else
             notify('unknown tool: ' .. tool_name, vim.log.levels.ERROR)
         end
@@ -454,7 +456,7 @@ end
 
 -- Auto-approve command execution using whitelist.
 ---@param tool CodeCompanion.Tools.Tool
----@return boolean requires_approval
+---@return boolean require_approval_before
 function M.cmd_runner(tool, _)
     return not is_cmd_allowed(tool.args.cmd)
 end
@@ -489,7 +491,7 @@ end
 -- Auto-approve file operations only in project dir (current git repo or cwd)
 -- excluding secret files.
 ---@param tool CodeCompanion.Tools.Tool
----@return boolean requires_approval
+---@return boolean require_approval_before
 function M.filepath(tool, _)
     return not is_project_path(tool.args.filepath) or is_secret_file(tool.args.filepath)
 end

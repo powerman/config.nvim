@@ -8,7 +8,7 @@ return {
     cmd = 'Copilot',
     event = 'InsertEnter',
     dependencies = {
-        'copilotlsp-nvim/copilot-lsp', -- for NES functionality
+        -- 'copilotlsp-nvim/copilot-lsp', -- for NES functionality
     },
     opts = {
         panel = {
@@ -19,7 +19,7 @@ return {
         },
         suggestion = {
             enabled = true,
-            auto_trigger = true,
+            auto_trigger = true, -- When false use keymaps next/prev/accept to trigger suggestions.
             keymap = {
                 accept = '<M-CR>',
                 accept_word = '<M-Right>',
@@ -29,6 +29,17 @@ return {
                 dismiss = '<M-\\>',
             },
         },
+        -- nes = {
+        --     enabled = true, -- TODO: Not really usable yet, maybe try folke/sidekick.nvim instead?
+        --     auto_trigger = true,
+        --     keymap = { -- Normal mode keymaps.
+        --         accept_and_goto = '<M-Up>',
+        --         accept = false,
+        --         dismiss = '<Esc>',
+        --     },
+        -- },
+        -- disable_limit_reached_message = true,
+        root_dir = vim.g.project_root,
         should_attach = function(_, bufname)
             -- Default behavior.
             if not vim.bo.buflisted then
@@ -47,5 +58,10 @@ return {
             end
             return true
         end,
+        server = {
+            type = 'binary',
+            custom_server_filepath = vim.fn.stdpath 'data'
+                .. '/mason/bin/copilot-language-server',
+        },
     },
 }

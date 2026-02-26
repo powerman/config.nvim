@@ -26,6 +26,7 @@ describe('auto_approve', function()
                 codecompanion = {
                     cmd_runner = true,
                     create_file = true,
+                    delete_file = true,
                     insert_edit_into_file = true,
                     read_file = true,
                 },
@@ -59,6 +60,7 @@ describe('auto_approve', function()
                 codecompanion = {
                     cmd_runner = false,
                     create_file = true,
+                    delete_file = true,
                     insert_edit_into_file = true,
                     read_file = true,
                 },
@@ -73,14 +75,14 @@ describe('auto_approve', function()
     describe('cmd_runner', function()
         it('requires approval for non-allowed commands', function()
             auto_approve.setup { allowed_cmds = { 'ls' } }
-            local requires_approval = auto_approve.cmd_runner { args = { cmd = 'rm' } }
-            assert.is_true(requires_approval)
+            local require_approval_before = auto_approve.cmd_runner { args = { cmd = 'rm' } }
+            assert.is_true(require_approval_before)
         end)
 
         it('auto-approves allowed commands', function()
             auto_approve.setup { allowed_cmds = { 'ls' } }
-            local requires_approval = auto_approve.cmd_runner { args = { cmd = 'ls' } }
-            assert.is_false(requires_approval)
+            local require_approval_before = auto_approve.cmd_runner { args = { cmd = 'ls' } }
+            assert.is_false(require_approval_before)
         end)
 
         describe('cd prefix handling', function()
@@ -90,8 +92,8 @@ describe('auto_approve', function()
                     project_root = project_root,
                 }
                 local cmd = 'cd ' .. project_root .. ' && npm test'
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
-                assert.is_false(requires_approval)
+                local require_approval_before = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_false(require_approval_before)
             end)
 
             it('supports advanced quote handling in prefix patterns', function()
@@ -158,11 +160,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd .. ' (' .. tc.desc .. ')'
                     )
                 end
@@ -174,8 +176,8 @@ describe('auto_approve', function()
                     project_root = project_root,
                 }
                 local cmd = 'cd ' .. project_root .. ' && npm build'
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
-                assert.is_true(requires_approval)
+                local require_approval_before = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_true(require_approval_before)
             end)
 
             it('ignores cd prefix when project_root is not set', function()
@@ -184,8 +186,8 @@ describe('auto_approve', function()
                     project_root = nil,
                 }
                 local cmd = 'cd /some/path && npm test'
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
-                assert.is_true(requires_approval)
+                local require_approval_before = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_true(require_approval_before)
             end)
 
             it('ignores cd prefix when project_root is empty', function()
@@ -194,8 +196,8 @@ describe('auto_approve', function()
                     project_root = '',
                 }
                 local cmd = 'cd /some/path && npm test'
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = cmd } }
-                assert.is_true(requires_approval)
+                local require_approval_before = auto_approve.cmd_runner { args = { cmd = cmd } }
+                assert.is_true(require_approval_before)
             end)
 
             it('handles multiple commands with different prefixes', function()
@@ -214,11 +216,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        requires_approval,
+                        require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -245,11 +247,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        requires_approval,
+                        require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -264,16 +266,17 @@ describe('auto_approve', function()
                 vim.cmd 'AutoApproveAddAllowedCmd go test'
 
                 -- Should auto-approve session command
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
-                assert.is_false(requires_approval)
+                local require_approval_before =
+                    auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_false(require_approval_before)
 
                 -- Should still work with original commands
-                requires_approval = auto_approve.cmd_runner { args = { cmd = 'ls' } }
-                assert.is_false(requires_approval)
+                require_approval_before = auto_approve.cmd_runner { args = { cmd = 'ls' } }
+                assert.is_false(require_approval_before)
 
                 -- Should require approval for non-allowed commands
-                requires_approval = auto_approve.cmd_runner { args = { cmd = 'rm file' } }
-                assert.is_true(requires_approval)
+                require_approval_before = auto_approve.cmd_runner { args = { cmd = 'rm file' } }
+                assert.is_true(require_approval_before)
             end)
 
             it('validates session commands', function()
@@ -291,12 +294,14 @@ describe('auto_approve', function()
                 vim.cmd 'AutoApproveAddAllowedCmd go test'
 
                 -- Session command should work
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
-                assert.is_false(requires_approval)
+                local require_approval_before =
+                    auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_false(require_approval_before)
 
                 -- Config command should also work
-                requires_approval = auto_approve.cmd_runner { args = { cmd = 'go build' } }
-                assert.is_false(requires_approval)
+                require_approval_before =
+                    auto_approve.cmd_runner { args = { cmd = 'go build' } }
+                assert.is_false(require_approval_before)
             end)
 
             it('resets session commands', function()
@@ -304,21 +309,24 @@ describe('auto_approve', function()
                 vim.cmd 'AutoApproveAddAllowedCmd npm install'
 
                 -- Both should work
-                local requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
-                assert.is_false(requires_approval)
+                local require_approval_before =
+                    auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_false(require_approval_before)
 
-                requires_approval = auto_approve.cmd_runner { args = { cmd = 'npm install' } }
-                assert.is_false(requires_approval)
+                require_approval_before =
+                    auto_approve.cmd_runner { args = { cmd = 'npm install' } }
+                assert.is_false(require_approval_before)
 
                 -- Reset
                 vim.cmd 'AutoApproveResetAllowedCmds'
 
                 -- Both should now require approval
-                requires_approval = auto_approve.cmd_runner { args = { cmd = 'go test' } }
-                assert.is_true(requires_approval)
+                require_approval_before = auto_approve.cmd_runner { args = { cmd = 'go test' } }
+                assert.is_true(require_approval_before)
 
-                requires_approval = auto_approve.cmd_runner { args = { cmd = 'npm install' } }
-                assert.is_true(requires_approval)
+                require_approval_before =
+                    auto_approve.cmd_runner { args = { cmd = 'npm install' } }
+                assert.is_true(require_approval_before)
             end)
 
             it('lists session commands', function()
@@ -355,11 +363,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -387,11 +395,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -423,11 +431,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -451,11 +459,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -474,11 +482,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -490,10 +498,10 @@ describe('auto_approve', function()
                     cmd_env = false,
                 }
 
-                local requires_approval =
+                local require_approval_before =
                     auto_approve.cmd_runner { args = { cmd = 'GOOS=linux go test' } }
                 assert.is_true(
-                    requires_approval,
+                    require_approval_before,
                     'Should require approval when env vars disabled'
                 )
             end)
@@ -516,11 +524,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -532,10 +540,10 @@ describe('auto_approve', function()
                     cmd_redir = false,
                 }
 
-                local requires_approval =
+                local require_approval_before =
                     auto_approve.cmd_runner { args = { cmd = 'go test > output.txt' } }
                 assert.is_true(
-                    requires_approval,
+                    require_approval_before,
                     'Should require approval when redirections disabled'
                 )
             end)
@@ -556,11 +564,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -572,10 +580,10 @@ describe('auto_approve', function()
                     cmd_control = false,
                 }
 
-                local requires_approval =
+                local require_approval_before =
                     auto_approve.cmd_runner { args = { cmd = 'go test && echo success' } }
                 assert.is_true(
-                    requires_approval,
+                    require_approval_before,
                     'Should require approval when command chains disabled'
                 )
             end)
@@ -595,11 +603,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -664,11 +672,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.cmd_runner { args = { cmd = tc.cmd } }
                     assert.equal(
                         tc.expected,
-                        not requires_approval,
+                        not require_approval_before,
                         'Failed for command: ' .. tc.cmd
                     )
                 end
@@ -765,23 +773,23 @@ describe('auto_approve', function()
         describe('project root checks', function()
             it('requires approval for paths outside project root', function()
                 auto_approve.setup { project_root = project_root }
-                local requires_approval =
+                local require_approval_before =
                     auto_approve.filepath { args = { filepath = '/tmp/other/file.txt' } }
-                assert.is_true(requires_approval)
+                assert.is_true(require_approval_before)
             end)
 
             it('auto-approves paths inside project root', function()
                 auto_approve.setup { project_root = project_root }
-                local requires_approval =
+                local require_approval_before =
                     auto_approve.filepath { args = { filepath = project_root .. '/file.txt' } }
-                assert.is_false(requires_approval)
+                assert.is_false(require_approval_before)
             end)
 
             it('requires approval when project_root is not set', function()
                 auto_approve.setup { project_root = nil }
-                local requires_approval =
+                local require_approval_before =
                     auto_approve.filepath { args = { filepath = '/any/path' } }
-                assert.is_true(requires_approval)
+                assert.is_true(require_approval_before)
             end)
         end)
 
@@ -797,11 +805,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.filepath { args = { filepath = tc.filepath } }
                     assert.equal(
                         tc.expected,
-                        requires_approval,
+                        require_approval_before,
                         'Failed for file: ' .. tc.filepath
                     )
                 end
@@ -824,11 +832,11 @@ describe('auto_approve', function()
                 }
 
                 for _, tc in ipairs(test_cases) do
-                    local requires_approval =
+                    local require_approval_before =
                         auto_approve.filepath { args = { filepath = tc.filepath } }
                     assert.equal(
                         tc.expected,
-                        requires_approval,
+                        require_approval_before,
                         'Failed for file: ' .. tc.filepath
                     )
                 end
@@ -840,10 +848,10 @@ describe('auto_approve', function()
                     secret_files = {},
                 }
 
-                local requires_approval = auto_approve.filepath {
+                local require_approval_before = auto_approve.filepath {
                     args = { filepath = project_root .. '/.env' },
                 }
-                assert.is_false(requires_approval)
+                assert.is_false(require_approval_before)
             end)
 
             it('uses default secret_files when nil', function()
@@ -852,11 +860,11 @@ describe('auto_approve', function()
                     secret_files = nil,
                 }
 
-                local requires_approval = auto_approve.filepath {
+                local require_approval_before = auto_approve.filepath {
                     args = { filepath = project_root .. '/.env' },
                 }
                 assert.is_true(
-                    requires_approval,
+                    require_approval_before,
                     'Should block .env file using default patterns'
                 )
             end)

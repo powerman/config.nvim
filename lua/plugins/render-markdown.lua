@@ -100,12 +100,12 @@ return {
     },
     config = function(_, opts)
         local util = require 'custom.util'
-        util.adapt_nerd_font_propo(require('render-markdown.config.callout').default)
-        util.adapt_nerd_font_propo(require('render-markdown.config.checkbox').default)
-        util.adapt_nerd_font_propo(require('render-markdown.config.heading').default)
-        util.adapt_nerd_font_propo(require('render-markdown.config.link').default)
+        -- util.adapt_nerd_font_propo(require('render-markdown.settings').callout.default)
+        util.adapt_nerd_font_propo(require('render-markdown.settings').checkbox.default)
+        util.adapt_nerd_font_propo(require('render-markdown.settings').heading.default)
+        util.adapt_nerd_font_propo(require('render-markdown.settings').link.default)
         -- Default checkbox config has a custom item "[-] todo", but I use "[-] cancelled".
-        require('render-markdown.config.checkbox').default.custom.todo = nil
+        require('render-markdown.settings').checkbox.default.custom.todo = nil
 
         require('render-markdown').setup(opts)
     end,
