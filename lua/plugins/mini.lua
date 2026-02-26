@@ -1,7 +1,7 @@
 --[[ 40+ independent plugins improving overall Neovim experience with minimal effort ]]
 --
 --  We use only some of available plugins (all already installed but not loaded).
---  See all plugins: https://github.com/echasnovski/mini.nvim?tab=readme-ov-file#modules
+--  See all plugins: https://github.com/nvim-mini/mini.nvim?tab=readme-ov-file#modules
 
 --[[ mini.ai - Extend and create a/i textobjects ]]
 --
@@ -29,7 +29,7 @@
 --  - Has builtins for brackets, function call, tag, user prompt, and any
 --    alphanumeric/punctuation/whitespace character.
 --
---  See: https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-surround.md#features
+--  See: https://github.com/nvim-mini/mini.nvim/blob/main/readmes/mini-surround.md#features
 --
 --  Examples:
 --    - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
@@ -90,7 +90,7 @@ end
 ---@type LazySpec
 return {
     {
-        'echasnovski/mini.nvim',
+        'nvim-mini/mini.nvim',
         version = '*',
         config = function()
             local ai_gen_spec = require('mini.ai').gen_spec
