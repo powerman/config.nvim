@@ -56,7 +56,6 @@ local languages = {
     kdl = 'kdl', -- embedded in bash via #USAGE comments (usage-cli tool)
     json = 'json',
     json5 = 'json5',
-    jsonc = 'jsonc',
     jsonnet = 'jsonnet',
     lua = 'lua',
     luadoc = false, -- embedded in lua, no filetype
