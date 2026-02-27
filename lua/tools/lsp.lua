@@ -1,11 +1,19 @@
 local gopls_settings = {
     -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+    -- Updated to commit 83aca55 (2026-02-27).
     gopls = {
         --- Build:
-        -- buildFlags = { '-tags=…' },
-        -- env = { VAR = 'VALUE' },
+        ---
+        -- buildFlags = {}, -- { '-tags=…' }
+        -- env = {}, -- { VAR = 'VALUE' }
         -- directoryFilters = { '-**/node_modules' },
-        templateExtensions = { 'tmpl' },
+        templateExtensions = { 'gotmpl', 'tmpl' },
+        -- expandWorkspaceToModule = true,
+        --- standaloneTags specifies a set of build constraints that identify individual Go
+        --- source files that make up the entire main package of an executable.
+        --- A common example of standalone main files is the convention of using the directive
+        --- //go:build ignore to denote files that are not intended to be included in any
+        --- package, for example because they are invoked directly by the developer using go run.
         -- standaloneTags = { 'ignore' },
 
         --- Formatting:
@@ -20,72 +28,159 @@ local gopls_settings = {
         ---   - This probably should support work with old packages without `go.mod`.
         --- See https://github.com/neovim/nvim-lspconfig/issues/115.
         ---
-        -- ['local'] = 'github.com/company/project',
+        -- ['local'] = '', -- 'github.com/company/project',
         gofumpt = true,
 
         --- UI:
-        -- codelenses = {
-        --     gc_details = false,
-        --     generate = true,
-        --     regenerate_cgo = true,
-        --     test = false,
-        --     run_govulncheck = false,
-        --     tidy = true,
-        --     upgrade_dependency = true,
-        --     vendor = true,
-        -- },
+        ---
+        codelenses = {
+            --- This codelens source annotates any //go:generate comments with commands to run
+            --- go generate in this directory, on all directories recursively beneath this one.
+            -- generate = true,
+            --- This codelens source annotates an import "C" declaration with a command to
+            --- re-run the cgo command to regenerate the corresponding Go declarations.
+            --- Use this after editing the C code in comments attached to the import, or in C
+            --- header files included by it.
+            -- regenerate_cgo = true,
+            --- This codelens source annotates each Test and Benchmark function in a *_test.go
+            --- file with a command to run it.
+            --- This source is off by default because VS Code has a client-side custom UI for
+            --- testing, and because progress notifications are not a great UX for streamed
+            --- test output.
+            -- test = false,
+            --- This codelens source annotates the module directive in a go.mod file with a
+            --- command to run Govulncheck asynchronously.
+            -- run_govulncheck = true,
+            --- This codelens source annotates the module directive in a go.mod file with a
+            --- command to run go mod tidy, which ensures that the go.mod file matches the
+            --- source code in the module.
+            -- tidy = true,
+            --- This codelens source annotates the module directive in a go.mod file with
+            --- commands to:
+            --- - check for available upgrades,
+            --- - upgrade direct dependencies, and
+            --- - upgrade all dependencies transitively.
+            -- upgrade_dependency = true,
+            --- This codelens source annotates the module directive in a go.mod file with a
+            --- command to run go mod vendor, which creates or updates the directory named
+            --- vendor in the module root so that it contains an up-to-date copy of all
+            --- necessary package dependencies.
+            -- vendor = true,
+            --- This codelens source annotates the module directive in a go.mod file with a
+            --- command to run govulncheck synchronously.
+            vulncheck = true,
+        },
         -- semanticTokens = false,
-        -- noSemanticString = false,
-        -- noSemanticNumber = false,
+        -- semanticTokenTypes = {}, -- { string=false, number=false }
+        -- semanticTokenModifiers = {},
+        --- newGoFileHeader enables automatic insertion of the copyright comment and package
+        --- declaration in a newly created Go file.
+        -- newGoFileHeader = true,
+        --- renameMovesSubpackages enables Rename operations on packages to move
+        --- subdirectories of the target package.
+        renameMovesSubpackages = true,
 
-        --- UI / Completion:
+        --- Completion:
+        ---
+        --- placeholders enables placeholders for function parameters or struct fields in
+        --- completion responses.
+        -- usePlaceholders = false,
         -- matcher = 'Fuzzy', -- CaseInsensitive|CaseSensitive|Fuzzy
-        -- TODO: Is this one better for my completion setup?
-        matcher = 'CaseInsensitive',
         -- experimentalPostfixCompletions = true,
+        --- experimentalPostfixCompletions enables artificial method snippets such as
+        --- "someSlice.sort!".
         -- completeFunctionCalls = true,
 
-        --- UI / Diagnostic:
-        -- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
-        -- TODO: Hard to say how these intersect with golangci-lint…
-        analyses = {
-            -- shadow = false,
-            unusedvariable = true,
-            useany = true,
-        },
-        -- TODO: Hard to say how these intersect with golangci-lint…
+        --- Diagnostic:
+        ---
+        --- https://github.com/golang/tools/blob/master/gopls/doc/analyzers.md
+        -- analyses = {},
         staticcheck = true,
+        -- staticcheckProvided = false,
+        --- annotations specifies the various kinds of compiler optimization details that
+        --- should be reported as diagnostics when enabled for a package by the "Toggle
+        --- compiler optimization details" (gopls.gc_details) command.
         -- annotations = {
         --     bounds = true,
         --     escape = true,
         --     inline = true,
         --     ['nil'] = true,
         -- },
-        vulncheck = 'Imports', -- Off|Imports
+        -- vulncheck = 'Prompt', -- Off|Imports|Prompt
+        --- diagnosticsTrigger controls when to run diagnostics.
+        --- - "Edit": Trigger diagnostics on file edit and save. (default)
+        --- - "Save": Trigger diagnostics only on file save. Events like initial workspace
+        ---           load or configuration change will still trigger diagnostics.
+        -- diagnosticsTrigger = 'Edit',
         -- analysisProgressReporting = true,
 
-        --- UI / Documentation:
-        -- hoverKind = 'FullDocumentation', -- FullDocumentation|NoDocumentation|SingleLine|Structured|SynopsisDocumentation
-        -- linksInHover = true, -- true|false|'gopls'
+        --- Documentation:
+        ---
+        --- hoverKind controls the information that appears in the hover text.
+        --- SingleLine is intended for use only by authors of editor plugins.
+        -- hoverKind = 'FullDocumentation', -- FullDocumentation|NoDocumentation|SingleLine|SynopsisDocumentation
+        -- linkTarget = 'pkg.go.dev',
+        --- linksInHover controls the presence of documentation links in hover markdown.
+        --- - false: do not show links
+        --- - true: show links to the linkTarget domain
+        --- - "gopls": show links to gopls' internal documentation viewer
+        -- linksInHover = true,
 
-        --- UI / Inlayhint:
+        --- Inlayhint:
+        ---
         --- https://github.com/golang/tools/blob/master/gopls/doc/inlayHints.md
-        --- TODO: Test this (there is a hotkey to toggle inlay hints).
         hints = {
+            --- controls inlay hints for variable types in assign statements:
+            ---   i/* int*/, j/* int*/ := 0, len(r)-1
             -- assignVariableTypes = false,
+            --- inlay hints for composite literal field names:
+            ---   {/*in: */"Hello, world", /*want: */"dlrow ,olleH"}
             compositeLiteralFields = true,
+            --- controls inlay hints for composite literal types:
+            ---   for _, c := range []struct {
+            ---     in, want string
+            ---   }{
+            ---     /*struct{ in string; want string }*/{"Hello, world", "dlrow ,olleH"},
+            ---   }
             -- compositeLiteralTypes = false,
+            --- controls inlay hints for constant values:
+            ---   const (
+            ---     KindNone   Kind = iota/* = 0*/
+            ---     KindPrint/*  = 1*/
+            ---     KindPrintf/* = 2*/
+            ---     KindErrorf/* = 3*/
+            ---   )
             constantValues = true,
+            --- inlay hints for implicit type parameters on generic functions:
+            ---   myFoo/*[int, string]*/(1, "hello")
             functionTypeParameters = true,
+            --- inlay hints for implicitly discarded errors:
+            ---   f.Close() // ignore error
+            ignoredError = true,
+            --- controls inlay hints for parameter names:
+            ---   parseInt(/* str: */ "123", /* radix: */ 8)
             parameterNames = true,
+            --- controls inlay hints for variable types in range statements:
+            ---   for k/* int*/, v/* string*/ := range []string{} {
+            ---     fmt.Println(k, v)
+            ---   }
             -- rangeVariableTypes = false,
         },
 
-        --- UI / Navigation:
+        --- Navigation:
+        ---
+        --- importShortcut specifies whether import statements should link to documentation or
+        --- go to definitions.
         -- importShortcut = 'Both', -- Both|Definition|Link
         -- symbolMatcher = 'FastFuzzy', -- CaseInsensitive|CaseSensitive|FastFuzzy|Fuzzy
-        -- symbolStyle = 'Dynamic', -- Dynamic|Full|Package
+        --- symbolScope controls which packages are searched for workspace/symbol requests.
+        --- When the scope is "workspace", gopls searches only workspace packages. When the
+        --- scope is "all", gopls searches all loaded packages, including dependencies and the
+        --- standard library.
         -- symbolScope = 'all', -- all|workspace
+        --- maxFileCacheBytes sets a soft limit on the file cache size in bytes.
+        --- If zero, the default budget is used.
+        -- maxFileCacheBytes = 0,
     },
 }
 
