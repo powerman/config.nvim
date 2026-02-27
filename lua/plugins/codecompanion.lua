@@ -69,7 +69,7 @@ local function agent_prompt(model)
         prompts = {
             {
                 role = prompt.USER_ROLE,
-                content = '#{mcp:neovim://workspace} @{agent} ',
+                content = '#{mcp:neovim://workspace} @{agent}',
             },
         },
     }
