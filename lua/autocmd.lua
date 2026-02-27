@@ -64,7 +64,10 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
             -- copying window-local options to new windows/tabs and thus apply them to other
             -- files even if they have another filetypes. Reset foldmethod/foldexpr to defaults
             -- for filetypes not handled by treesitter's FileType autocmd.
-            if vim.wo.foldmethod == 'expr' and vim.wo.foldexpr ~= 'v:lua.vim.treesitter.foldexpr()' then
+            if
+                vim.wo.foldmethod == 'expr'
+                and vim.wo.foldexpr ~= 'v:lua.vim.treesitter.foldexpr()'
+            then
                 vim.wo.foldmethod = 'manual'
                 vim.wo.foldexpr = '0'
             end
