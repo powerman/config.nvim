@@ -42,7 +42,13 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     end,
 })
 
--- Enable manual convenient folding for markdown sections.
+-- Setup folding per filetype.
+-- NOTE: This autocmd runs after treesitter's FileType autocmd (which sets foldmethod=expr with
+-- vim.treesitter.foldexpr()), so it overrides treesitter folding for markdown.
+-- Treesitter markdown folding folds individual code blocks, lists, blockquotes etc. as separate
+-- nodes inside sections - which is noisy when working with markdown as a document.
+-- Our custom expr folds only by headings (^#), giving clean section-level folds matching
+-- the visible heading hierarchy: # -> level 1, ## -> level 2, etc.
 vim.api.nvim_create_autocmd('BufWinEnter', {
     desc = 'Setup folding per filetype',
     group = vim.api.nvim_create_augroup('user.folding', { clear = true }),
@@ -56,9 +62,12 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
         else
             -- Workaround for `tab sball` (used in other autocmd above) which will result in
             -- copying window-local options to new windows/tabs and thus apply them to other
-            -- files even if they have another filetypes. So, reset these options to defaults.
-            vim.wo.foldmethod = 'manual'
-            vim.wo.foldexpr = '0'
+            -- files even if they have another filetypes. Reset foldmethod/foldexpr to defaults
+            -- for filetypes not handled by treesitter's FileType autocmd.
+            if vim.wo.foldmethod == 'expr' and vim.wo.foldexpr ~= 'v:lua.vim.treesitter.foldexpr()' then
+                vim.wo.foldmethod = 'manual'
+                vim.wo.foldexpr = '0'
+            end
             vim.wo.foldtext = [[foldtext()]]
         end
 
@@ -78,12 +87,9 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
                 and not vim.wo[win].diff
             then
                 vim.api.nvim_win_call(win, function()
-                    if vim.bo[ev.buf].filetype == 'markdown' then
-                        vim.cmd 'normal! zR'
-                    else
-                        vim.cmd 'normal! zE'
-                        vim.cmd 'normal! zx'
-                    end
+                    -- Open all folds. For treesitter foldmethod=expr this ensures nothing
+                    -- is collapsed on first open, regardless of foldlevel.
+                    vim.cmd 'normal! zR'
                 end)
             end
         end, 30) -- It's a race, of course. Increase in case of issues.
