@@ -78,23 +78,5 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
         if vim.g.SessionLoad then
             return
         end
-        -- Auto-open all folds on first open.
-        -- Use defer_fn for compatibility with opening files with Telescope
-        -- (which opens files using async file loading and file contents may not be loaded
-        -- at the moment BufWinEnter - or other events like FileReadPost - fires).
-        local win = vim.api.nvim_get_current_win()
-        vim.defer_fn(function()
-            if
-                vim.api.nvim_win_is_valid(win)
-                and vim.api.nvim_win_get_buf(win) == ev.buf
-                and not vim.wo[win].diff
-            then
-                vim.api.nvim_win_call(win, function()
-                    -- Open all folds. For treesitter foldmethod=expr this ensures nothing
-                    -- is collapsed on first open, regardless of foldlevel.
-                    vim.cmd 'normal! zR'
-                end)
-            end
-        end, 30) -- It's a race, of course. Increase in case of issues.
     end,
 })

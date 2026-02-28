@@ -85,3 +85,7 @@ vim.opt.diffopt:append 'algorithm:histogram'
 
 -- Border for floating windows.
 vim.opt.winborder = 'rounded'
+
+-- Don't fold by default, but allow folding based on syntax or indentation.
+vim.o.foldlevelstart = 99
+vim.o.foldlevel = 99
