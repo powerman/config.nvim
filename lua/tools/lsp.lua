@@ -310,6 +310,14 @@ return {
     lua_ls = {
         settings = {
             Lua = {
+                workspace = {
+                    -- Required to force Lua_LS to initialize workspace on Neovim start.
+                    -- Without this there is a race condition and workspace may or may not be
+                    -- initialized when you open a Lua file.
+                    -- If workspace is not initialized, Lua_LS won't recognize Neovim API
+                    -- and will throw errors for all `vim.*` calls.
+                    library = {},
+                },
                 completion = {
                     callSnippet = 'Replace',
                 },
