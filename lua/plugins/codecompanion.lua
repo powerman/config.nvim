@@ -528,6 +528,12 @@ return {
             opts = {
                 log_level = 'ERROR', -- TRACE|DEBUG|ERROR|INFO
                 language = 'Russian', -- The language used for LLM responses.
+                per_project_config = { -- Needed for custom rule groups.
+                    -- return {rules={['GROUP NAME']={files={'.codecompanion/rules/FILE.md'}}}}
+                    files = {
+                        '.codecompanion/config.lua',
+                    },
+                },
             },
         },
         config = function(_, opts)
@@ -539,6 +545,31 @@ return {
 
             local util = require 'custom.util'
             util.adapt_nerd_font_propo(config.config)
+
+            -- Add general local rules file to the default rule group.
+            table.insert(config.config.rules.default.files, 'AGENT.local.md')
+
+            -- Load project rule groups from `.agent/*.md` files.
+            -- This enables additional (beyond the default group, e.g., `AGENT.md`)
+            -- project-specific rule groups without altering the main configuration file.
+            -- Each `.md` file in `.agent/` defines a rule group named after the file.
+            local files = require 'codecompanion.utils.files'
+            local rule_dir = vim.g.project_root .. '/.agent'
+            do
+                local rule_files = files.list_dir(rule_dir)
+                if rule_files then
+                    for _, file_name in ipairs(rule_files) do
+                        if file_name:len() > 3 and file_name:sub(-3) == '.md' then
+                            local rule_name = file_name:match '(.+)%.md$'
+                            local file_path = rule_dir .. '/' .. file_name
+                            config.config.rules[rule_name] = {
+                                description = files.read(file_path) or '',
+                                files = { file_path },
+                            }
+                        end
+                    end
+                end
+            end
 
             -- Enforce using only local LLM adapters if remote adapters are forbidden,
             -- to avoid accidentally sending sensitive data to remote servers.
