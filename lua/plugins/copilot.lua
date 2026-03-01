@@ -7,9 +7,6 @@ return {
     cond = vim.g.allow_remote_llm,
     cmd = 'Copilot',
     event = 'InsertEnter',
-    dependencies = {
-        -- 'copilotlsp-nvim/copilot-lsp', -- for NES functionality
-    },
     opts = {
         panel = {
             enabled = false,
@@ -29,15 +26,9 @@ return {
                 dismiss = '<M-\\>',
             },
         },
-        -- nes = {
-        --     enabled = true, -- TODO: Not really usable yet, maybe try folke/sidekick.nvim instead?
-        --     auto_trigger = true,
-        --     keymap = { -- Normal mode keymaps.
-        --         accept_and_goto = '<M-Up>',
-        --         accept = false,
-        --         dismiss = '<Esc>',
-        --     },
-        -- },
+        nes = {
+            enabled = false, -- NES is provided by folke/sidekick.nvim.
+        },
         -- disable_limit_reached_message = true,
         root_dir = vim.g.project_root,
         should_attach = function(_, bufname)
