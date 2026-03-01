@@ -1,5 +1,5 @@
 ---@class AutoApproveConfig
----@field allowed_cmds? string[] Allowed commands for cmd_runner, neovim__execute_command, shell__shell_exec. Supports patterns (e.g., 'go test *').
+---@field allowed_cmds? string[] Allowed commands for run_command, neovim__execute_command, shell__shell_exec. Supports patterns (e.g., 'go test *').
 ---@field cmd_env? boolean Allow safe environment variables in commands (default: true).
 ---@field cmd_glob? boolean Allow * ? in command args (default: false).
 ---@field cmd_redir? boolean Allow safe output redirections in commands (default: true).
@@ -23,7 +23,7 @@ local defaults = {
     },
     project_root = nil,
     codecompanion = {
-        cmd_runner = true,
+        run_command = true,
         create_file = true,
         delete_file = true,
         insert_edit_into_file = true,
@@ -151,9 +151,9 @@ function M.setup_codecompanion()
             goto continue
         end
 
-        if tool_name == 'cmd_runner' then
+        if tool_name == 'run_command' then
             ---@type boolean|function(CodeCompanion.Agent.Tool, CodeCompanion.Agent)
-            tools[tool_name].opts.require_approval_before = M.cmd_runner
+            tools[tool_name].opts.require_approval_before = M.run_command
         elseif
             tool_name == 'create_file'
             or tool_name == 'delete_file'
@@ -457,7 +457,7 @@ end
 -- Auto-approve command execution using whitelist.
 ---@param tool CodeCompanion.Tools.Tool
 ---@return boolean require_approval_before
-function M.cmd_runner(tool, _)
+function M.run_command(tool, _)
     return not is_cmd_allowed(tool.args.cmd)
 end
 

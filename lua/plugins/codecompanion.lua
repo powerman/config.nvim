@@ -11,14 +11,14 @@
 -- NOTE:  <Leader>cr    AI chat: regenerate.
 -- NOTE:  <Leader>cx    AI chat: clear.
 -- NOTE:  <Leader>cc    AI chat: codeblock.
--- NOTE:  <Leader>cba   AI chat: buffer sync all.
--- NOTE:  <Leader>cbd   AI chat: buffer sync diff.
+-- NOTE:  <Leader>ctf   AI chat: buffer sync all.
+-- NOTE:  <Leader>ctd   AI chat: buffer sync diff.
 -- NOTE:  <Leader>ca    AI chat: change adapter.
 -- NOTE:  <Leader>cz    AI chat: fold code.
 -- NOTE:  <Leader>cd    AI chat: debug.
--- NOTE:  <Leader>dy    AI inline: always accept diff in this buffer.
--- NOTE:  <Leader>da    AI inline: accept diff.
--- NOTE:  <Leader>dr    AI inline: reject diff.
+-- NOTE:  <Leader>dA    AI diff: always accept.
+-- NOTE:  <Leader>da    AI diff: accept.
+-- NOTE:  <Leader>dr    AI diff: reject.
 -- NOTE:  <M-r>         AI chat history: rename.
 -- NOTE:  <M-d>         AI chat history: delete.
 -- NOTE:  <C-Y>         AI chat history: duplicate.
@@ -50,7 +50,7 @@ local function cb_browse_chats(filter_fn)
 end
 
 local _agent_index = 10
-local function agent_prompt(model)
+local function mcp_agent_prompt(model)
     _agent_index = _agent_index + 1
     return {
         interaction = 'chat',
@@ -66,10 +66,16 @@ local function agent_prompt(model)
                 model = model,
             },
         },
+        rules = {
+            'default',
+        },
+        tools = {
+            'mcp_agent',
+        },
         prompts = {
             {
                 role = prompt.USER_ROLE,
-                content = '#{mcp:neovim://workspace} @{agent}',
+                content = '#{mcp:neovim://workspace}',
             },
         },
     }
@@ -192,6 +198,20 @@ return {
         end,
         opts = {
             interactions = {
+                shared = {
+                    keymaps = {
+                        always_accept = {
+                            modes = { n = '<Leader>dA' },
+                        },
+                        accept_change = {
+                            modes = { n = '<Leader>da' },
+                        },
+                        reject_change = {
+                            modes = { n = '<Leader>dr' },
+                        },
+                    },
+                },
+
                 background = {
                     adapter = {
                         name = 'copilot',
@@ -212,15 +232,6 @@ return {
                         model = 'gpt-4.1', -- Multiplier = 0 (free).
                     },
                     keymaps = {
-                        always_accept = {
-                            modes = { n = '<Leader>dy' },
-                        },
-                        accept_change = {
-                            modes = { n = '<Leader>da' },
-                        },
-                        reject_change = {
-                            modes = { n = '<Leader>dr' },
-                        },
                         stop = {
                             modes = { n = '<C-C>' },
                         },
@@ -267,11 +278,11 @@ return {
                     },
                     tools = {
                         groups = {
-                            ['agent'] = {
-                                description = 'Agent tools',
+                            ['mcp_agent'] = {
+                                description = 'Agent tools from MCP servers',
                                 tools = {
                                     --- Web search and browsing tools.
-                                    'search_web',
+                                    'web_search',
                                     'fetch_webpage',
                                     'context7__get-library-docs',
                                     'context7__resolve-library-id',
@@ -280,7 +291,7 @@ return {
                                     'tavily-mcp__tavily-map',
                                     'tavily-mcp__tavily-search',
                                     --- File analysis tools.
-                                    'list_code_usages',
+                                    'grep_search',
                                     'filesystem__get_file_info',
                                     'filesystem__list_allowed_directories',
                                     'filesystem__list_directory',
@@ -334,10 +345,10 @@ return {
                             modes = { n = '<Leader>cy' },
                         },
                         buffer_sync_all = {
-                            modes = { n = '<Leader>cba' },
+                            modes = { n = '<Leader>ctf' },
                         },
                         buffer_sync_diff = {
-                            modes = { n = '<Leader>cbd' },
+                            modes = { n = '<Leader>ctd' },
                         },
                         change_adapter = {
                             modes = { n = '<Leader>ca' },
@@ -358,16 +369,13 @@ return {
                             modes = { n = '<Leader>cA' },
                         },
                         yolo_mode = {
-                            modes = { n = '<Leader>cta' },
+                            modes = { n = '<Leader>cty' },
                         },
                         goto_file_under_cursor = {
                             modes = { n = 'gf' },
                         },
                         copilot_stats = {
                             modes = { n = '<Leader>cS' },
-                        },
-                        super_diff = {
-                            modes = { n = '<Leader>cD' },
                         },
                     },
                 },
@@ -512,10 +520,10 @@ return {
                         i = cb_browse_chats(),
                     },
                 },
-                ['Agent GPT-4.1 (free)'] = agent_prompt 'gpt-4.1', -- Multiplier = 0 (free).
-                ['Agent Sonnet 4.6'] = agent_prompt 'claude-sonnet-4.6', -- Multiplier = 1.
-                ['Agent Gemini 3.1 Pro'] = agent_prompt 'gemini-3.1-pro-preview', -- Multiplier = 1.
-                ['Agent GPT-5.3 Codex'] = agent_prompt 'gpt-5.3-codex', -- Multiplier = 1.
+                ['Agent GPT-4.1 (free)'] = mcp_agent_prompt 'gpt-4.1', -- Multiplier = 0 (free).
+                ['Agent Sonnet 4.6'] = mcp_agent_prompt 'claude-sonnet-4.6', -- Multiplier = 1.
+                ['Agent Gemini 3.1 Pro'] = mcp_agent_prompt 'gemini-3.1-pro-preview', -- Multiplier = 1.
+                ['Agent GPT-5.3 Codex'] = mcp_agent_prompt 'gpt-5.3-codex', -- Multiplier = 1.
             },
             opts = {
                 log_level = 'ERROR', -- TRACE|DEBUG|ERROR|INFO
@@ -525,12 +533,17 @@ return {
         config = function(_, opts)
             require('codecompanion').setup(opts)
             require('custom.codecompanion.auto_approve').setup_codecompanion()
+            require('custom.codecompanion.fidget-spinner'):init()
 
             local config = require 'codecompanion.config'
 
             local util = require 'custom.util'
             util.adapt_nerd_font_propo(config.config)
 
+            -- Enforce using only local LLM adapters if remote adapters are forbidden,
+            -- to avoid accidentally sending sensitive data to remote servers.
+            -- Nota that data can leak not only through LLM interactions, but also through tools,
+            -- so avoid giving access to tools like web search even to local LLMs.
             if not vim.g.allow_remote_llm then
                 -- Forbid loading remote LLM adapters.
                 local orig_require = require
@@ -600,6 +613,8 @@ return {
                 end
             end
 
+            -- CodeCompanion executes 'checktime' only for the @insert_edit_into_file tool,
+            -- but files may also be modified by other tools.
             vim.api.nvim_create_autocmd('WinLeave', {
                 desc = 'Reload buffers when leaving CodeCompanion Chat window',
                 pattern = '*',
@@ -612,27 +627,32 @@ return {
             })
 
             -- Fix picker for slash commands to add selection to the prompt instead of
-            -- opening file in a new tab.
-            local Telescope = require 'codecompanion.providers.slash_commands.telescope'
-            local orig_display = Telescope.display
-            function Telescope:display()
-                local f = orig_display(self)
-                return function()
-                    local actions = require 'telescope.actions'
-                    local orig_select_default = actions.select_default
-                    actions.select_default = actions.select_tab
-                    local res = f()
-                    actions.select_default = orig_select_default
-                    return res
+            -- opening the file in a new tab.
+            local telescope = require 'codecompanion.providers.slash_commands.telescope'
+            do
+                local orig_display = telescope.display
+                function telescope:display()
+                    local f = orig_display(self)
+                    return function()
+                        local actions = require 'telescope.actions'
+                        local orig_select_default = actions.select_default
+                        actions.select_default = actions.select_tab
+                        local res = f()
+                        actions.select_default = orig_select_default
+                        return res
+                    end
                 end
             end
 
+            -- Play a sound when LLM response completes or awaits tool approval
+            -- when Neovim is not focused, to prevent missing critical notifications.
             local notifier = require('custom.sound_notifier').new(vim.g.llm_message_sound)
             vim.api.nvim_create_autocmd('User', {
                 group = notifier.augroup,
                 pattern = {
                     'CodeCompanionChatDone',
                     'CodeCompanionInlineFinished',
+                    'CodeCompanionToolApprovalRequested',
                     'MCPHubApprovalWindowOpened',
                 },
                 callback = notifier:notify_callback(),

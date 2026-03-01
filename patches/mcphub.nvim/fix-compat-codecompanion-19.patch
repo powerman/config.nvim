@@ -1,0 +1,388 @@
+From 9a39887cb853fa7f902e3bdd2cb4911bc3219f96 Mon Sep 17 00:00:00 2001
+From: Bahaa Zahika <bahaa.zahika@gmail.com>
+Date: Mon, 2 Mar 2026 07:46:29 +0200
+Subject: [PATCH] feat(extensions): adapt CodeCompanion extension for v19
+ compatibility
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Migrate the CodeCompanion extension to support CodeCompanion v19's
+breaking API changes while maintaining the same user-facing behavior.
+
+Changes:
+- Tool config: callback = { table } → callback = function() return table end
+- Tool cmds handler: (agent, args, _, output_handler) → (self, action, opts)
+- Tool output handler: (self, agent, cmd, data) → (self, data, meta)
+- Variables → Editor Context: config.interactions.chat.variables →
+  config.interactions.chat.editor_context
+- Image handling: helpers.add_image() → Chat:add_image_message()
+- Group system_prompt: function(self) → function(group_config, ctx)
+
+Files modified:
+- lua/mcphub/extensions/codecompanion/tools.lua
+- lua/mcphub/extensions/codecompanion/core.lua
+- lua/mcphub/extensions/codecompanion/variables.lua
+- lua/mcphub/extensions/codecompanion/slash_commands.lua
+---
+ lua/mcphub/extensions/codecompanion/core.lua  | 48 +++++-------
+ .../codecompanion/slash_commands.lua          |  9 +--
+ lua/mcphub/extensions/codecompanion/tools.lua | 78 +++++++++++--------
+ .../extensions/codecompanion/variables.lua    | 23 +++---
+ 4 files changed, 78 insertions(+), 80 deletions(-)
+
+diff --git a/lua/mcphub/extensions/codecompanion/core.lua b/lua/mcphub/extensions/codecompanion/core.lua
+index 387f05e..28e9c57 100644
+--- a/lua/mcphub/extensions/codecompanion/core.lua
++++ b/lua/mcphub/extensions/codecompanion/core.lua
+@@ -8,7 +8,7 @@ local shared = require("mcphub.extensions.shared")
+ ---@param output_handler function Callback for asynchronous calls
+ ---@param context MCPHub.ToolCallContext
+ ---@return nil|{ status: "success"|"error", data: string }
+-function M.execute_mcp_tool(params, agent, output_handler, context)
++function M.execute_mcp_tool(params, tools, output_handler, context)
+     context = context or {}
+     ---@diagnostic disable-next-line: missing-parameter
+     async.run(function()
+@@ -43,7 +43,7 @@ function M.execute_mcp_tool(params, agent, output_handler, context)
+             hub:access_resource(parsed_params.server_name, parsed_params.uri, {
+                 caller = {
+                     type = "codecompanion",
+-                    codecompanion = agent,
++                    codecompanion = tools,
+                     auto_approve = result.approve,
+                 },
+                 parse_response = true,
+@@ -63,7 +63,7 @@ function M.execute_mcp_tool(params, agent, output_handler, context)
+             hub:call_tool(parsed_params.server_name, parsed_params.tool_name, parsed_params.arguments, {
+                 caller = {
+                     type = "codecompanion",
+-                    codecompanion = agent,
++                    codecompanion = tools,
+                     auto_approve = result.approve,
+                 },
+                 parse_response = true,
+@@ -108,7 +108,6 @@ local function add_tool_output(
+     images
+ )
+     local config = require("codecompanion.config")
+-    local helpers = require("codecompanion.interactions.chat.helpers")
+     local show_result_in_chat = opts.show_result_in_chat == true
+     local text = llm_msg
+     local formatted_name = opts.format_tool and opts.format_tool(display_name, tool) or display_name
+@@ -121,7 +120,7 @@ local function add_tool_output(
+                 or string.format("**`%s` Tool**: Successfully finished", formatted_name)
+         )
+         for _, image in ipairs(images) do
+-            helpers.add_image(chat, image)
++            chat:add_image_message(image)
+         end
+     else
+         if show_result_in_chat or is_error then
+@@ -148,17 +147,14 @@ end
+ ---@return {error: function, success: function}
+ function M.create_output_handlers(display_name, has_function_calling, opts)
+     return {
+-        ---@param self CodeCompanion.Agent.Tool
+-        ---@param agent CodeCompanion.Agent
+-        ---@param stderr table The error output from the command
+-        error = function(self, agent, cmd, stderr)
+-            ---@diagnostic disable-next-line: cast-local-type
+-            stderr = has_function_calling and (stderr[#stderr] or "") or cmd[#cmd]
+-            ---@diagnostic disable-next-line: cast-local-type
+-            agent = has_function_calling and agent or self
+-            if type(stderr) == "table" then
+-                ---@diagnostic disable-next-line: cast-local-type
+-                stderr = vim.inspect(stderr)
++        ---@param self CodeCompanion.Tools.Tool The tool object
++        ---@param stderr table|nil The error output from the command
++        ---@param meta { cmd: table, tools: CodeCompanion.Tools } Metadata with tools coordinator
++        error = function(self, stderr, meta)
++            local chat = meta.tools.chat
++            local err_data = stderr and (stderr[#stderr] or "") or ""
++            if type(err_data) == "table" then
++                err_data = vim.inspect(err_data)
+             end
+             local formatted_name = opts.format_tool and opts.format_tool(display_name, self) or display_name
+             local err_msg = string.format(
+@@ -169,21 +165,19 @@ function M.create_output_handlers(display_name, has_function_calling, opts)
+ ````
+ ]],
+                 formatted_name,
+-                stderr
++                err_data
+             )
+-            add_tool_output(display_name, self, agent.chat, err_msg, true, has_function_calling, opts, nil, {})
++            add_tool_output(display_name, self, chat, err_msg, true, has_function_calling, opts, nil, {})
+         end,
+ 
+-        ---@param self CodeCompanion.Agent.Tool
+-        ---@param agent CodeCompanion.Agent
+-        ---@param cmd table The command that was executed
+-        ---@param stdout table The output from the command
+-        success = function(self, agent, cmd, stdout)
++        ---@param self CodeCompanion.Tools.Tool The tool object
++        ---@param stdout table|nil The output from the command
++        ---@param meta { cmd: table, tools: CodeCompanion.Tools } Metadata with tools coordinator
++        success = function(self, stdout, meta)
++            local chat = meta.tools.chat
+             local image_cache = require("mcphub.utils.image_cache")
+             ---@type MCPResponseOutput
+-            local result = has_function_calling and stdout[#stdout] or cmd[#cmd]
+-            ---@diagnostic disable-next-line: cast-local-type
+-            agent = has_function_calling and agent or self
++            local result = stdout and stdout[#stdout] or {}
+             local formatted_name = opts.format_tool and opts.format_tool(display_name, self) or display_name
+             local to_llm = nil
+             local to_user = nil
+@@ -243,7 +237,7 @@ function M.create_output_handlers(display_name, has_function_calling, opts)
+             add_tool_output(
+                 display_name,
+                 self,
+-                agent.chat,
++                chat,
+                 to_llm or fallback_to_llm,
+                 false,
+                 has_function_calling,
+diff --git a/lua/mcphub/extensions/codecompanion/slash_commands.lua b/lua/mcphub/extensions/codecompanion/slash_commands.lua
+index 6444ab4..077c407 100644
+--- a/lua/mcphub/extensions/codecompanion/slash_commands.lua
++++ b/lua/mcphub/extensions/codecompanion/slash_commands.lua
+@@ -14,9 +14,8 @@ function M.register()
+     local slash_commands = config.interactions.chat.slash_commands
+ 
+     -- Remove existing MCP slash commands
+-    for key, value in pairs(slash_commands) do
+-        local id = value.id or ""
+-        if id:sub(1, 3) == "mcp" then
++    for key, _ in pairs(slash_commands) do
++        if type(key) == "string" and key:sub(1, 4) == "mcp:" then
+             slash_commands[key] = nil
+         end
+     end
+@@ -41,7 +40,6 @@ function M.register()
+         end
+ 
+         slash_commands["mcp:" .. prompt_name] = {
+-            id = "mcp" .. server_name .. prompt_name,
+             description = description,
+             callback = function(self)
+                 shared.collect_arguments(arguments, function(values)
+@@ -92,10 +90,9 @@ function M.register()
+ 
+                         -- Handle images
+                         if output.images and #output.images > 0 then
+-                            local helpers = require("codecompanion.interactions.chat.helpers")
+                             for _, image in ipairs(output.images) do
+                                 local id = string.format("mcp-%s", os.time())
+-                                helpers.add_image(self, {
++                                self:add_image_message({
+                                     id = id,
+                                     base64 = image.data,
+                                     mimetype = image.mimeType,
+diff --git a/lua/mcphub/extensions/codecompanion/tools.lua b/lua/mcphub/extensions/codecompanion/tools.lua
+index 7712c5d..7c9474d 100644
+--- a/lua/mcphub/extensions/codecompanion/tools.lua
++++ b/lua/mcphub/extensions/codecompanion/tools.lua
+@@ -25,17 +25,17 @@ end
+ ---@param has_function_calling boolean
+ ---@param opts MCPHub.Extensions.CodeCompanionConfig
+ local function create_static_handler(action_name, has_function_calling, opts)
+-    ---@param agent CodeCompanion.Agent The Editor tool
+-    ---@param args MCPHub.ToolCallArgs | MCPHub.ResourceAccessArgs The arguments from the LLM's tool call
+-    ---@param output_handler function Callback for asynchronous calls
++    ---@param self CodeCompanion.Tools The tools coordinator
++    ---@param action MCPHub.ToolCallArgs | MCPHub.ResourceAccessArgs The arguments from the LLM's tool call
++    ---@param cmd_opts { input?: any, output_cb: function } Options including the output callback
+     ---@return nil|{ status: "success"|"error", data: string }
+-    return function(agent, args, _, output_handler)
++    return function(self, action, cmd_opts)
+         local context = {
+             tool_display_name = action_name,
+             is_individual_tool = false,
+             action = action_name,
+         }
+-        core.execute_mcp_tool(args, agent, output_handler, context)
++        core.execute_mcp_tool(action, self, cmd_opts.output_cb, context)
+     end
+ end
+ 
+@@ -50,14 +50,14 @@ end
+ ---@param namespaced_name string Namespaced tool name (safe_server_name__safe_tool_name)
+ ---@return function
+ local function create_individual_tool_handler(server_name, tool_name, namespaced_name)
+-    ---@param agent CodeCompanion.Agent The Editor tool
+-    ---@param args MCPHub.ToolCallArgs
+-    ---@param output_handler function Callback for asynchronous calls
+-    return function(agent, args, _, output_handler)
++    ---@param self CodeCompanion.Tools The tools coordinator
++    ---@param action MCPHub.ToolCallArgs The arguments from the LLM's tool call
++    ---@param cmd_opts { input?: any, output_cb: function } Options including the output callback
++    return function(self, action, cmd_opts)
+         local params = {
+             server_name = server_name,
+             tool_name = tool_name,
+-            tool_input = args,
++            tool_input = action,
+         }
+         ---@type MCPHub.ToolCallContext
+         local context = {
+@@ -65,7 +65,7 @@ local function create_individual_tool_handler(server_name, tool_name, namespaced
+             is_individual_tool = true,
+             action = "use_mcp_tool",
+         }
+-        core.execute_mcp_tool(params, agent, output_handler, context)
++        core.execute_mcp_tool(params, self, cmd_opts.output_cb, context)
+     end
+ end
+ 
+@@ -137,7 +137,7 @@ function M.create_static_tools(opts)
+                 id = "mcp_static:mcp",
+                 description = " Call tools and resources from MCP servers with:\n\n - `use_mcp_tool`\n - `access_mcp_resource`\n",
+                 hide_in_help_window = false,
+-                system_prompt = function(_)
++                system_prompt = function(group_config, ctx)
+                     local hub = require("mcphub").get_hub_instance()
+                     if not hub then
+                         vim.notify("MCP Hub is not initialized", vim.log.levels.WARN)
+@@ -170,15 +170,21 @@ function M.create_static_tools(opts)
+             hide_in_help_window = true,
+             visible = false,
+             ---@class MCPHub.Extensions.CodeCompanionTool: CodeCompanion.Agent.Tool
+-            callback = {
+-                name = action_name,
+-                cmds = { create_static_handler(action_name, has_function_calling, opts) },
+-                system_prompt = function()
+-                    return string.format("You can use the %s tool to %s\n", action_name, schema["function"].description)
+-                end,
+-                output = core.create_output_handlers(action_name, has_function_calling, opts),
+-                schema = schema,
+-            },
++            callback = function()
++                return {
++                    name = action_name,
++                    cmds = { create_static_handler(action_name, has_function_calling, opts) },
++                    system_prompt = function(group_config, ctx)
++                        return string.format(
++                            "You can use the %s tool to %s\n",
++                            action_name,
++                            schema["function"].description
++                        )
++                    end,
++                    output = core.create_output_handlers(action_name, has_function_calling, opts),
++                    schema = schema,
++                }
++            end,
+         }
+         table.insert(tools.groups.mcp.tools, action_name)
+     end
+@@ -277,19 +283,23 @@ function M.register(opts)
+                         description = tool.description,
+                         hide_in_help_window = true,
+                         visible = opts.show_server_tools_in_chat == true,
+-                        callback = {
+-                            name = namespaced_tool_name,
+-                            cmds = { create_individual_tool_handler(server.name, tool_name, namespaced_tool_name) },
+-                            output = core.create_output_handlers(namespaced_tool_name, true, opts),
+-                            schema = {
+-                                type = "function",
+-                                ["function"] = {
+-                                    name = namespaced_tool_name,
+-                                    description = tool.description,
+-                                    parameters = tool.inputSchema,
++                        callback = function()
++                            return {
++                                name = namespaced_tool_name,
++                                cmds = {
++                                    create_individual_tool_handler(server.name, tool_name, namespaced_tool_name),
++                                },
++                                output = core.create_output_handlers(namespaced_tool_name, true, opts),
++                                schema = {
++                                    type = "function",
++                                    ["function"] = {
++                                        name = namespaced_tool_name,
++                                        description = tool.description,
++                                        parameters = tool.inputSchema,
++                                    },
+                                 },
+-                            },
+-                        },
++                            }
++                        end,
+                     }
+                 end
+             end
+@@ -328,7 +338,7 @@ function M.register(opts)
+                         )
+                     ),
+                     tools = tool_names,
+-                    system_prompt = function(self)
++                    system_prompt = function(group_config, ctx)
+                         if custom_instructions and custom_instructions ~= "" then
+                             return custom_instructions
+                         end
+diff --git a/lua/mcphub/extensions/codecompanion/variables.lua b/lua/mcphub/extensions/codecompanion/variables.lua
+index 2a15a55..75820e9 100644
+--- a/lua/mcphub/extensions/codecompanion/variables.lua
++++ b/lua/mcphub/extensions/codecompanion/variables.lua
+@@ -14,18 +14,17 @@ function M.register(opts)
+         return
+     end
+ 
+-    local cc_variables = config.interactions.chat.variables
++    local cc_editor_context = config.interactions.chat.editor_context
+ 
+-    -- Remove existing MCP variables
+-    for key, value in pairs(cc_variables) do
+-        local id = value.id or ""
+-        if id:sub(1, 3) == "mcp" then
+-            cc_variables[key] = nil
++    -- Remove existing MCP editor context entries
++    for key, _ in pairs(cc_editor_context) do
++        if type(key) == "string" and key:sub(1, 4) == "mcp:" then
++            cc_editor_context[key] = nil
+         end
+     end
+ 
+     local added_resources = {}
+-    -- Add current resources as variables
++    -- Add current resources as editor context
+     for _, resource in ipairs(resources) do
+         local server_name = resource.server_name
+         local uri = resource.uri
+@@ -34,12 +33,11 @@ function M.register(opts)
+         description = description:gsub("\n", " ")
+         description = resource_name .. " (" .. description .. ")"
+         local var_id = "mcp:" .. uri
+-        cc_variables[var_id] = {
+-            id = "mcp" .. server_name .. uri,
++        cc_editor_context[var_id] = {
+             description = description,
+             hide_in_help_window = true,
+             callback = function(self)
+-                -- Sync call - blocks UI (can't use async in variables yet)
++                -- Sync call - blocks UI (can't use async in editor context yet)
+                 local result = hub:access_resource(server_name, uri, {
+                     caller = {
+                         type = "codecompanion",
+@@ -57,10 +55,9 @@ function M.register(opts)
+ 
+                 -- Handle images
+                 if result.images and #result.images > 0 then
+-                    local helpers = require("codecompanion.interactions.chat.helpers")
+                     for _, image in ipairs(result.images) do
+                         local id = string.format("mcp-%s", os.time())
+-                        helpers.add_image(self.Chat, {
++                        self.Chat:add_image_message({
+                             id = id,
+                             base64 = image.data,
+                             mimetype = image.mimeType,
+@@ -74,7 +71,7 @@ function M.register(opts)
+         table.insert(added_resources, var_id)
+     end
+ 
+-    -- Update syntax highlighting for variables
++    -- Update syntax highlighting for editor context
+     M.update_variable_syntax(added_resources)
+ end
+ -- Setup MCP resources as CodeCompanion variables

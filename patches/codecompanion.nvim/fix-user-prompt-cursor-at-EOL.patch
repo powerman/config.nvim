@@ -1,25 +1,25 @@
 diff --git a/lua/codecompanion/interactions/chat/init.lua b/lua/codecompanion/interactions/chat/init.lua
-index 3bf2e482..e5bf43e1 100644
+index f3925447..31fea744 100644
 --- a/lua/codecompanion/interactions/chat/init.lua
 +++ b/lua/codecompanion/interactions/chat/init.lua
-@@ -538,7 +538,11 @@ function Chat.new(args)
+@@ -565,7 +565,11 @@ function Chat.new(args)
+ 
+   if not self.hidden then
+     self.close_last_chat()
+-    self.ui:open():render(self.buffer_context, self.messages, { stop_context_insertion = args.stop_context_insertion })
++    self.ui:open():render(self.buffer_context, self.messages, {
++      stop_context_insertion = args.stop_context_insertion,
++      auto_submit = args.auto_submit,
++      from_prompt_library = args.from_prompt_library,
++    })
+   else
+     self.ui:render(self.buffer_context, self.messages, { stop_context_insertion = args.stop_context_insertion })
    end
- 
-   self.close_last_chat()
--  self.ui:open():render(self.buffer_context, self.messages, { stop_context_insertion = args.stop_context_insertion })
-+  self.ui:open():render(self.buffer_context, self.messages, {
-+    stop_context_insertion = args.stop_context_insertion,
-+    auto_submit = args.auto_submit,
-+    from_prompt_library = args.from_prompt_library,
-+  })
- 
-   -- Set the header line for the chat buffer
-   if args.messages and vim.tbl_count(args.messages) > 0 then
 diff --git a/lua/codecompanion/interactions/chat/ui/init.lua b/lua/codecompanion/interactions/chat/ui/init.lua
-index bc12124c..a4d1eff6 100644
+index ad09c130..e4e0415c 100644
 --- a/lua/codecompanion/interactions/chat/ui/init.lua
 +++ b/lua/codecompanion/interactions/chat/ui/init.lua
-@@ -408,10 +408,10 @@ end
+@@ -430,10 +430,14 @@ end
  ---Render the settings and any messages in the chat buffer
  ---@param context table
  ---@param messages table
@@ -28,17 +28,21 @@ index bc12124c..a4d1eff6 100644
  ---@return self
  function UI:render(context, messages, opts)
 -  opts = vim.tbl_extend("keep", opts or {}, { force_header = false, stop_context_insertion = false })
-+  opts = vim.tbl_extend("keep", opts or {}, { force_header = false, stop_context_insertion = false, auto_submit = nil, from_prompt_library = false })
++  opts = vim.tbl_extend(
++    "keep",
++    opts or {},
++    { force_header = false, stop_context_insertion = false, auto_submit = nil, from_prompt_library = false }
++  )
  
    local lines = {}
  
-@@ -486,6 +486,12 @@ function UI:render(context, messages, opts)
+@@ -508,6 +512,12 @@ function UI:render(context, messages, opts)
    else
      log:trace("Setting the messages in the chat buffer")
      add_messages_to_buf(messages)
 +    -- Ensure the buffer ends with an empty line so the cursor is placed
 +    -- correctly (after the last character) when auto_submit is false and
-+    -- the chat was opened from the prompt library
++    -- the chat was opened from the prompt library with non-empty user prompt
 +    if opts.auto_submit == false and opts.from_prompt_library and #lines > 0 and lines[#lines] ~= "" then
 +      spacer()
 +    end
@@ -46,7 +50,7 @@ index bc12124c..a4d1eff6 100644
  
    -- If the user has visually selected some text, add that to the chat buffer
 diff --git a/tests/interactions/chat/test_chat.lua b/tests/interactions/chat/test_chat.lua
-index 86986c7e..f7b8f21f 100644
+index 56371b18..825af397 100644
 --- a/tests/interactions/chat/test_chat.lua
 +++ b/tests/interactions/chat/test_chat.lua
 @@ -79,6 +79,56 @@ T["Chat"]["chat buffer is initialized"] = function()

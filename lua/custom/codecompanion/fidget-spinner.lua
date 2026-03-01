@@ -6,13 +6,13 @@ local progress = require 'fidget.progress'
 local M = {}
 
 function M:init()
-    local group = vim.api.nvim_create_augroup('CodeCompanionFidgetHooks', {})
+    local group = vim.api.nvim_create_augroup('CodeCompanionInlineFidgetSpinner', {})
 
     vim.api.nvim_create_autocmd({ 'User' }, {
         pattern = 'CodeCompanionRequestStarted',
         group = group,
         callback = function(request)
-            if request.data.strategy ~= 'inline' then
+            if request.data.interaction ~= 'inline' then
                 return
             end
             local handle = M:create_progress_handle(request)
@@ -24,7 +24,7 @@ function M:init()
         pattern = 'CodeCompanionRequestFinished',
         group = group,
         callback = function(request)
-            if request.data.strategy ~= 'inline' then
+            if request.data.interaction ~= 'inline' then
                 return
             end
             local handle = M:pop_progress_handle(request.data.id)
@@ -50,7 +50,7 @@ end
 
 function M:create_progress_handle(request)
     return progress.handle.create {
-        title = ' Requesting assistance (' .. (request.data.strategy or 'unknown') .. ')',
+        title = ' Requesting assistance (' .. (request.data.interaction or 'unknown') .. ')',
         message = 'In progress...',
         lsp_client = {
             name = M:llm_role_title(request.data.adapter),
