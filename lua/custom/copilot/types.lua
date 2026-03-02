@@ -1,0 +1,64 @@
+--- Type definitions for the Copilot system prompt module.
+--- These mirror the configuration shape needed to generate
+--- a system prompt close to the official VS Code Copilot prompt.
+
+--- Available tools mapping.
+--- Each field corresponds to a Copilot ToolName enum value.
+--- Value is the actual tool name string as known to CodeCompanion.
+--- Omit a field (leave nil) if the tool is not available or not relevant.
+---@class Copilot.Tools
+--- File editing via insert-edit (VS Code "insert_edit_into_file").
+---@field EditFile? string
+--- String replacement in files ("replace_string_in_file").
+---@field ReplaceString? string
+--- Multi-file string replacement ("multi_replace_string_in_file").
+---@field MultiReplaceString? string
+--- Patch-based file editing ("apply_patch").
+---@field ApplyPatch? string
+--- Read file contents.
+---@field ReadFile? string
+--- Create a new file.
+---@field CreateFile? string
+--- Run a command in a terminal.
+---@field CoreRunInTerminal? string
+--- Run tests.
+---@field CoreRunTest? string
+--- Run a project task.
+---@field CoreRunTask? string
+--- Manage a todo/task list.
+---@field CoreManageTodoList? string
+--- Semantic code search across the workspace.
+---@field Codebase? string
+--- Grep/text search in files.
+---@field FindTextInFiles? string
+--- Find files by name/glob.
+---@field FindFiles? string
+--- Delegated search via a sub-agent.
+---@field SearchSubagent? string
+--- Fetch a web page.
+---@field FetchWebPage? string
+--- Get diagnostics/errors from the editor.
+---@field GetErrors? string
+
+---@class Copilot.Options
+--- Identity string to use in identity rules (e.g. "GitHub Copilot").
+---@field identity string
+--- Model family string as used by Copilot
+--- (e.g. "gpt-4o", "claude-sonnet-4", "gemini-2.5-pro").
+---@field model string
+--- Name of the model to report in identity rules (e.g. "GPT-4o").
+---@field modelDisplayName? string
+--- Locale for response translation (e.g. "ru", "ja", "auto").
+--- If nil or "en", no translation instructions are added.
+---@field locale? string
+--- When true, the base agent instructions (identity, safety, main prompt) are omitted.
+---@field omitBaseAgentInstructions? boolean
+--- When true, uses the alternate GPT prompt for gpt-* models.
+---@field enableAlternateGptPrompt? boolean
+--- Agentic Ask mode (code search mode).
+--- When true, no Agent mode (related to editing files/executing commands) instructions are added.
+---@field codesearchMode? boolean
+--- When true, adds LaTeX math formatting instructions.
+---@field mathEnabled? boolean
+--- Available tools mapping.
+---@field tools Copilot.Tools
