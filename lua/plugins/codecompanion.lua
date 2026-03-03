@@ -130,22 +130,6 @@ return {
             'j-hui/fidget.nvim', -- Display status.
             'franco-ruggeri/codecompanion-spinner.nvim', -- Inline spinner in chat.
         },
-        init = function()
-            -- XXX: There is a bug somewhere: after LLM response the final part of markdown might
-            -- not be processed by render-markdown plugin. So, trigger extra re-rendering.
-            vim.api.nvim_create_autocmd({ 'User' }, {
-                pattern = 'CodeCompanionRequestFinished',
-                group = vim.api.nvim_create_augroup('user.cc_rerender_md', { clear = true }),
-                callback = function(request)
-                    vim.defer_fn(function()
-                        vim.api.nvim_exec_autocmds(
-                            'TextChanged',
-                            { buffer = request.data.bufnr }
-                        )
-                    end, 300) -- Still race, of course, but mostly works.
-                end,
-            })
-        end,
         opts = {
             interactions = {
                 shared = {
