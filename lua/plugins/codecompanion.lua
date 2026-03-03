@@ -218,6 +218,11 @@ return {
                                 prompt = prompt.tool_system_prompt,
                             },
                         },
+                        ['grep_search'] = {
+                            opts = {
+                                require_approval_before = false,
+                            },
+                        },
                         groups = {
                             ['mcp_agent'] = {
                                 description = 'Agent tools from MCP servers',
@@ -428,7 +433,7 @@ return {
                         vim.g.project_root .. '/.codecompanion/prompts',
                     },
                     opts = {
-                        -- BUG: If index is not set, user's lua prompts won't be sorted at all.
+                        -- BUG: https://github.com/olimorris/codecompanion.nvim/pull/2841
                         index = 0,
                     },
                 },

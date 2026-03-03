@@ -76,6 +76,7 @@ vim.g.llm_allowed_cmds = {
     'golangci-lint run',
     'make lint',
     'make test',
+    'make test_file FILE=*',
     'mise doctor',
     -- 'mise exec *', XXX: Dangerous, allows any command.
     -- 'mise x *', XXX: Dangerous, allows any command.
