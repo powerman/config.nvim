@@ -31,56 +31,6 @@ local function chat_filter(chat_data)
     return vim.g.project_root == chat_data.project_root or vim.g.project_root == chat_data.cwd
 end
 
----@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
-local function cb_have_chats(filter_fn)
-    return function()
-        local history = require('codecompanion').extensions.history
-        local have_chats = not vim.tbl_isempty(history.get_chats(filter_fn))
-        local mode = vim.api.nvim_get_mode()
-        return have_chats and (mode.mode == 'n' or mode.mode == 'i')
-    end
-end
-
----@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
-local function cb_browse_chats(filter_fn)
-    return function()
-        local history = require('codecompanion').extensions.history
-        history.browse_chats(filter_fn)
-    end
-end
-
-local _agent_index = 10
-local function mcp_agent_prompt(model)
-    _agent_index = _agent_index + 1
-    return {
-        interaction = 'chat',
-        description = 'Create a new chat buffer in Agent mode',
-        condition = function()
-            return vim.g.allow_remote_llm
-        end,
-        opts = {
-            index = _agent_index,
-            stop_context_insertion = true,
-            adapter = {
-                name = 'copilot',
-                model = model,
-            },
-        },
-        rules = {
-            'default',
-        },
-        tools = {
-            'mcp_agent',
-        },
-        prompts = {
-            {
-                role = prompt.USER_ROLE,
-                content = '#{mcp:neovim://workspace}',
-            },
-        },
-    }
-end
-
 ---@module 'lazy'
 ---@type LazySpec
 return {
@@ -240,7 +190,7 @@ return {
                 chat = {
                     opts = {
                         completion_provider = 'cmp',
-                        system_prompt = prompt.chat.copilot_instructions,
+                        system_prompt = prompt.default_system_prompt,
                     },
                     adapter = {
                         name = 'copilot',
@@ -277,10 +227,19 @@ return {
                         end,
                     },
                     tools = {
+                        opts = {
+                            system_prompt = {
+                                enabled = true,
+                                replace_main_system_prompt = true,
+                                prompt = prompt.tool_system_prompt,
+                            },
+                        },
                         groups = {
                             ['mcp_agent'] = {
                                 description = 'Agent tools from MCP servers',
                                 tools = {
+                                    --- Editor tools.
+                                    'get_diagnostics',
                                     --- Web search and browsing tools.
                                     'web_search',
                                     'fetch_webpage',
@@ -318,6 +277,7 @@ return {
                                 },
                                 opts = {
                                     collapse_tools = true,
+                                    ignore_tool_system_prompt = false,
                                 },
                             },
                         },
@@ -383,7 +343,8 @@ return {
             display = {
                 chat = {
                     window = {
-                        width = 0.66,
+                        width = 0.66, -- For layout = 'vertical'.
+                        layout = 'tab',
                     },
                     start_in_insert_mode = true,
                 },
@@ -402,17 +363,14 @@ return {
                         keymap = {}, -- Use Action Palette to open.
                         save_chat_keymap = {}, -- Use autosave.
                         expiration_days = 30,
-                        chat_filter = chat_filter, -- Show chats only from the current project.
                         auto_generate_title = true,
                         title_generation_opts = vim.tbl_extend('force', {
                             refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
                         }, (vim.g.allow_remote_llm and {
-                            -- This one is free on my Copilot Pro plan.
                             adapter = 'copilot',
                             model = 'gpt-4.1', -- Multiplier = 0 (free).
                         } or {
                             -- Use current model for Ollama.
-                            -- TODO: May be a bad choice for translategemma.
                         })),
                         summary = {
                             create_summary_keymap = '<Leader>csc',
@@ -420,14 +378,10 @@ return {
                             generation_opts = vim.tbl_extend('force', {
                                 --
                             }, (vim.g.allow_remote_llm and {
-                                -- This one is free on my Copilot Pro plan.
                                 adapter = 'copilot',
                                 model = 'gpt-4.1', -- Multiplier = 0 (free).
-                                -- model = 'gpt-4o', -- Multiplier = 0 (free).
-                                -- model = 'gpt-5-mini', -- Multiplier = 0 (free).
                             } or {
                                 -- Use current model for Ollama.
-                                -- TODO: May be a bad choice, maybe always use ministral_3?
                             })),
                         },
                     },
@@ -494,36 +448,12 @@ return {
                         index = 0,
                     },
                 },
-                ['Saved Project Chats ...'] = {
-                    interaction = 'chat',
-                    description = 'Browse saved project chats',
-                    opts = {
-                        index = 4,
-                        stop_context_insertion = true,
-                    },
-                    condition = cb_have_chats(chat_filter),
-                    prompts = {
-                        n = cb_browse_chats(chat_filter),
-                        i = cb_browse_chats(chat_filter),
-                    },
-                },
-                ['Saved Chats ...'] = {
-                    interaction = 'chat',
-                    description = 'Browse all saved chats',
-                    opts = {
-                        index = 5,
-                        stop_context_insertion = true,
-                    },
-                    condition = cb_have_chats(),
-                    prompts = {
-                        n = cb_browse_chats(),
-                        i = cb_browse_chats(),
-                    },
-                },
-                ['Agent GPT-4.1 (free)'] = mcp_agent_prompt 'gpt-4.1', -- Multiplier = 0 (free).
-                ['Agent Sonnet 4.6'] = mcp_agent_prompt 'claude-sonnet-4.6', -- Multiplier = 1.
-                ['Agent Gemini 3.1 Pro'] = mcp_agent_prompt 'gemini-3.1-pro-preview', -- Multiplier = 1.
-                ['Agent GPT-5.3 Codex'] = mcp_agent_prompt 'gpt-5.3-codex', -- Multiplier = 1.
+                ['Saved Project Chats ...'] = prompt.library.saved_chats(chat_filter),
+                ['Saved Chats ...'] = prompt.library.saved_chats(),
+                ['Agent GPT-4.1 (free)'] = prompt.library.mcp_agent 'gpt-4.1', -- Multiplier = 0 (free).
+                ['Agent Sonnet 4.6'] = prompt.library.mcp_agent 'claude-sonnet-4.6', -- Multiplier = 1.
+                ['Agent Gemini 3.1 Pro'] = prompt.library.mcp_agent 'gemini-3.1-pro-preview', -- Multiplier = 1.
+                ['Agent GPT-5.3 Codex'] = prompt.library.mcp_agent 'gpt-5.3-codex', -- Multiplier = 1.
             },
             opts = {
                 log_level = 'ERROR', -- TRACE|DEBUG|ERROR|INFO
