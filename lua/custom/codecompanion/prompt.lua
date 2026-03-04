@@ -6,28 +6,133 @@ local M = {
         USER_ROLE = 'user',
         SYSTEM_ROLE = 'system',
     },
-    -- Functions that generate prompt_library entries.
+    -- Entries for prompt_library.
     library = {},
-    ---@type table<string, string> A mapping of tool names to custom instructions to be included in the system prompt when the tool is available.
+    -- Extra instructions for specific tools to be included in the system prompt
+    -- when those tools are available.
+    -- Set at the end to allow referencing local variables and functions.
+    ---@type table<string, string> A mapping of tool names to custom instructions.
     tool_instructions = {},
 }
 
-local copilot_locale = {
-    ['English'] = 'en',
-    ['French'] = 'fr',
-    ['Italian'] = 'it',
-    ['German'] = 'de',
-    ['Spanish'] = 'es',
-    ['Russian'] = 'ru',
-    ['Chinese (Simplified)'] = 'zh-CN',
-    ['Chinese (Traditional)'] = 'zh-TW',
-    ['Japanese'] = 'ja',
-    ['Korean'] = 'ko',
-    ['Czech'] = 'cs',
-    ['Portuguese (Brazil)'] = 'pt-br',
-    ['Turkish'] = 'tr',
-    ['Polish'] = 'pl',
-}
+-- Utility function to create a simple counter for unique indices.
+local function make_counter(start)
+    local count = start or 0
+    return function()
+        local current = count
+        count = count + 1
+        return current
+    end
+end
+
+-- Get the model name from the adapter context for dynamic system prompts.
+---@param ctx CodeCompanion.SystemPrompt.Context
+M.get_model = function(ctx)
+    local adapter = ctx.adapter
+    local model = ''
+    if adapter and adapter.type == 'http' then
+        model = adapter.model and adapter.model.name or ''
+    elseif adapter and adapter.type == 'acp' then
+        model = adapter.model
+    end
+    return model
+end
+
+-- A simple set implementation for O(1) lookups of tool availability in system prompts.
+local ToolSet = {}
+
+-- Create a new ToolSet from a list of available tool names.
+---@param available string[] The list of available tools to include in the set.
+function ToolSet.new(available)
+    local set = {}
+    for _, v in ipairs(available) do
+        set[v] = true
+    end
+    return setmetatable({ _set = set }, { __index = ToolSet })
+end
+
+-- Find the first tool name from alternatives that is present in the set.
+---@param alternatives string[] The list of alternative tool names to check for in the set, in order of preference.
+---@return string? The first tool name from alternatives that is present in the set, or nil if none are found.
+function ToolSet:find_first(alternatives)
+    return vim.iter(alternatives):find(function(v)
+        return self._set[v]
+    end)
+end
+
+-- This is an experimental attempt to use the memory tool like a lightweight
+-- Spec-Driven Development (SDD) system, to preserve important design decisions.
+-- In theory, this should help maintain architectural coherence across sessions
+-- for decisions not documented in AGENT.md, without the overhead of a full SDD system.
+local tool_memory_as_SSD_instructions = [[
+These instructions extend (not replace) the default memory tool behaviour.
+They apply specifically to software development sessions within a project directory.
+
+Memory files are stored in the `memories/` subdirectory of the current project.
+
+## File structure
+
+Use two files with fixed names:
+
+`/memories/decisions.md` — architectural decisions for this project.
+Create it the first time a decision worth preserving arises.
+
+`/memories/tasks.md` — tasks for a multi-session effort.
+Create it when a request produces 5 or more distinct subtasks.
+Delete it when all tasks are complete.
+
+For any other information worth saving, ask the user before creating new files.
+If the user agrees, follow the default memory instructions for naming and structure.
+
+## When to read
+
+At the start of any session involving non-trivial work, check whether
+`/memories/decisions.md` exists and read it if so.
+Check `/memories/tasks.md` if the user's request seems to continue prior work.
+
+## When to write
+
+`decisions.md`: save a decision when it is:
+
+- non-obvious (not self-evident from reading the code),
+- not already captured in docs, comments, or AGENT.md,
+- and likely to affect future work on this project.
+
+Typical candidates: why X was chosen over Y, a rejected alternative,
+a discovered constraint (API limitation, compatibility issue),
+a deliberate trade-off.
+
+Do NOT save routine implementation steps or anything already in the codebase.
+
+`tasks.md`: create it as soon as the task list is formed, before starting work.
+Mark each task complete with `[x]` immediately after finishing it, not at the end of the session.
+Delete the file once all tasks are marked complete.
+
+## Format
+
+<example file='decisions.md'>
+## {topic}
+
+- **Decision:** {what was decided}
+- **Rationale:** {why}
+- **Rejected alternative:** {what and why} (omit if none)
+
+</example>
+
+<example file='tasks.md'>
+## {effort name}
+
+- [ ] {task}
+- [x] {completed task}
+
+</example>
+
+## Hygiene
+
+Prefer `str_replace` over rewriting the whole file.
+Remove stale decisions if they no longer reflect the codebase.
+Keep entries concise — one decision per section, no prose.
+]]
 
 -- Extracted from CodeCompanion's CONSTANTS.SYSTEM_PROMPT, with minor change.
 local codecompanion_instructions = [[
@@ -89,84 +194,26 @@ The user is working on a %s machine. Please respond with system specific command
     )
 end
 
-local _next_index = 4
-local function next_index()
-    local index = _next_index
-    _next_index = _next_index + 1
-    return index
-end
-
-local _next_agent_index = 10
-local function next_agent_index()
-    local index = _next_agent_index
-    _next_agent_index = _next_agent_index + 1
-    return index
-end
-
----@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
-local function cb_have_chats(filter_fn)
-    return function()
-        local history = require('codecompanion').extensions.history
-        local have_chats = not vim.tbl_isempty(history.get_chats(filter_fn))
-        local mode = vim.api.nvim_get_mode()
-        return have_chats and (mode.mode == 'n' or mode.mode == 'i')
-    end
-end
-
----@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
-local function cb_browse_chats(filter_fn)
-    return function()
-        local history = require('codecompanion').extensions.history
-        history.browse_chats(filter_fn)
-    end
-end
-
--- Get the model name from the adapter context for dynamic system prompts.
----@param ctx CodeCompanion.SystemPrompt.Context
-M.get_model = function(ctx)
-    local adapter = ctx.adapter
-    local model = ''
-    if adapter and adapter.type == 'http' then
-        model = adapter.model and adapter.model.name or ''
-    elseif adapter and adapter.type == 'acp' then
-        model = adapter.model
-    end
-    return model
-end
-
--- Return the first matching value from lookup that is contained in data, or an empty string.
----@param lookup string[] The list of values (tool, in order by preference) to check
----@param data string[] The list of values to check against (all tools added to the system prompt)
-local function first_match(lookup, data)
-    return vim.iter(lookup):find(function(v)
-        return vim.tbl_contains(data, v)
-    end) or ''
-end
-
--- A simple set implementation for O(1) lookups of tool availability in system prompts.
-local ToolSet = {}
-
----@param available string[] The list of available tools to include in the set.
-function ToolSet.new(available)
-    local set = {}
-    for _, v in ipairs(available) do
-        set[v] = true
-    end
-    return setmetatable({ _set = set }, { __index = ToolSet })
-end
-
----@param alternatives string[] The list of alternative tool names to check for in the set, in order of preference.
----@return string? The first tool name from alternatives that is present in the set, or nil if none are found.
-function ToolSet:find_first(alternatives)
-    return vim.iter(alternatives):find(function(v)
-        return self._set[v]
-    end)
-end
-
 ---@param ctx CodeCompanion.SystemPrompt.Context
 ---@param available string[] The tools available
 ---@return string
 local function system_prompt(ctx, available)
+    local copilot_locale = {
+        ['English'] = 'en',
+        ['French'] = 'fr',
+        ['Italian'] = 'it',
+        ['German'] = 'de',
+        ['Spanish'] = 'es',
+        ['Russian'] = 'ru',
+        ['Chinese (Simplified)'] = 'zh-CN',
+        ['Chinese (Traditional)'] = 'zh-TW',
+        ['Japanese'] = 'ja',
+        ['Korean'] = 'ko',
+        ['Czech'] = 'cs',
+        ['Portuguese (Brazil)'] = 'pt-br',
+        ['Turkish'] = 'tr',
+        ['Polish'] = 'pl',
+    }
     local tools = ToolSet.new(available)
     local copilot_prompt = require('custom.copilot').system_prompt {
         identity = 'CodeCompanion',
@@ -260,6 +307,32 @@ M.tool_system_prompt = function(args)
     return system_prompt(args.ctx, args.tools)
 end
 
+M.tool_instructions = {
+    ['memory'] = tool_memory_as_SSD_instructions,
+}
+
+-- Counter for assigning unique indices to prompt library entries.
+-- Starts at 4 to skip over the built-in entries.
+local next_index = make_counter(4)
+
+---@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
+local function cb_have_chats(filter_fn)
+    return function()
+        local history = require('codecompanion').extensions.history
+        local have_chats = not vim.tbl_isempty(history.get_chats(filter_fn))
+        local mode = vim.api.nvim_get_mode()
+        return have_chats and (mode.mode == 'n' or mode.mode == 'i')
+    end
+end
+
+---@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
+local function cb_browse_chats(filter_fn)
+    return function()
+        local history = require('codecompanion').extensions.history
+        history.browse_chats(filter_fn)
+    end
+end
+
 ---@param filter_fn? fun(chat_data: CodeCompanion.History.ChatIndexData): boolean Optional filter function
 M.library.saved_chats = function(filter_fn)
     return {
@@ -276,6 +349,10 @@ M.library.saved_chats = function(filter_fn)
         },
     }
 end
+
+-- Counter for assigning unique indices to agent entries in the prompt library.
+-- Starts at 10 to skip over the built-in entries and the saved_chats entries.
+local next_agent_index = make_counter(10)
 
 M.library.mcp_agent = function(model)
     return {

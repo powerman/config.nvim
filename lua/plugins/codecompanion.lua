@@ -227,6 +227,7 @@ return {
                             ['mcp_agent'] = {
                                 description = 'Agent tools from MCP servers',
                                 tools = {
+                                    'memory',
                                     --- Editor tools.
                                     'get_diagnostics',
                                     --- Web search and browsing tools.
@@ -492,7 +493,7 @@ return {
 
             -- Enforce using only local LLM adapters if remote adapters are forbidden,
             -- to avoid accidentally sending sensitive data to remote servers.
-            -- Nota that data can leak not only through LLM interactions, but also through tools,
+            -- Note that data can leak not only through LLM interactions, but also through tools,
             -- so avoid giving access to tools like web search even to local LLMs.
             if not vim.g.allow_remote_llm then
                 -- Forbid loading remote LLM adapters.
