@@ -31,12 +31,12 @@ return {
         },
         -- disable_limit_reached_message = true,
         root_dir = vim.g.project_root,
-        should_attach = function(_, bufname)
+        should_attach = function(buf_id, bufname)
             -- Default behavior.
-            if not vim.bo.buflisted then
+            if not vim.bo[buf_id].buflisted then
                 return false
             end
-            if vim.bo.buftype ~= '' then
+            if vim.bo[buf_id].buftype ~= '' then
                 return false
             end
             -- Protect sensitive files which often contains secrets.
