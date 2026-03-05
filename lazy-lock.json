@@ -12,6 +12,7 @@
   "codecompanion-spinner.nvim": { "branch": "main", "commit": "7797a81141e5de62eecebf2af561698ed58900dc" },
   "codecompanion.nvim": { "branch": "main", "commit": "9ef72232bffeeadd31d3a29b301cbc05662b0e29" },
   "conform.nvim": { "branch": "master", "commit": "3543d000dafbc41cc7761d860cfdb24e82154f75" },
+  "copilot-prompt.nvim": { "branch": "main", "commit": "92be0891f90778cf34fa7f0ea2d880da45ce37b0" },
   "copilot.lua": { "branch": "master", "commit": "00446a63cba4cc59bb24fc1e210a555a3e4acdfb" },
   "dressing.nvim": { "branch": "master", "commit": "2d7c2db2507fa3c4956142ee607431ddb2828639" },
   "efmls-configs-nvim": { "branch": "main", "commit": "2dd907fe0043b95a901a9aee814f17804aa4426d" },

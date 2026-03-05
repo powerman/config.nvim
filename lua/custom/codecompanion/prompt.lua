@@ -215,7 +215,7 @@ local function system_prompt(ctx, available)
         ['Polish'] = 'pl',
     }
     local tools = ToolSet.new(available)
-    local copilot_prompt = require('custom.copilot').system_prompt {
+    local copilot_prompt = require('copilot_prompt').system_prompt {
         identity = 'CodeCompanion',
         model = M.get_model(ctx),
         locale = copilot_locale[ctx.language] or 'auto',

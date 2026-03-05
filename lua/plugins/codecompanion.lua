@@ -46,6 +46,10 @@ return {
         },
     },
     {
+        'powerman/copilot-prompt.nvim',
+        version = '*',
+    },
+    {
         'powerman/sound-notifier.nvim',
         version = '*',
         opts = {},
