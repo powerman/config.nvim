@@ -40,6 +40,7 @@
   "ruscmd.nvim": { "branch": "main", "commit": "f96ff83f441f8e662ea2b50e1084762852e4e41a" },
   "schemastore.nvim": { "branch": "main", "commit": "c4b3c25e5661600e04be787fbce8c6704583717f" },
   "sidekick.nvim": { "branch": "main", "commit": "c2bdf8cfcd87a6be5f8b84322c1b5052e78e302e" },
+  "sound-notifier.nvim": { "branch": "main", "commit": "b5edf0e342ecb58213a88325dd7df8244f0107f4" },
   "substitute.nvim": { "branch": "main", "commit": "17ffaeb5a1dc2dbef39cf0865d8a4b6000836714" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "6fea601bd2b694c6f2ae08a6c6fab14930c60e2c" },
   "telescope-ui-select.nvim": { "branch": "master", "commit": "6e51d7da30bd139a6950adf2a47fda6df9fa06d2" },

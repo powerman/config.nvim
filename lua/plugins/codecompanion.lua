@@ -45,6 +45,11 @@ return {
             project_root = vim.g.project_root,
         },
     },
+    {
+        'powerman/sound-notifier.nvim',
+        version = '*',
+        opts = {},
+    },
     -- Copy images from your system clipboard into a chat buffer via :PasteImage.
     {
         'HakonHarnes/img-clip.nvim',
@@ -597,9 +602,9 @@ return {
 
             -- Play a sound when LLM response completes or awaits tool approval
             -- when Neovim is not focused, to prevent missing critical notifications.
-            local notifier = require('custom.sound_notifier').new(vim.g.llm_message_sound)
+            local notifier = require('sound_notifier').new(vim.g.llm_message_sound)
             vim.api.nvim_create_autocmd('User', {
-                group = notifier.augroup,
+                group = vim.api.nvim_create_augroup('user.cc_sound_notifier', { clear = true }),
                 pattern = {
                     'CodeCompanionChatDone',
                     'CodeCompanionInlineFinished',
