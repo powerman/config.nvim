@@ -442,10 +442,6 @@ return {
                         '~/.config/codecompanion/prompts',
                         vim.g.project_root .. '/.codecompanion/prompts',
                     },
-                    opts = {
-                        -- BUG: https://github.com/olimorris/codecompanion.nvim/pull/2841
-                        index = 0,
-                    },
                 },
                 ['Saved Project Chats ...'] = prompt.library.saved_chats(chat_filter),
                 ['Saved Chats ...'] = prompt.library.saved_chats(),
