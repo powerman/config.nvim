@@ -26,6 +26,7 @@
 local prompt = require 'custom.codecompanion.prompt'
 
 ---@module 'codecompanion._extensions.history.types'
+
 ---@param chat_data CodeCompanion.History.ChatIndexData
 local function chat_filter(chat_data)
     return vim.g.project_root == chat_data.project_root or vim.g.project_root == chat_data.cwd
@@ -48,10 +49,12 @@ return {
     {
         'powerman/copilot-prompt.nvim',
         version = '*',
+        lazy = true,
     },
     {
         'powerman/sound-notifier.nvim',
         version = '*',
+        lazy = true,
         opts = {},
     },
     -- Copy images from your system clipboard into a chat buffer via :PasteImage.
@@ -138,6 +141,8 @@ return {
             'ravitemer/mcphub.nvim', -- Manage MCP servers.
             'j-hui/fidget.nvim', -- Display status.
             'franco-ruggeri/codecompanion-spinner.nvim', -- Inline spinner in chat.
+            'powerman/copilot-prompt.nvim',
+            'powerman/sound-notifier.nvim',
         },
         opts = {
             interactions = {
@@ -154,7 +159,6 @@ return {
                         },
                     },
                 },
-
                 background = {
                     adapter = {
                         name = 'copilot',
@@ -228,6 +232,11 @@ return {
                             },
                         },
                         ['grep_search'] = {
+                            opts = {
+                                require_approval_before = false,
+                            },
+                        },
+                        ['memory'] = {
                             opts = {
                                 require_approval_before = false,
                             },
@@ -602,6 +611,7 @@ return {
 
             -- Play a sound when LLM response completes or awaits tool approval
             -- when Neovim is not focused, to prevent missing critical notifications.
+            ---@module 'sound_notifier'
             local notifier = require('sound_notifier').new(vim.g.llm_message_sound)
             vim.api.nvim_create_autocmd('User', {
                 group = vim.api.nvim_create_augroup('user.cc_sound_notifier', { clear = true }),

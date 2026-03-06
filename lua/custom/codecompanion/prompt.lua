@@ -8,26 +8,12 @@ local M = {
     },
     -- Entries for prompt_library.
     library = {},
-    -- Extra instructions for specific tools to be included in the system prompt
-    -- when those tools are available.
-    -- Set at the end to allow referencing local variables and functions.
-    ---@type table<string, string> A mapping of tool names to custom instructions.
-    tool_instructions = {},
 }
-
--- Utility function to create a simple counter for unique indices.
-local function make_counter(start)
-    local count = start or 0
-    return function()
-        local current = count
-        count = count + 1
-        return current
-    end
-end
 
 -- Get the model name from the adapter context for dynamic system prompts.
 ---@param ctx CodeCompanion.SystemPrompt.Context
-M.get_model = function(ctx)
+---@return string model CodeCompanion adapter's model name.
+local function get_model(ctx)
     local adapter = ctx.adapter
     local model = ''
     if adapter and adapter.type == 'http' then
@@ -38,27 +24,22 @@ M.get_model = function(ctx)
     return model
 end
 
--- A simple set implementation for O(1) lookups of tool availability in system prompts.
-local ToolSet = {}
-
--- Create a new ToolSet from a list of available tool names.
----@param available string[] The list of available tools to include in the set.
-function ToolSet.new(available)
-    local set = {}
-    for _, v in ipairs(available) do
-        set[v] = true
-    end
-    return setmetatable({ _set = set }, { __index = ToolSet })
-end
-
--- Find the first tool name from alternatives that is present in the set.
----@param alternatives string[] The list of alternative tool names to check for in the set, in order of preference.
----@return string? The first tool name from alternatives that is present in the set, or nil if none are found.
-function ToolSet:find_first(alternatives)
-    return vim.iter(alternatives):find(function(v)
-        return self._set[v]
-    end)
-end
+local copilot_locale = {
+    ['English'] = 'en',
+    ['French'] = 'fr',
+    ['Italian'] = 'it',
+    ['German'] = 'de',
+    ['Spanish'] = 'es',
+    ['Russian'] = 'ru',
+    ['Chinese (Simplified)'] = 'zh-CN',
+    ['Chinese (Traditional)'] = 'zh-TW',
+    ['Japanese'] = 'ja',
+    ['Korean'] = 'ko',
+    ['Czech'] = 'cs',
+    ['Portuguese (Brazil)'] = 'pt-br',
+    ['Turkish'] = 'tr',
+    ['Polish'] = 'pl',
+}
 
 -- This is an experimental attempt to use the memory tool like a lightweight
 -- Spec-Driven Development (SDD) system, to preserve important design decisions.
@@ -134,35 +115,20 @@ Remove stale decisions if they no longer reflect the codebase.
 Keep entries concise — one decision per section, no prose.
 ]]
 
--- Extracted from CodeCompanion's CONSTANTS.SYSTEM_PROMPT, with minor change.
+-- Extra instruction for specific tools to be included in the system prompt
+-- when those tools are available.
+-- Set at the end to allow referencing local variables and functions.
+---@type table<string, string> A mapping of tool names to custom instructions.
+local tool_instruction = {
+    ['memory'] = tool_memory_as_SSD_instructions,
+}
+
+-- Additional CodeCompanion formatting instructions not covered by copilot-prompt.nvim.
 local codecompanion_instructions = [[
 <outputFormattingInstructions>
 Use Markdown formatting in your answers.
 
 DO NOT use H1 or H2 headers in your response.
-
-When suggesting code changes or new content, use Markdown code blocks.
-
-To start a code block, use 4 backticks.
-After the backticks, add the programming language name as the language ID
-and the file path within curly braces if available.
-To close a code block, use 4 backticks on a new line.
-If you want the user to decide where to place the code, do not add the file path.
-In the code block, use a line comment with '...existing code...'
-to indicate code that is already present in the file.
-Ensure this comment is specific to the programming language.
-Code block example:
-
-````languageId {path/to/file}
-// ...existing code...
-{ changed code }
-// ...existing code...
-{ changed code }
-// ...existing code...
-````
-
-Ensure line comments use the correct syntax for the programming language
-(e.g. "#" for Python, "--" for Lua).
 
 Avoid wrapping the whole response in triple backticks.
 
@@ -194,87 +160,69 @@ The user is working on a %s machine. Please respond with system specific command
     )
 end
 
+---@param available string[] List of active tool names.
+---@return Copilot.Tools
+local function make_tools(available)
+    local set = {}
+    for _, v in ipairs(available) do
+        set[v] = true
+    end
+    local function first(...)
+        for _, name in ipairs { ... } do
+            if set[name] then
+                return name
+            end
+        end
+    end
+    return {
+        EditFile = first('filesystem__edit_file', 'insert_edit_into_file', 'neovim__edit_file'),
+        ReplaceString = nil, -- No such tool in CodeCompanion.
+        MultiReplaceString = nil, -- No such tool in CodeCompanion.
+        ApplyPatch = nil, -- No such tool in CodeCompanion.
+        ReadFile = first(
+            'filesystem__read_file',
+            'read_file',
+            'neovim__read_file',
+            'filesystem__read_text_file',
+            'filesystem__read_media_file',
+            'filesystem__read_multiple_files',
+            'neovim__read_multiple_files'
+        ),
+        CreateFile = first('filesystem__write_file', 'create_file', 'neovim__write_file'),
+        CoreRunInTerminal = first(
+            'shell__shell_exec',
+            'run_command',
+            'neovim__execute_command'
+        ),
+        CoreRunTest = nil, -- No such tool in CodeCompanion.
+        CoreRunTask = nil, -- No such tool in CodeCompanion.
+        CoreManageTodoList = nil, -- No such tool in CodeCompanion.
+        Codebase = nil, -- No such tool in CodeCompanion.
+        FindTextInFiles = first 'grep_search',
+        FindFiles = first('filesystem__search_files', 'file_search', 'neovim__find_files'),
+        SearchSubagent = nil, -- No such tool in CodeCompanion.
+        FetchWebPage = first('fetch_webpage', 'tavily_mcp__tavily_extract'),
+        GetErrors = first 'get_diagnostics',
+        ToolSearch = nil, -- No such tool in CodeCompanion.
+        SearchWorkspaceSymbols = nil, -- No such tool in CodeCompanion.
+        GetScmChanges = first('get_changed_files', 'git__git_diff_unstaged'),
+    }
+end
+
 ---@param ctx CodeCompanion.SystemPrompt.Context
 ---@param available string[] The tools available
 ---@return string
 local function system_prompt(ctx, available)
-    local copilot_locale = {
-        ['English'] = 'en',
-        ['French'] = 'fr',
-        ['Italian'] = 'it',
-        ['German'] = 'de',
-        ['Spanish'] = 'es',
-        ['Russian'] = 'ru',
-        ['Chinese (Simplified)'] = 'zh-CN',
-        ['Chinese (Traditional)'] = 'zh-TW',
-        ['Japanese'] = 'ja',
-        ['Korean'] = 'ko',
-        ['Czech'] = 'cs',
-        ['Portuguese (Brazil)'] = 'pt-br',
-        ['Turkish'] = 'tr',
-        ['Polish'] = 'pl',
-    }
-    local tools = ToolSet.new(available)
     local copilot_prompt = require('copilot_prompt').system_prompt {
         identity = 'CodeCompanion',
-        model = M.get_model(ctx),
+        model = get_model(ctx),
         locale = copilot_locale[ctx.language] or 'auto',
-        omitBaseAgentInstructions = false,
         enableAlternateGptPrompt = true, -- Just an experiment, not sure if it will be helpful.
-        codesearchMode = false,
-        mathEnabled = false,
-        tools = {
-            EditFile = tools:find_first {
-                'filesystem__edit_file',
-                'insert_edit_into_file',
-                'neovim__edit_file',
-            },
-            ReplaceString = nil, -- No such tool in CodeCompanion.
-            MultiReplaceString = nil, -- No such tool in CodeCompanion.
-            ApplyPatch = nil, -- No such tool in CodeCompanion.
-            ReadFile = tools:find_first {
-                'filesystem__read_file',
-                'read_file',
-                'neovim__read_file',
-                'filesystem__read_text_file',
-                'filesystem__read_media_file',
-                'filesystem__read_multiple_files',
-                'neovim__read_multiple_files',
-            },
-            CreateFile = tools:find_first {
-                'filesystem__write_file',
-                'create_file',
-                'neovim__write_file',
-            },
-            CoreRunInTerminal = tools:find_first {
-                'shell__shell_exec',
-                'run_command',
-                'neovim__execute_command',
-            },
-            CoreRunTest = nil, -- No such tool in CodeCompanion.
-            CoreRunTask = nil, -- No such tool in CodeCompanion.
-            CoreManageTodoList = nil, -- No such tool in CodeCompanion.
-            Codebase = nil, -- No such tool in CodeCompanion.
-            FindTextInFiles = tools:find_first {
-                'grep_search',
-            },
-            FindFiles = tools:find_first {
-                'filesystem__search_files',
-                'file_search',
-                'neovim__find_files',
-            },
-            SearchSubagent = nil, -- No such tool in CodeCompanion.
-            FetchWebPage = tools:find_first {
-                'fetch_webpage',
-                'tavily_mcp__tavily_extract',
-            },
-            GetErrors = tools:find_first {
-                'get_diagnostics',
-            },
-        },
+        codeBlockFormatting = true,
+        tools = make_tools(available),
     }
     local tool_instructions = ''
-    for tool, instruction in pairs(M.tool_instructions) do
+    for tool, instruction in pairs(tool_instruction) do
         if vim.tbl_contains(available, tool) then
             tool_instructions = tool_instructions
                 .. string.format(
@@ -307,9 +255,15 @@ M.tool_system_prompt = function(args)
     return system_prompt(args.ctx, args.tools)
 end
 
-M.tool_instructions = {
-    ['memory'] = tool_memory_as_SSD_instructions,
-}
+-- Utility function to create a simple counter for unique indices.
+local function make_counter(start)
+    local count = start or 0
+    return function()
+        local current = count
+        count = count + 1
+        return current
+    end
+end
 
 -- Counter for assigning unique indices to prompt library entries.
 -- Starts at 4 to skip over the built-in entries.
