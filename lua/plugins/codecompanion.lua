@@ -623,6 +623,37 @@ return {
                 },
                 callback = notifier:notify_callback(),
             })
+
+            -- Based on https://codecompanion.olimorris.dev/configuration/chat-buffer#truncating-tool-output
+            vim.api.nvim_create_autocmd('User', {
+                pattern = 'CodeCompanionChatCreated',
+                callback = function(args)
+                    local chat = require('codecompanion').buf_get_chat(args.data.bufnr)
+                    chat:add_callback('on_tool_output', function(data)
+                        ---@cast data table { tool: string, for_llm: string, for_user: string }
+                        local tokens = require 'codecompanion.utils.tokens'
+                        local max_tokens = 10000
+                        local all_tokens = tokens.calculate(data.for_llm)
+
+                        if data.for_llm and all_tokens > max_tokens then
+                            -- Trim to roughly max_tokens worth of characters
+                            local max_chars = max_tokens * 6
+                            data.for_llm = data.for_llm:sub(1, max_chars)
+                                .. '\n\n[Output truncated]'
+                            data.for_user = data.for_llm
+                            vim.notify(
+                                string.format(
+                                    "Tool output from '%s' truncated (%d to ~%d tokens)",
+                                    data.tool,
+                                    all_tokens,
+                                    max_tokens
+                                ),
+                                vim.log.levels.WARN
+                            )
+                        end
+                    end)
+                end,
+            })
         end,
     },
 }
