@@ -480,15 +480,49 @@ return {
             local util = require 'custom.util'
             util.adapt_nerd_font_propo(config.config)
 
-            -- Add general local rules file to the default rule group.
-            table.insert(config.config.rules.default.files, 'AGENT.local.md')
+            -- Patch default rules files config to support link to AGENTS.md in CLAUDE.md.
+            do
+                local rules = config.config.rules.default.files
 
-            -- Load project rule groups from `.agent/*.md` files.
-            -- This enables additional (beyond the default group, e.g., `AGENT.md`)
+                -- Remove CLAUDE- and AGENTS-related entries.
+                for i = #rules, 1, -1 do
+                    local entry = rules[i]
+                    local path = type(entry) == 'string' and entry or entry.path
+                    if path:find 'CLAUDE' or path:find 'AGENTS' then
+                        table.remove(rules, i)
+                    end
+                end
+
+                -- Add project-level: AGENTS.md or CLAUDE.md.
+                if
+                    vim.uv.fs_stat 'AGENTS.md'
+                    or vim.uv.fs_stat 'AGENTS.local.md'
+                    or not (vim.uv.fs_stat 'CLAUDE.md' or vim.uv.fs_stat 'CLAUDE.local.md')
+                then
+                    table.insert(rules, 'AGENTS.md')
+                    table.insert(rules, 'AGENTS.local.md')
+                else
+                    table.insert(rules, { path = 'CLAUDE.md', parser = 'claude' })
+                    table.insert(rules, { path = 'CLAUDE.local.md', parser = 'claude' })
+                end
+
+                -- Add global: ~/.agent/AGENTS.md or ~/.claude/CLAUDE.md.
+                if
+                    vim.uv.fs_stat(vim.fn.expand '~/.agent/AGENTS.md')
+                    or not (vim.uv.fs_stat(vim.fn.expand '~/.claude/CLAUDE.md'))
+                then
+                    table.insert(rules, '~/.agent/AGENTS.md')
+                else
+                    table.insert(rules, { path = '~/.claude/CLAUDE.md', parser = 'claude' })
+                end
+            end
+
+            -- Load project rule groups from `.agent/rules/*.md` files.
+            -- This enables additional (beyond the default group, e.g., `AGENTS.md`)
             -- project-specific rule groups without altering the main configuration file.
-            -- Each `.md` file in `.agent/` defines a rule group named after the file.
+            -- Each `.md` file in `.agent/rules/` defines a rule group named after the file.
             local files = require 'codecompanion.utils.files'
-            local rule_dir = vim.g.project_root .. '/.agent'
+            local rule_dir = vim.g.project_root .. '/.agent/rules'
             do
                 local rule_files = files.list_dir(rule_dir)
                 if rule_files then
