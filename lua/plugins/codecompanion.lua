@@ -1,8 +1,4 @@
 --[[ CodeCompanion is a productivity tool which streamlines how you develop with LLMs ]]
--- Disabled in non-IDE mode (e.g. root user on servers).
-if not vim.g.ide then
-    return {}
-end
 
 -- NOTE:  :CodeCompanion […]       Prompt inline AI assistant.
 -- NOTE:  :CodeCompanion /<name>   Library prompt inline AI assistant.
@@ -41,6 +37,7 @@ end
 return {
     {
         'custom.codecompanion.auto_approve',
+        cond = vim.g.ide,
         dir = '~/.config/nvim/lua',
         lazy = true, -- Will be loaded as a dependency of other plugins.
         main = 'custom.codecompanion.auto_approve',
@@ -52,11 +49,13 @@ return {
     },
     {
         'powerman/copilot-prompt.nvim',
+        cond = vim.g.ide,
         version = '*',
         lazy = true,
     },
     {
         'powerman/sound-notifier.nvim',
+        cond = vim.g.ide,
         version = '*',
         lazy = true,
         opts = {},
@@ -64,6 +63,7 @@ return {
     -- Copy images from your system clipboard into a chat buffer via :PasteImage.
     {
         'HakonHarnes/img-clip.nvim',
+        cond = vim.g.ide,
         version = '*',
         cmd = 'PasteImage',
         opts = {
@@ -81,6 +81,7 @@ return {
     },
     {
         'ravitemer/codecompanion-history.nvim', -- Save and load conversation history.
+        cond = vim.g.ide,
         cmd = { 'CodeCompanionHistory', 'CodeCompanionSummaries' },
         config = true,
     },
@@ -88,6 +89,7 @@ return {
     -- management and monitoring.
     {
         'ravitemer/mcphub.nvim',
+        cond = vim.g.ide,
         -- version = '*', -- TODO: Re-enable after next release.
         cmd = 'MCPHub',
         dependencies = {
@@ -115,6 +117,7 @@ return {
     },
     {
         'olimorris/codecompanion.nvim',
+        cond = vim.g.ide,
         version = '*',
         cmd = {
             'CodeCompanion',
