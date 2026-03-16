@@ -7,11 +7,12 @@
 --   # xmllint: part of libxml2 OS package
 if not vim.g.ide then
     return {
-        sh = { 'shfmt' },
-        yaml = { 'yamlfmt' },
-        toml = { 'taplo' },
         json = { 'jq' },
+        lua = { 'stylua' },
+        sh = { 'shfmt' },
+        toml = { 'taplo' },
         xml = { 'xmllint' },
+        yaml = { 'yamlfmt' },
     }
 end
 

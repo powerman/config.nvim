@@ -3,12 +3,16 @@
 --   mise use -g github:feel-ix-343/markdown-oxide hadolint
 if not vim.g.ide then
     -- Configure 3rd-party tools to be executed by EFM.
-    local efm_languages_base = {
+    local efm_languages_not_ide = {
         dockerfile = { require 'efmls-configs.linters.hadolint' },
+        lua = { require 'efmls-configs.linters.selene' },
+        sh = { require 'efmls-configs.linters.shellcheck' },
+        yaml = { require 'efmls-configs.linters.yamllint' },
     }
     return {
         -- May need extra setup, see: https://github.com/Feel-ix-343/markdown-oxide.
         markdown_oxide = {}, -- Markdown with Obsidian support.
+        tombi = {}, -- TOML.
         -- General purpose Language Server. It just runs any 3rd-party tools.
         -- Most of available tools are formatters and linters.
         -- Usually works after saving file.
@@ -23,10 +27,10 @@ if not vim.g.ide then
             },
             settings = {
                 rootMarkers = { '.git/' },
-                languages = efm_languages_base,
+                languages = efm_languages_not_ide,
                 lintDebounce = 1000000000, -- 1 second, to lower CPU usage.
             },
-            filetypes = vim.tbl_keys(efm_languages_base),
+            filetypes = vim.tbl_keys(efm_languages_not_ide),
         },
     }
 end
