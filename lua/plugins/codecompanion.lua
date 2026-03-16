@@ -1,4 +1,8 @@
 --[[ CodeCompanion is a productivity tool which streamlines how you develop with LLMs ]]
+-- Disabled in non-IDE mode (e.g. root user on servers).
+if not vim.g.ide then
+    return {}
+end
 
 -- NOTE:  :CodeCompanion […]       Prompt inline AI assistant.
 -- NOTE:  :CodeCompanion /<name>   Library prompt inline AI assistant.

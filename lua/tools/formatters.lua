@@ -1,5 +1,20 @@
 ---@module 'conform'
 ---@type table<string, conform.FiletypeFormatter>
+
+-- In non-IDE mode (e.g. root user on servers): use only minimal formatters for scripts/configs.
+-- Install these via mise or OS packages (no Mason needed):
+--   mise use -g shfmt yamlfmt taplo jq
+--   # xmllint: part of libxml2 OS package
+if not vim.g.ide then
+    return {
+        sh = { 'shfmt' },
+        yaml = { 'yamlfmt' },
+        toml = { 'taplo' },
+        json = { 'jq' },
+        xml = { 'xmllint' },
+    }
+end
+
 return {
     -- Conform can also run multiple formatters sequentially
     -- python = { "isort", "black" },

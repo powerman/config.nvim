@@ -6,7 +6,7 @@
 ---@type LazySpec
 return {
     'folke/sidekick.nvim',
-    cond = vim.g.allow_remote_llm,
+    cond = vim.g.allow_remote_llm and vim.g.ide,
     cmd = 'Sidekick',
     event = 'InsertEnter',
     keys = {

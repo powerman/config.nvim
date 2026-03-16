@@ -32,44 +32,28 @@
 -- Map of treesitter parser name -> Neovim filetype.
 -- Use false as filetype for embedded/injected parsers that have no standalone filetype
 -- (they are activated automatically via treesitter injections, not via FileType autocmd).
-local languages = {
+
+-- Base parsers: shell scripts, system configs (/etc), service configs (nginx, ssh, etc.).
+-- Always installed, even in non-IDE mode (server/root).
+local base_languages = {
     bash = 'sh',
-    c = 'c',
-    css = 'css',
     diff = 'diff',
     dockerfile = 'dockerfile',
-    editorconfig = 'editorconfig',
     git_config = 'gitconfig',
-    git_rebase = 'gitrebase',
     gitattributes = 'gitattributes',
     gitcommit = 'gitcommit',
     gitignore = 'gitignore',
-    go = 'go',
-    gomod = 'gomod',
-    gotmpl = 'gotmpl',
-    gowork = 'gowork',
-    html = 'html',
-    http = 'http',
     ini = 'ini',
-    javascript = 'javascript',
-    jsdoc = false, -- embedded in javascript/typescript, no filetype
-    kdl = 'kdl', -- embedded in bash via #USAGE comments (usage-cli tool)
     json = 'json',
-    json5 = 'json5',
-    jsonnet = 'jsonnet',
     lua = 'lua',
     luadoc = false, -- embedded in lua, no filetype
     make = 'make',
     markdown = 'markdown',
     markdown_inline = false, -- embedded in markdown, no filetype
-    mermaid = 'mermaid',
     muttrc = 'muttrc',
     nginx = 'nginx',
     printf = false, -- embedded in c/bash/etc., no filetype
     promql = 'promql',
-    proto = 'proto',
-    query = 'query',
-    sql = 'sql',
     ssh_config = 'sshconfig',
     strace = 'strace',
     tmux = 'tmux',
@@ -80,6 +64,32 @@ local languages = {
     xcompose = 'xcompose',
     yaml = 'yaml',
 }
+
+-- Additional parsers for IDE mode only (development languages and tools).
+local ide_languages = {
+    c = 'c',
+    css = 'css',
+    editorconfig = 'editorconfig',
+    git_rebase = 'gitrebase',
+    go = 'go',
+    gomod = 'gomod',
+    gotmpl = 'gotmpl',
+    gowork = 'gowork',
+    html = 'html',
+    http = 'http',
+    javascript = 'javascript',
+    jsdoc = false, -- embedded in javascript/typescript, no filetype
+    kdl = 'kdl', -- embedded in bash via #USAGE comments (usage-cli tool)
+    json5 = 'json5',
+    jsonnet = 'jsonnet',
+    mermaid = 'mermaid',
+    proto = 'proto',
+    query = 'query',
+    sql = 'sql',
+}
+
+local languages = vim.g.ide and vim.tbl_extend('keep', base_languages, ide_languages)
+    or base_languages
 
 local function parsers()
     return vim.tbl_keys(languages)

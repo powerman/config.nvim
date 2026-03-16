@@ -46,6 +46,9 @@ vim.cmd('cd ' .. vim.g.project_root)
 local project_bin_dirs = { '.buildcache/bin' }
 vim.env.PATH = require('custom.util').project_path(project_bin_dirs) .. vim.env.PATH
 
+-- Set to false for root user: disables IDE features (LSP, AI, Mason) to reduce RAM/disk usage.
+vim.g.ide = vim.fn.getenv 'USER' ~= 'root'
+
 -- Set to true if you agree to send your files to 3rd-party companies.
 vim.g.allow_remote_llm = vim.fn.filereadable '/proc/1/comm' == 1
     and vim.fn.readfile('/proc/1/comm')[1] == 'firejail'

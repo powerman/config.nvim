@@ -6,6 +6,7 @@
 ---@type LazySpec
 return {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
+    cond = vim.g.ide,
     lazy = false, -- Lazy breaks `opts.run_on_start = true`.
     dependencies = {
         -- Mason allows you to easily manage external editor tooling such as LSP servers, DAP

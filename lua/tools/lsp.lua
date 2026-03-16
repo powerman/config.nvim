@@ -1,3 +1,36 @@
+-- In non-IDE mode (e.g. root user on servers): use only minimal LSP (released as binaries).
+-- Install these via mise or OS packages (no Mason needed):
+--   mise use -g github:feel-ix-343/markdown-oxide hadolint
+if not vim.g.ide then
+    -- Configure 3rd-party tools to be executed by EFM.
+    local efm_languages_base = {
+        dockerfile = { require 'efmls-configs.linters.hadolint' },
+    }
+    return {
+        -- May need extra setup, see: https://github.com/Feel-ix-343/markdown-oxide.
+        markdown_oxide = {}, -- Markdown with Obsidian support.
+        -- General purpose Language Server. It just runs any 3rd-party tools.
+        -- Most of available tools are formatters and linters.
+        -- Usually works after saving file.
+        efm = {
+            init_options = {
+                documentFormatting = true,
+                documentRangeFormatting = true,
+                hover = true,
+                documentSymbol = false, -- Duplicates all symbols for markdown.
+                codeAction = true,
+                completion = true,
+            },
+            settings = {
+                rootMarkers = { '.git/' },
+                languages = efm_languages_base,
+                lintDebounce = 1000000000, -- 1 second, to lower CPU usage.
+            },
+            filetypes = vim.tbl_keys(efm_languages_base),
+        },
+    }
+end
+
 local gopls_settings = {
     -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
     -- Updated to commit 83aca55 (2026-02-27).
