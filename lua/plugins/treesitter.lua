@@ -82,7 +82,6 @@ local ide_languages = {
     kdl = 'kdl', -- embedded in bash via #USAGE comments (usage-cli tool)
     json5 = 'json5',
     jsonnet = 'jsonnet',
-    mermaid = 'mermaid',
     proto = 'proto',
     query = 'query',
     sql = 'sql',
