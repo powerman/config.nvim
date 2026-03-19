@@ -1,7 +1,7 @@
 From 9a39887cb853fa7f902e3bdd2cb4911bc3219f96 Mon Sep 17 00:00:00 2001
 From: Bahaa Zahika <bahaa.zahika@gmail.com>
 Date: Mon, 2 Mar 2026 07:46:29 +0200
-Subject: [PATCH] feat(extensions): adapt CodeCompanion extension for v19
+Subject: [PATCH 1/2] feat(extensions): adapt CodeCompanion extension for v19
  compatibility
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -386,3 +386,27 @@ index 2a15a55..75820e9 100644
      M.update_variable_syntax(added_resources)
  end
  -- Setup MCP resources as CodeCompanion variables
+
+From f94e1c8e1aea68c3f8f6df5cf51c752033584fd0 Mon Sep 17 00:00:00 2001
+From: bahaaza <45566682+bahaaza@users.noreply.github.com>
+Date: Thu, 19 Mar 2026 11:38:06 +0200
+Subject: [PATCH 2/2] Update lua/mcphub/extensions/codecompanion/variables.lua
+
+Co-authored-by: Carlos Galan Cladera <cgcladera@gmail.com>
+---
+ lua/mcphub/extensions/codecompanion/variables.lua | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lua/mcphub/extensions/codecompanion/variables.lua b/lua/mcphub/extensions/codecompanion/variables.lua
+index 75820e9..0271d43 100644
+--- a/lua/mcphub/extensions/codecompanion/variables.lua
++++ b/lua/mcphub/extensions/codecompanion/variables.lua
+@@ -14,7 +14,7 @@ function M.register(opts)
+         return
+     end
+ 
+-    local cc_editor_context = config.interactions.chat.editor_context
++    local cc_editor_context = config.config.interactions.shared.editor_context
+ 
+     -- Remove existing MCP editor context entries
+     for key, _ in pairs(cc_editor_context) do
