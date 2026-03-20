@@ -208,6 +208,7 @@ local function handle_LspAttach(ev)
 
     if
         client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, ev.buf)
+        and vim.bo[ev.buf].filetype ~= 'gotmpl' -- gopls marks template text as LspReferenceRead
     then
         highlight_references(client.id, ev.buf)
     end

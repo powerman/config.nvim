@@ -37,12 +37,14 @@
 -- Always installed, even in non-IDE mode (server/root).
 local base_languages = {
     bash = 'sh',
+    caddy = 'caddy',
     diff = 'diff',
     dockerfile = 'dockerfile',
     git_config = 'gitconfig',
     gitattributes = 'gitattributes',
     gitcommit = 'gitcommit',
     gitignore = 'gitignore',
+    gotmpl = 'gotmpl',
     ini = 'ini',
     json = 'json',
     lua = 'lua',
@@ -73,7 +75,6 @@ local ide_languages = {
     git_rebase = 'gitrebase',
     go = 'go',
     gomod = 'gomod',
-    gotmpl = 'gotmpl',
     gowork = 'gowork',
     html = 'html',
     http = 'http',
@@ -118,6 +119,16 @@ return {
                 local filename = vim.fn.fnamemodify(filepath, ':t')
                 return string.match(filename, '.*mise.*%.toml$') ~= nil
             end, { force = true, all = false })
+
+            -- Check b:gotmpl_lang buffer variable (set in after/ftplugin/gotmpl.lua)
+            -- to determine which language to inject into gotmpl text nodes.
+            require('vim.treesitter.query').add_predicate(
+                'gotmpl-lang?',
+                function(_, _, bufnr, pred)
+                    return vim.b[tonumber(bufnr) or 0].gotmpl_lang == pred[2]
+                end,
+                { force = true, all = false }
+            )
 
             vim.api.nvim_create_autocmd('FileType', {
                 pattern = filetypes(),

@@ -3,7 +3,14 @@ vim.filetype.add {
     filename = {
         ['~/.markdownlintrc'] = 'ini', -- Also can be 'jsonc'.
     },
-    -- pattern = {},
+    pattern = {
+        -- Go template files: use gotmpl treesitter for {{ }} directives,
+        -- inner language highlighting is configured in after/ftplugin/gotmpl.lua.
+        ['.*%.nft%.tmpl'] = 'gotmpl',
+        ['.*%.conf%.tmpl'] = 'gotmpl',
+        ['.*/main%.cf%.tmpl'] = 'gotmpl',
+        ['.*/Caddyfile%.tmpl'] = 'gotmpl',
+    },
 }
 
 if vim.g.debug_lsp then
