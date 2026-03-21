@@ -18,7 +18,13 @@ vim.o.showmode = false
 -- Schedule the setting after `UiEnter` because it can increase startup-time.
 vim.schedule(function()
     vim.o.clipboard = 'unnamedplus'
-    vim.g.clipboard = 'xclip' -- `xsel` conflicts with KDE Plasma Klipper syncronization.
+    if vim.fn.executable 'xclip' == 1 then
+        vim.g.clipboard = 'xclip' -- `xsel` conflicts with KDE Plasma Klipper syncronization.
+    else
+        -- Over SSH or without X11: use OSC 52 escape sequences to access
+        -- the local (host) clipboard through the terminal emulator.
+        vim.g.clipboard = 'osc52'
+    end
 end)
 
 -- Set highlight on search.
