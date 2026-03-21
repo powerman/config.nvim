@@ -237,6 +237,24 @@ return {
                 callback = handle_LspAttach,
             })
 
+            -- Workaround: some LSP servers (e.g. gopls) put verbose error dumps into
+            -- $/progress messages instead of sending them via window/showMessage.
+            -- Fidget renders progress as a persistent floating window, so these errors
+            -- hang on screen indefinitely. Strip long messages from progress reports
+            -- and re-send them as notifications (which Fidget auto-dismisses).
+            local orig_progress = vim.lsp.handlers['$/progress']
+            vim.lsp.handlers['$/progress'] = function(err, result, ctx, config)
+                if result and result.value and type(result.value.message) == 'string' then
+                    if result.value.message:find('%f[%w][Ee]rror%f[%W]') then
+                        local client = vim.lsp.get_client_by_id(ctx.client_id)
+                        local name = client and client.name or ('id=' .. ctx.client_id)
+                        vim.notify(('[%s] %s'):format(name, result.value.message), vim.log.levels.WARN)
+                        result.value.message = nil
+                    end
+                end
+                return orig_progress(err, result, ctx, config)
+            end
+
             -- LSP servers and clients are able to communicate to each other what features they support.
             -- By default, Neovim doesn't support everything that is in the LSP specification.
             -- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
