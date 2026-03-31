@@ -245,10 +245,13 @@ return {
             local orig_progress = vim.lsp.handlers['$/progress']
             vim.lsp.handlers['$/progress'] = function(err, result, ctx, config)
                 if result and result.value and type(result.value.message) == 'string' then
-                    if result.value.message:find('%f[%w][Ee]rror%f[%W]') then
+                    if result.value.message:find '%f[%w][Ee]rror%f[%W]' then
                         local client = vim.lsp.get_client_by_id(ctx.client_id)
                         local name = client and client.name or ('id=' .. ctx.client_id)
-                        vim.notify(('[%s] %s'):format(name, result.value.message), vim.log.levels.WARN)
+                        vim.notify(
+                            ('[%s] %s'):format(name, result.value.message),
+                            vim.log.levels.WARN
+                        )
                         result.value.message = nil
                     end
                 end

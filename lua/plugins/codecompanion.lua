@@ -379,25 +379,33 @@ return {
                         save_chat_keymap = {}, -- Use autosave.
                         expiration_days = 30,
                         auto_generate_title = true,
-                        title_generation_opts = vim.tbl_extend('force', {
-                            refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
-                        }, (vim.g.allow_remote_llm and {
-                            adapter = 'copilot',
-                            model = 'gpt-4.1', -- Multiplier = 0 (free).
-                        } or {
-                            -- Use current model for Ollama.
-                        })),
+                        title_generation_opts = vim.tbl_extend(
+                            'force',
+                            {
+                                refresh_every_n_prompts = 0, -- e.g., 3 to refresh after every 3rd user prompt
+                            },
+                            (
+                                not vim.g.allow_remote_llm and {}
+                                or {
+                                    adapter = 'copilot',
+                                    model = 'gpt-4.1', -- Multiplier = 0 (free).
+                                }
+                            )
+                        ),
                         summary = {
                             create_summary_keymap = '<Leader>csc',
                             browse_summaries_keymap = '<Leader>csb',
-                            generation_opts = vim.tbl_extend('force', {
-                                --
-                            }, (vim.g.allow_remote_llm and {
-                                adapter = 'copilot',
-                                model = 'gpt-4.1', -- Multiplier = 0 (free).
-                            } or {
-                                -- Use current model for Ollama.
-                            })),
+                            generation_opts = vim.tbl_extend(
+                                'force',
+                                {},
+                                (
+                                    not vim.g.allow_remote_llm and {}
+                                    or {
+                                        adapter = 'copilot',
+                                        model = 'gpt-4.1', -- Multiplier = 0 (free).
+                                    }
+                                )
+                            ),
                         },
                     },
                 },
