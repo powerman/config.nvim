@@ -5,7 +5,7 @@
 Project "config.nvim" - personal Neovim configuration for daily coding work
 (few users, different Linux distributions).
 
-- Minimum Neovim version: 0.11.
+- Minimum Neovim version: 0.12.
 - Lua dialect: LuaJIT 2.1 (Lua 5.1). Use `vim.*` APIs, not `io.*` or `os.*`.
 - Plugin manager: Lazy.nvim (specs in `lua/plugins/*.lua`).
 

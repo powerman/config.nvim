@@ -1,7 +1,7 @@
 # ~/.config/nvim
 
 [![License MIT](https://img.shields.io/badge/license-MIT-royalblue.svg)](LICENSE)
-[![Neovim 0.11+](https://img.shields.io/badge/Neovim-0.11%2B-royalblue?logo=neovim&logoColor=white)](https://neovim.io/)
+[![Neovim 0.12+](https://img.shields.io/badge/Neovim-0.12%2B-royalblue?logo=neovim&logoColor=white)](https://neovim.io/)
 [![Lua 5.1](https://img.shields.io/badge/Lua-5.1-blue)](https://www.lua.org/)
 [![Test](https://img.shields.io/github/actions/workflow/status/powerman/config.nvim/test.yml?label=test)](https://github.com/powerman/config.nvim/actions/workflows/test.yml)
 
