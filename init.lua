@@ -51,7 +51,7 @@ vim.g.ide = vim.fn.getenv 'USER' ~= 'root'
 
 -- Set to true if you agree to send your files to 3rd-party companies.
 vim.g.allow_remote_llm = vim.fn.filereadable '/proc/1/comm' == 1
-    and vim.fn.readfile('/proc/1/comm')[1] == 'firejail'
+    and vim.fn.readfile('/proc/1/comm')[1] == 'bwrap'
 
 -- List of files (in glob format) that should not be sent to LLM.
 vim.g.llm_secret_files = {
