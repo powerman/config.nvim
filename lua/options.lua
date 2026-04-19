@@ -18,9 +18,25 @@ vim.o.showmode = false
 -- Schedule the setting after `UiEnter` because it can increase startup-time.
 vim.schedule(function()
     vim.o.clipboard = 'unnamedplus'
-    if vim.env.WAYLAND_DISPLAY ~= '' and vim.fn.executable 'wl-copy' == 1 then
+    if (vim.env.WAYLAND_DISPLAY or '') ~= '' and vim.fn.executable 'wl-copy' == 1 then
+        -- BUG: https://github.com/neovim/neovim/issues/11804: clipboard=unnamedplus
+        -- spawns wl-copy on every yank/delete, which blocks Wayland key auto-repeat.
+        --
+        -- One possible workaround is https://github.com/bkoropoff/clipipe.
+        -- Another is to use OSC 52, if supported by the terminal emulator.
         vim.g.clipboard = 'wl-copy'
-    elseif vim.env.DISPLAY ~= '' and vim.fn.executable 'xclip' == 1 then
+        -- If supported, upgrade to OSC 52 to avoid subprocess spawning on every yank/paste.
+        local group = vim.api.nvim_create_augroup('clipboard_osc52_upgrade', { clear = true })
+        vim.api.nvim_create_autocmd('TermResponse', {
+            group = group,
+            callback = function()
+                if (vim.g.termfeatures or {}).osc52 then
+                    vim.g.clipboard = 'osc52'
+                    vim.api.nvim_del_augroup_by_id(group)
+                end
+            end,
+        })
+    elseif (vim.env.DISPLAY or '') ~= '' and vim.fn.executable 'xclip' == 1 then
         vim.g.clipboard = 'xclip' -- `xsel` conflicts with KDE Plasma Klipper syncronization.
     else
         -- Over SSH or without X11: use OSC 52 escape sequences to access
