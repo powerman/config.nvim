@@ -146,6 +146,16 @@ vim.g.llm_allowed_cmds = {
 -- Sound file to play on LLM response.
 vim.g.llm_message_sound = '/usr/share/sounds/freedesktop/stereo/message.oga'
 
+-- Source Gentoo system vimrc if not yet loaded (e.g. when using mise-installed Neovim
+-- which has no /etc/vim/sysinit.vim as its system vimrc).
+-- Detect by checking if the 'gentoo' augroup (defined in that file) already exists.
+if vim.fn.filereadable '/etc/vim/sysinit.vim' == 1 then
+    local already_loaded = pcall(vim.api.nvim_get_autocmds, { group = 'gentoo' })
+    if not already_loaded then
+        vim.cmd 'source /etc/vim/sysinit.vim'
+    end
+end
+
 -- Setup Nerd Fonts.
 require 'nerd-fonts'
 
