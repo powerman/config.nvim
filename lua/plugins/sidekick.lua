@@ -26,13 +26,23 @@ return {
         },
     },
     opts = {
-        signs = {
-            enabled = true,
-            icon = '',
-        },
         nes = {
             diff = {
                 inline = false, -- "words"|"chars"|false
+            },
+        },
+        ui = {
+            -- stylua: ignore
+            icons = {
+              nes               = "",
+              attached          = "",
+              started           = "",
+              installed         = "",
+              missing           = "",
+              external_attached = "󰖩",
+              external_started  = "󰖪",
+              terminal_attached = "",
+              terminal_started  = "",
             },
         },
     },
