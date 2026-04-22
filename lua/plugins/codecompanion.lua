@@ -486,6 +486,17 @@ return {
             },
         },
         config = function(_, opts)
+            -- Enable Copilot adapter without `:Copilot auth signin`
+            -- to avoid storing the token into the plugin's configuration file.
+            -- https://github.com/olimorris/codecompanion.nvim/discussions/3057
+            do
+                local token = os.getenv 'GITHUB_COPILOT_TOKEN' or os.getenv 'GH_COPILOT_TOKEN'
+                local ok, cc_token = pcall(require, 'codecompanion.adapters.http.copilot.token')
+                if ok and token and token ~= '' and not cc_token._oauth_token then
+                    cc_token._oauth_token = token
+                end
+            end
+
             require('codecompanion').setup(opts)
             require('custom.codecompanion.auto_approve').setup_codecompanion()
             require('custom.codecompanion.fidget-spinner'):init()
