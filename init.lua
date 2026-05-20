@@ -59,7 +59,7 @@ vim.g.allow_remote_llm = (function(pid, command)
         pid = tonumber(proc('stat'):match '%d+ %(.+%) . (%d+)') or 0
     end
     return pid > 0
-end)(1, 'bwrap')
+end)(1, 'bwrap') or vim.fn.getenv 'USER' == 'ai-dev'
 
 -- List of files (in glob format) that should not be sent to LLM.
 vim.g.llm_secret_files = {
