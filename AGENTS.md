@@ -44,57 +44,7 @@ Use these commands for corresponding tasks:
 
 ## Mandatory Rules
 
-### Repository Safety
-
-- DO NOT create, amend, squash, rebase, or otherwise modify commits.
-- DO NOT switch branches.
-- DO NOT perform any network git operations inside this repository
-  (e.g. `git push`, `git pull`, `git fetch`).
-- You MAY use `git stash` if necessary, but clean up after yourself.
-- You MAY use `git restore` for reverting local changes.
-- Do not delete, rewrite, or mass-modify files outside the explicit scope of the task.
-- Avoid destructive shell commands (e.g. `rm -rf`, recursive operations)
-  unless explicitly required.
-- DO NOT edit `lazy-lock.json` manually.
-  Plugin versions are managed via `:Lazy update` and `:Lazy restore`.
-
 ### Coding Standards
-
-#### Semantic Linefeeds (comments and documentation only)
-
-Start each sentence on a new line.
-Break long sentences at natural pauses —
-after commas, semicolons, conjunctions,
-or between logical clauses.
-Do NOT hard-wrap to a fixed column width.
-The goal is meaningful diffs:
-one changed idea = one changed line.
-
-```lua
---- Checks if a buffer is valid and listed.
---- Returns false for scratch buffers,
---- because they should not appear in the buffer list.
----
---- If the buffer has been modified,
---- the caller must decide whether to save or discard changes
---- before removing it from the list.
-```
-
-#### Documentation (markdown)
-
-- Write new documentation in English.
-- Avoid adding new documentation unless specifically requested by user.
-- Update existing documentation together with code changes
-  ONLY if otherwise existing documentation became incorrect.
-- Keep lines within 96 characters.
-
-#### Commenting
-
-- Write new comments in English.
-- Do not add redundant comments that restate obvious code behavior.
-- Explain rationale, intent, trade-offs, and non-obvious behavior.
-- Use full sentences in comments and documentation.
-- Keep lines within 96 characters.
 
 #### Formatting and Style
 
@@ -152,3 +102,5 @@ one changed idea = one changed line.
 - `vim.keymap.set` — always provide `desc` in opts for which-key discoverability.
 - Lazy plugin specs use `opts` (table/function) instead of `config`
   when the plugin supports `setup(opts)`.
+- DO NOT edit `lazy-lock.json` manually.
+  Plugin versions are managed via `:Lazy update` and `:Lazy restore`.
