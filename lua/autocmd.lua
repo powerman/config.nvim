@@ -42,6 +42,36 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     end,
 })
 
+-- Filetypes where spell checking is disabled.
+local no_spell_filetypes = {
+    'yaml.docker-compose',
+    -- Add entries as needed.
+}
+
+-- Set spell per filetype.
+--
+-- Neovim does not allow setting `spell` independently per window:
+-- `vim.wo.spell = false` also sets `vim.o.spell` to `false` globally.
+-- This means a new window (e.g. via `:tabnew`) inherits the wrong global
+-- value.  Capturing the intended default at first FileType event (after
+-- options are loaded) lets us restore the correct spell state.
+local default_spell
+
+vim.api.nvim_create_autocmd('FileType', {
+    desc = 'Set spell per filetype',
+    group = vim.api.nvim_create_augroup('user.spell', { clear = true }),
+    callback = function(ev)
+        if default_spell == nil then
+            default_spell = vim.o.spell
+        end
+        if vim.tbl_contains(no_spell_filetypes, vim.bo[ev.buf].filetype) then
+            vim.wo.spell = false
+        else
+            vim.wo.spell = default_spell
+        end
+    end,
+})
+
 -- Setup folding per filetype.
 -- NOTE: This autocmd runs after treesitter's FileType autocmd (which sets foldmethod=expr with
 -- vim.treesitter.foldexpr()), so it overrides treesitter folding for markdown.
