@@ -14,6 +14,7 @@
   "efmls-configs-nvim": { "branch": "main", "commit": "e872dc195336716b19023b7a4dd9f689352acc8d" },
   "fidget.nvim": { "branch": "main", "commit": "e1a07a5e46fb65a45a0c76870140bd2d16a73ebf" },
   "gitsigns.nvim": { "branch": "main", "commit": "a462f416e2ce4744531c6256252dee99a7d34a83" },
+  "jinja.nvim": { "branch": "main", "commit": "7f8108c96b8be3ad52b7f6ae5542e74f655a0960" },
   "langmapper.nvim": { "branch": "main", "commit": "49462fd9f4f33cf8cfbaa779ba07d3c0b255cc06" },
   "lazy-local-patcher.nvim": { "branch": "main", "commit": "cb51ac5cee94c1a5bfef5d55846dc484652f38b9" },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },

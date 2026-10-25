@@ -4,7 +4,6 @@
 ---@type LazySpec
 return {
     'powerman/jinja.nvim',
-    dev = true,
     ---@module 'jinja'
     ---@type JinjaConfig
     opts = {
