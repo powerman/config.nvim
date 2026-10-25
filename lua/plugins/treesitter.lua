@@ -99,6 +99,8 @@ local function filetypes()
     for _, filetype in pairs(languages) do
         if filetype then
             ft[#ft + 1] = filetype
+            -- Jinja templates use parser of the inner language (see `jinja.lua`).
+            ft[#ft + 1] = filetype .. '.jinja'
         end
     end
     return ft

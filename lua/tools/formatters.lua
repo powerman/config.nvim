@@ -1,3 +1,10 @@
+-- Formatters of the inner language of Jinja templates (`<inner>.jinja`) don't know about tags,
+-- so they either fail or break formatting of tags.
+-- It's a function, because conform ignores empty tables and uses inner language formatters.
+local function jinja()
+    return {}
+end
+
 ---@module 'conform'
 ---@type table<string, conform.FiletypeFormatter>
 
@@ -7,6 +14,7 @@
 --   # xmllint: part of libxml2 OS package
 if not vim.g.ide then
     return {
+        jinja = jinja,
         json = { 'jq' },
         lua = { 'stylua' },
         sh = { 'shfmt' },
@@ -41,6 +49,7 @@ return {
     -- javascriptreact = { 'dprint' }, -- Require `dprint config add dprint-plugin-typescript`.
     javascriptreact = { 'prettierd' },
     -- javascriptreact = { 'standardjs' }, -- Fail on invalid JS.
+    jinja = jinja,
     -- json = { 'dprint' }, -- Fix some errors. Require `dprint config add dprint-plugin-json`.
     json = { 'fixjson' }, -- Convert relaxed JSON5 to JSON.
     -- json = { 'jq' }, -- Fail on invalid JSON.
