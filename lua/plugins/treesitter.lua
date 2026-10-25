@@ -46,6 +46,7 @@ local base_languages = {
     gitignore = 'gitignore',
     gotmpl = 'gotmpl',
     ini = 'ini',
+    jinja = 'jinja',
     json = 'json',
     lua = 'lua',
     luadoc = false, -- embedded in lua, no filetype
@@ -118,6 +119,7 @@ return {
                 local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
                 local filename = vim.fn.fnamemodify(filepath, ':t')
                 return string.match(filename, '.*mise.*%.toml$') ~= nil
+                    or string.match(filename, '.*mise.*%.toml%.jinja$') ~= nil
             end, { force = true, all = false })
 
             -- Check b:gotmpl_lang buffer variable (set in after/ftplugin/gotmpl.lua)
@@ -126,6 +128,16 @@ return {
                 'gotmpl-lang?',
                 function(_, _, bufnr, pred)
                     return vim.b[tonumber(bufnr) or 0].gotmpl_lang == pred[2]
+                end,
+                { force = true, all = false }
+            )
+
+            -- Use b:jinja_lang buffer variable (set in after/ftplugin/jinja.lua)
+            -- as a language to inject into jinja text nodes.
+            require('vim.treesitter.query').add_directive(
+                'set-jinja-lang!',
+                function(_, _, bufnr, _, metadata)
+                    metadata['injection.language'] = vim.b[tonumber(bufnr) or 0].jinja_lang
                 end,
                 { force = true, all = false }
             )

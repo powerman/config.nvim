@@ -51,6 +51,8 @@ return {
                 hl.GitSignsAddInline = { fg = hl.DiffText.bg, reverse = true }
                 hl.GitSignsChangeInline = hl.GitSignsAddInline
                 hl.GitSignsDeleteInline = hl.GitSignsAddInline
+                -- Added in `after/queries/jinja/highlights.scm` and `custom/_jinja.lua`.
+                hl['@jinja.tag'] = { bg = require('tokyonight.util').blend_bg(c.cyan, 0.15) }
                 -- Added in `codecompanion.lua`.
                 hl.MiniDiffOverContext = { bg = hl.DiffDelete.bg }
                 hl.MiniDiffOverContextBuf = { bg = hl.DiffAdd.bg }

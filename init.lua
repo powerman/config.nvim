@@ -68,6 +68,17 @@ vim.g.llm_secret_files = {
     '.secret.sh',
 }
 
+-- Custom Jinja delimiters for *.jinja files inside directories matching given globs
+-- (e.g. Copier templates with custom `_envops`).
+-- Custom delimiters must have the same length as default ones.
+vim.g.jinja_delimiters = {
+    ['~/Templates/copier-*'] = {
+        block = { '#{', '}#' },
+        variable = { '#=', '=#' },
+        comment = { '#%', '%#' },
+    },
+}
+
 -- Source Gentoo system vimrc if not yet loaded (e.g. when using mise-installed Neovim
 -- which has no /etc/vim/sysinit.vim as its system vimrc).
 -- Detect by checking if the 'gentoo' augroup (defined in that file) already exists.
