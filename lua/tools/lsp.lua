@@ -225,6 +225,7 @@ local gopls_settings = {
 local efm_languages = {
     dockerfile = { require 'efmls-configs.linters.hadolint' },
     -- BUG: Leave running processes in unknown curcumstances.
+    -- May be fixed by https://github.com/mattn/efm-langserver/issues/98.
     html = { require 'efmls-configs.linters.djlint' },
     -- Configuration: https://github.com/igorshubovych/markdownlint-cli?tab=readme-ov-file#configuration
     markdown = { require 'efmls-configs.linters.markdownlint' },
