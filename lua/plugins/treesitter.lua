@@ -53,13 +53,11 @@ local base_languages = {
     make = 'make',
     markdown = 'markdown',
     markdown_inline = false, -- embedded in markdown, no filetype
-    muttrc = 'muttrc',
     nginx = 'nginx',
     printf = false, -- embedded in c/bash/etc., no filetype
     promql = 'promql',
     ssh_config = 'sshconfig',
     strace = 'strace',
-    tmux = 'tmux',
     toml = 'toml',
     udev = 'udevrules',
     vim = 'vim',
@@ -128,16 +126,6 @@ return {
                 'gotmpl-lang?',
                 function(_, _, bufnr, pred)
                     return vim.b[tonumber(bufnr) or 0].gotmpl_lang == pred[2]
-                end,
-                { force = true, all = false }
-            )
-
-            -- Use b:jinja_lang buffer variable (set in after/ftplugin/jinja.lua)
-            -- as a language to inject into jinja text nodes.
-            require('vim.treesitter.query').add_directive(
-                'set-jinja-lang!',
-                function(_, _, bufnr, _, metadata)
-                    metadata['injection.language'] = vim.b[tonumber(bufnr) or 0].jinja_lang
                 end,
                 { force = true, all = false }
             )
