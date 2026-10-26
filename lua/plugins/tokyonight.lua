@@ -53,14 +53,6 @@ return {
                 hl.GitSignsDeleteInline = hl.GitSignsAddInline
                 -- Added in `jinja.nvim`.
                 hl['@jinja.tag'] = { bg = require('tokyonight.util').blend_bg(c.cyan, 0.15) }
-                -- Added in `codecompanion.lua`.
-                hl.MiniDiffOverContext = { bg = hl.DiffDelete.bg }
-                hl.MiniDiffOverContextBuf = { bg = hl.DiffAdd.bg }
-                hl.MiniDiffOverChange = hl.GitSignsDeleteVirtLnInline
-                hl.MiniDiffOverChangeBuf = { bg = hl.DiffText.bg }
-                hl.MiniDiffSignAdd = hl.GitSignsAdd
-                hl.MiniDiffSignChange = hl.GitSignsChange
-                hl.MiniDiffSignDelete = hl.GitSignsDelete
             end,
         },
         config = function(_, opts)

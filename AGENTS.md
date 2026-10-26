@@ -30,7 +30,6 @@ Standard Neovim config structure plus:
 - `patches/` — Diff patches automatically applied to plugins installed via Lazy.
 - `run_plenary.vim`, `tests/` — Testing with Plenary.
 - `sgconfig.yml`, `.sg/` — Custom ast-grep linting rules.
-- `codecompanion/` — Additional configuration for the CodeCompanion plugin.
 
 ### Tasks
 

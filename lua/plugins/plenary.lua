@@ -9,7 +9,6 @@
 return {
     {
         'nvim-lua/plenary.nvim',
-        branch = 'master', -- Required by olimorris/codecompanion.nvim.
         config = function()
             require 'patch.plenary.PlenaryBusted'
             require 'patch.plenary.path_normalize'

@@ -9,21 +9,6 @@ local function todo_item(sign, icon)
     }
 end
 
-local function cc_header(name, icon)
-    return {
-        pattern = '^## ' .. name .. '$',
-        icon = icon .. '  ',
-        background = 'CodeCompanionInputHeader',
-    }
-end
-
-local function cc_html_tag(icon)
-    return {
-        icon = icon,
-        highlight = 'Comment',
-    }
-end
-
 ---@module 'lazy'
 ---@type LazySpec
 return {
@@ -31,7 +16,7 @@ return {
     version = '*',
     enabled = vim.g.have_nerd_font,
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-    ft = { 'markdown', 'codecompanion' },
+    ft = 'markdown',
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {
@@ -60,41 +45,6 @@ return {
         html = {
             comment = {
                 conceal = false,
-            },
-        },
-        overrides = {
-            filetype = {
-                codecompanion = {
-                    heading = {
-                        custom = {
-                            codecompanion_me = cc_header('Me', ''),
-                            codecompanion_llm = cc_header('CodeCompanion', '󰚩'),
-                            codecompanion_llm_anthropic = cc_header('Anthropic', '󰚩'),
-                            codecompanion_llm_azure_openai = cc_header('Azure OpenAI', '󰚩'),
-                            codecompanion_llm_copilot = cc_header('Copilot', ''),
-                            codecompanion_llm_deepseek = cc_header('DeepSeek', '󰚩'),
-                            codecompanion_llm_gemini = cc_header('Gemini', ''),
-                            codecompanion_llm_githubmodels = cc_header('GitHub Models', '󰊤'),
-                            codecompanion_llm_huggingface = cc_header('Hugging Face', '󰚩'),
-                            codecompanion_llm_mistral = cc_header('Mistral', '󰚩'),
-                            codecompanion_llm_novita = cc_header('Novita', '󰚩'),
-                            codecompanion_llm_ollama = cc_header('Ollama', ''),
-                            codecompanion_llm_openai = cc_header('OpenAI', '󰚩'),
-                            codecompanion_llm_xai = cc_header('xAI', '󰚩'),
-                        },
-                    },
-                    html = {
-                        tag = {
-                            buf = cc_html_tag '',
-                            file = cc_html_tag '󰨸',
-                            help = cc_html_tag '',
-                            image = cc_html_tag '󰥶',
-                            symbols = cc_html_tag '',
-                            tool = cc_html_tag '',
-                            url = cc_html_tag '󰌹',
-                        },
-                    },
-                },
             },
         },
     },
