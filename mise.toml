@@ -1,5 +1,8 @@
+# jdx/mise-action installs only releases older than a day, so a newer one would fail CI.
+min_version = '2026.10.19'
+
 [settings]
-lockfile = true              # DO NOT FORGET TO `touch mise.lock` if mise.lock does not exist!
+lockfile = true # DO NOT FORGET TO `touch mise.lock` if mise.lock does not exist!
 npm.package_manager = 'pnpm' # Avoid .mise/locks/** sidecars required by default aube.
 
 
@@ -10,6 +13,12 @@ pnpm = 'latest'
 'aqua:neovim/neovim' = 'latest'
 
 #--- Format
+# Opinionated Code Formatter.
+prettier = 'latest'
+# A TOML toolkit written in Rust.
+taplo = 'latest'
+# An extensible command line tool or library to format yaml files.
+yamlfmt = 'latest'
 # An opinionated Lua code formatter.
 stylua = 'latest'
 
@@ -33,13 +42,31 @@ description = 'Run all tests'
 depends = ['test:*']
 
 [tasks.default]
-description = 'Run all linters and tests'
-depends = ['lint', 'test']
+description = 'Run all formatters, linters and tests'
+depends = ['fmt', 'lint', 'test']
 
 [tasks.ci]
 description = 'Run all CI tasks'
 depends = ['fmt', 'lint', 'test']
-run = '! git status --porcelain | tee /dev/stderr | grep -q .' # Is working tree clean after fmt?
+# Is working tree clean after fmt?
+run = '! git status --porcelain | tee /dev/stderr | grep -q .'
+
+[tasks.'fmt:markdown']
+description = 'Format markdown files'
+sources = ['**/*.md']
+run = 'prettier --write "**/*.md"'
+
+# Taplo doesn't respect .gitignore.
+[tasks.'fmt:toml']
+description = 'Format TOML files'
+sources = ['**/*.toml']
+env.RUST_LOG = 'warn' # Hide INFO logs of taplo.
+run = "git ls-files -z -co --exclude-standard '*.toml' | xargs -0 -r taplo format"
+
+[tasks.'fmt:yaml']
+description = 'Format YAML files'
+sources = ['**/*.yml', '**/*.yaml']
+run = "git ls-files -z -co --exclude-standard '*.yml' '*.yaml' | xargs -0 -r yamlfmt"
 
 [tasks.'fmt:stylua']
 description = 'Format Lua code'
@@ -48,6 +75,25 @@ run = 'stylua .'
 [tasks.'lint:workflows']
 description = 'Lint GitHub Action workflows'
 run = 'actionlint'
+
+[tasks.'lint:markdown']
+description = 'Lint markdown files'
+wait_for = ['fmt:markdown']
+sources = ['**/*.md']
+run = 'prettier --check "**/*.md"'
+
+[tasks.'lint:toml']
+description = 'Check TOML files formatting'
+wait_for = ['fmt:toml']
+sources = ['**/*.toml']
+env.RUST_LOG = 'warn' # Hide INFO logs of taplo.
+run = "git ls-files -z -co --exclude-standard '*.toml' | xargs -0 -r taplo format --check"
+
+[tasks.'lint:yaml']
+description = 'Check YAML files formatting'
+wait_for = ['fmt:yaml']
+sources = ['**/*.yml', '**/*.yaml']
+run = "git ls-files -z -co --exclude-standard '*.yml' '*.yaml' | xargs -0 -r yamlfmt -lint"
 
 [tasks.'lint:stylua']
 description = 'Check Lua code formatting'
